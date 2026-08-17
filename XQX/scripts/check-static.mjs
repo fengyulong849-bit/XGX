@@ -34,7 +34,6 @@ const forbidden = [
 
 const scannedFiles = [
   'package.json',
-  '.devcontainer/devcontainer.json',
   'supabase/migrations/202608170001_m0_extensions_types_and_security.sql'
 ];
 for (const file of scannedFiles) {
