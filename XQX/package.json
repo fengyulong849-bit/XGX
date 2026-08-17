@@ -1,0 +1,14 @@
+{
+  "name": "xqx",
+  "private": true,
+  "version": "0.1.0",
+  "description": "小确闲 v1 前端原型与 Supabase 后端开发工程",
+  "scripts": {
+    "dev": "npx --yes http-server . -p 4173 -c-1",
+    "check:static": "node scripts/check-static.mjs",
+    "supabase": "npx --yes supabase@latest"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

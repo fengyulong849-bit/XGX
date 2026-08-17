@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · 规则与隐私</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=DMMono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#0A1320;--surface:#142336;--surface-2:#1A2B44;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--amber-2:#F5B14C;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+  --ease:cubic-bezier(.4,.2,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(720px 480px at 10% -6%,rgba(232,163,61,.06),transparent 60%)}
+
+/* ===== 顶栏 ===== */
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(14,26,43,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 24px;z-index:40;gap:14px}
+.topbar .back{background:none;border:1px solid var(--rule-2);color:var(--muted);border-radius:10px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px;transition:all .2s}
+.topbar .back:hover{color:var(--amber);border-color:var(--amber)}
+.topbar .crumb{font-family:var(--serif);font-size:18px;font-weight:600}
+.topbar .crumb i{font-style:italic;color:var(--amber)}
+.topbar .spacer{flex:1}
+.topbar .nav-links{display:flex;gap:2px}
+.topbar .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s}
+.topbar .nav-links a:hover{color:var(--ink);background:var(--surface)}
+
+/* ===== 布局 ===== */
+.layout{position:relative;z-index:1;display:flex;margin-top:56px;min-height:calc(100vh - 56px)}
+
+/* ===== 左侧锚点导航 ===== */
+.side-nav{width:220px;flex-shrink:0;padding:32px 24px;border-right:1px solid var(--rule);position:sticky;top:56px;align-self:flex-start;max-height:calc(100vh - 56px);overflow-y:auto}
+.side-nav h3{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--tertiary);margin-bottom:16px;text-transform:uppercase;letter-spacing:.08em}
+.side-nav ul{list-style:none;display:flex;flex-direction:column;gap:2px}
+.side-nav a{display:block;padding:10px 14px;border-radius:10px;color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;transition:all .2s;border-left:2px solid transparent}
+.side-nav a:hover{color:var(--ink);background:var(--surface)}
+.side-nav a.active{color:var(--amber);background:var(--surface);border-left-color:var(--amber);font-weight:600}
+.side-nav .side-footer{margin-top:24px;padding-top:20px;border-top:1px solid var(--rule)}
+.side-nav .side-footer a{display:block;padding:6px 14px;font-size:12px;color:var(--tertiary);border-left:none}
+.side-nav .side-footer a:hover{color:var(--blue)}
+
+/* ===== 主内容 ===== */
+.content{flex:1;padding:48px 40px 80px;max-width:860px}
+.content-header{margin-bottom:48px}
+.content-header .eyebrow{font-family:var(--serif);font-style:italic;font-size:15px;color:var(--amber);margin-bottom:8px;display:block}
+.content-header h1{font-family:var(--serif);font-size:clamp(32px,4vw,44px);font-weight:600;margin-bottom:12px}
+.content-header p{font-size:15px;color:var(--muted);max-width:560px}
+
+/* ===== 规则卡片 ===== */
+.rule-card{background:var(--surface);border:1px solid var(--rule);border-radius:18px;padding:32px;margin-bottom:20px;position:relative;overflow:hidden;scroll-margin-top:80px}
+.rule-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad);opacity:.6}
+.rule-card.highlight{border-left:3px solid var(--amber)}
+.rule-card h2{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;gap:10px}
+.rule-card h2 .num{font-family:var(--mono);font-size:14px;color:var(--tertiary);font-weight:500}
+.rule-card.highlight h2::after{content:'⚠️ 重要';font-family:var(--mono);font-size:11px;color:var(--rose);background:rgba(217,122,108,.12);padding:3px 10px;border-radius:999px;margin-left:8px}
+.rule-card p{font-size:14px;color:var(--muted);line-height:1.85;margin-bottom:12px}
+.rule-card p:last-child{margin-bottom:0}
+.rule-card strong{color:var(--ink);font-weight:600}
+.rule-card ul{list-style:none;padding:0;margin:12px 0}
+.rule-card ul li{font-size:14px;color:var(--muted);padding:8px 0 8px 20px;position:relative;line-height:1.7}
+.rule-card ul li::before{content:'—';position:absolute;left:0;color:var(--tertiary)}
+.rule-card .tag-list{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.rule-card .tag-list .tag{background:var(--bg-2);border:1px solid var(--rule);color:var(--muted);font-size:12px;padding:4px 12px;border-radius:999px;font-family:var(--mono)}
+
+/* ===== 底部 CTA ===== */
+.cta-section{text-align:center;padding:48px 32px;margin-top:40px}
+.cta-section h3{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:8px}
+.cta-section p{color:var(--muted);font-size:14px;margin-bottom:24px}
+.cta-section .cta-links{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+/* ===== 移动端 ===== */
+@media(max-width:880px){
+  .layout{flex-direction:column}
+  .side-nav{width:100%;position:static;max-height:none;border-right:none;border-bottom:1px solid var(--rule);padding:20px 16px}
+  .side-nav h3{margin-bottom:10px}
+  .side-nav ul{flex-direction:row;flex-wrap:wrap;gap:4px}
+  .side-nav a{padding:6px 12px;font-size:12px;border-left:none;border-radius:999px}
+  .side-nav a.active{border-left:none;background:rgba(232,163,61,.12)}
+  .side-nav .side-footer{display:none}
+  .content{padding:32px 20px 64px}
+  .rule-card{padding:24px 20px}
+}
+
+/* ===== 无障碍 / 降级 ===== */
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition-duration:.01ms!important}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back" onclick="history.back()">← 返回</button>
+  <span class="crumb">规则与<i>隐私</i></span>
+  <div class="spacer"></div>
+  <nav class="nav-links">
+    <a href="P1_首页.html">首页</a>
+    <a href="P2_捏脸DIY.html">捏脸</a>
+    <a href="P3_释怀仪式.html">释怀</a>
+    <a href="P4_个人中心.html">我的</a>
+  </nav>
+</div>
+
+<div class="layout">
+
+  <!-- 左侧锚点导航 -->
+  <nav class="side-nav" id="sideNav">
+    <h3>规则导航</h3>
+    <ul>
+      <li><a href="#content" data-target="content">内容规则</a></li>
+      <li><a href="#anon" data-target="anon">匿名口径</a></li>
+      <li><a href="#retention" data-target="retention">15 天保存规则</a></li>
+      <li><a href="#points" data-target="points">积分规则</a></li>
+      <li><a href="#sensitive" data-target="sensitive">敏感词处理</a></li>
+      <li><a href="#account" data-target="account">账号与注销</a></li>
+    </ul>
+    <div class="side-footer">
+      <a href="P5_找回密码.html">找回密码 →</a>
+      <a href="P1_首页.html">返回首页 →</a>
+    </div>
+  </nav>
+
+  <!-- 主内容 -->
+  <main class="content">
+
+    <div class="content-header">
+      <span class="eyebrow">规则与隐私</span>
+      <h1>小确闲，怎么玩才算<br><span style="font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent">对自己好一点</span></h1>
+      <p>一份清晰的规则说明。我们希望小确闲是一个安全、匿名、温柔的空间，让你可以放心地发泄、释怀。</p>
+    </div>
+
+    <!-- 内容规则 -->
+    <div class="rule-card" id="content">
+      <h2><span class="num">01</span> 内容规则</h2>
+      <p>每天最多发布 <strong>3 条</strong>公开吐槽，每条 <strong>1–50 字纯文本</strong>。</p>
+      <p>不设评论、私信、关注与排行榜，只保留共鸣。允许正常负面情绪，禁止以下内容：</p>
+      <div class="tag-list">
+        <span class="tag">违法违规</span>
+        <span class="tag">威胁恐吓</span>
+        <span class="tag">隐私泄露</span>
+        <span class="tag">歧视仇恨</span>
+        <span class="tag">色情低俗</span>
+        <span class="tag">诈骗营销</span>
+        <span class="tag">严重伤害性内容</span>
+      </div>
+    </div>
+
+    <!-- 匿名口径 -->
+    <div class="rule-card highlight" id="anon">
+      <h2><span class="num">02</span> 匿名口径</h2>
+      <p>吐槽不显示账号、昵称或头像，<strong>全站匿名</strong>。</p>
+      <p>为保护匿名性，<strong>禁止填写</strong>以下可识别信息：</p>
+      <ul>
+        <li>手机号、邮箱、微信号、身份证号</li>
+        <li>详细地址、工号、企业内部标识</li>
+        <li>任何可定位到具体个人的信息</li>
+      </ul>
+      <p>涉及具体对象请用 <strong>"某领导""某同事""某公司"</strong> 代称。系统会对可疑内容进行检测与拦截。</p>
+    </div>
+
+    <!-- 15 天保存规则 -->
+    <div class="rule-card highlight" id="retention">
+      <h2><span class="num">03</span> 15 天保存规则</h2>
+      <p>吐槽从发布起 <strong>15 天自然渐隐</strong>：</p>
+      <ul>
+        <li>卡片装饰（边框、光影）逐渐变淡</li>
+        <li>正文始终可读，不做模糊处理</li>
+        <li>满 15 天后静默消失并删除</li>
+      </ul>
+      <p>删除后 <strong>不提醒、不发积分、不留记录</strong>。释怀仪式可在 15 天内主动销毁自己的吐槽。</p>
+    </div>
+
+    <!-- 积分规则 -->
+    <div class="rule-card" id="points">
+      <h2><span class="num">04</span> 积分规则</h2>
+      <p>积分是陪伴你的小确幸，可以解锁更多功能。以下是积分获取方式：</p>
+      <ul>
+        <li><strong>每日签到</strong>：+100（含随机惊喜，大/中/小惊喜额外 +50/+20/+10）</li>
+        <li><strong>签到里程碑</strong>：连续 3 天 +100，7 天 +300，14 天 +600，之后每 7 天 +300</li>
+        <li><strong>吐槽入墙</strong>：+50（每日限 3 条）</li>
+        <li><strong>共鸣（点击者）</strong>：+10（每日前 10 次）</li>
+        <li><strong>共鸣（作者）</strong>：+10（待领取，一次收下）</li>
+        <li><strong>释怀销毁</strong>：+100（需发布满 24 小时且不跳过）</li>
+        <li><strong>喝水提醒</strong>：+20（每日前 6 次）</li>
+        <li><strong>久坐提醒</strong>：+30（每日前 4 次）</li>
+        <li><strong>复活领导</strong>：-500（每次倒地复活）</li>
+      </ul>
+      <p class="footnote" style="font-size:12px;color:var(--tertiary);margin-top:16px">所有数值由服务端配置，上线两周后据真实行为调整。</p>
+    </div>
+
+    <!-- 敏感词处理 -->
+    <div class="rule-card" id="sensitive">
+      <h2><span class="num">05</span> 敏感词处理</h2>
+      <p>前端即时反馈 + 服务端复检，双重保护：</p>
+      <ul>
+        <li><strong>前端预检</strong>：输入时实时检测，命中即时提示修改</li>
+        <li><strong>服务端复检</strong>：入库硬门槛，浏览器无法绕过</li>
+        <li><strong>发布后审核</strong>：违规内容将被静默删除，不通知发布者</li>
+      </ul>
+      <p>如果你发现了违规内容，可以通过反馈渠道告诉我们。</p>
+    </div>
+
+    <!-- 账号与注销 -->
+    <div class="rule-card highlight" id="account">
+      <h2><span class="num">06</span> 账号与注销</h2>
+      <p>我们采用 <strong>极简账号体系</strong>，不收集多余信息：</p>
+      <ul>
+        <li>账号仅由 <strong>账号 + 密码 + 恢复码</strong> 组成</li>
+        <li>不绑定手机、邮箱、昵称、头像</li>
+        <li>恢复码与密码同时丢失将 <strong>无法找回</strong></li>
+      </ul>
+      <p><strong>注销账号</strong>：注销后个人数据按规则删除，公开吐槽立即销毁，<strong>且无法恢复</strong>。请谨慎操作。</p>
+    </div>
+
+    <!-- 底部 CTA -->
+    <div class="cta-section">
+      <h3>了解了，开始玩吧</h3>
+      <p>希望你在这里，偶尔能轻一点</p>
+      <div class="cta-links">
+        <a href="P1_首页.html" style="background:var(--grad);color:var(--bg);border:none;font-weight:700;font-size:14px;padding:12px 28px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block;box-shadow:0 6px 18px rgba(232,163,61,.25);transition:all .2s">回到首页 →</a>
+        <a href="P5_找回密码.html" style="background:transparent;border:1px solid var(--rule-2);color:var(--ink);font-weight:500;font-size:14px;padding:12px 28px;border-radius:999px;cursor:pointer;text-decoration:none;display:inline-block;transition:all .2s">找回密码</a>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+/* ============ 锚点高亮 ============ */
+const sections = document.querySelectorAll('.rule-card, .content-header');
+const navLinks = document.querySelectorAll('#sideNav a');
+
+const observer = new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      const id = entry.target.id;
+      if(id){
+        navLinks.forEach(l=>{
+          l.classList.toggle('active', l.dataset.target===id);
+        });
+      }
+    }
+  });
+},{rootMargin:'-80px 0px -60% 0px'});
+
+sections.forEach(s=>observer.observe(s));
+
+/* ============ 点击平滑滚动 ============ */
+navLinks.forEach(link=>{
+  link.addEventListener('click',(e)=>{
+    const id = link.dataset.target;
+    const target = document.getElementById(id);
+    if(target){
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+  });
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · P2 捏脸DIY（3D人物）</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=DMMono:wght@400;500&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
+</script>
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#0A1320;--surface:#142336;--surface-2:#1A2B44;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+  --ease:cubic-bezier(.4,.2,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(14,26,43,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 24px;z-index:40;gap:14px}
+.topbar .back{background:none;border:1px solid var(--rule-2);color:var(--muted);border-radius:10px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px;transition:all .2s}
+.topbar .back:hover{color:var(--amber);border-color:var(--amber)}
+.topbar .crumb{font-family:var(--serif);font-size:18px;font-weight:600}
+.topbar .crumb i{font-style:italic;color:var(--amber)}
+.topbar .spacer{flex:1}
+.topbar .pts{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--rule);padding:7px 14px;border-radius:999px}
+.topbar .pts b{color:var(--amber)}
+
+.main{position:fixed;top:56px;bottom:72px;left:0;right:0;display:flex}
+
+/* 左：3D 摄影棚 */
+.studio{flex:0 0 60%;background:radial-gradient(ellipse 70% 60% at 50% 30%,rgba(232,163,61,.10),transparent 65%),var(--bg-2);position:relative;border-right:1px solid var(--rule);overflow:hidden}
+#three-canvas{display:block;width:100%;height:100%;cursor:grab}
+#three-canvas:active{cursor:grabbing}
+.studio-hint{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:13px;color:var(--tertiary);z-index:5;pointer-events:none}
+.rotate-ring{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(20,35,54,.8);backdrop-filter:blur(12px);border:1px solid var(--rule);border-radius:999px;padding:8px 16px;font-size:12px;color:var(--muted);z-index:5}
+.rotate-ring .dot{width:6px;height:6px;border-radius:50%;background:var(--calm);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.rotate-ring button{background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12px;padding:2px 8px;border-radius:6px}
+.rotate-ring button:hover{color:var(--amber);background:rgba(232,163,61,.1)}
+.rotate-ring button.on{color:var(--amber)}
+
+/* 右：配置面板 */
+.config{flex:1;background:var(--bg);overflow-y:auto;padding:20px 22px 24px}
+.config::-webkit-scrollbar{width:6px}
+.config::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:3px}
+.cfg-head{margin-bottom:16px}
+.cfg-head h3{font-family:var(--serif);font-size:20px;font-weight:600}
+.cfg-head p{font-size:12px;color:var(--muted);margin-top:2px}
+.dim-list{display:flex;flex-direction:column;gap:8px}
+.dim{background:var(--surface);border:1px solid var(--rule);border-left:3px solid transparent;border-radius:12px;overflow:hidden;transition:all .2s var(--ease)}
+.dim.active{border-left-color:var(--amber);background:var(--surface-2)}
+.dim-head{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;user-select:none}
+.dim-head .di{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .2s}
+.dim.active .dim-head .di{background:rgba(232,163,61,.15)}
+.dim-head .dn{font-size:14px;font-weight:600;color:var(--ink)}
+.dim-head .dv{font-size:12px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.dim.active .dim-head .dv{color:var(--amber)}
+.dim-head .chev{color:var(--tertiary);font-size:12px;transition:transform .2s}
+.dim.active .dim-head .chev{transform:rotate(90deg);color:var(--amber)}
+.dim-body{max-height:0;overflow:hidden;transition:max-height .3s var(--ease)}
+.dim.active .dim-body{max-height:220px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;padding:0 15px 15px}
+.opt{background:rgba(255,255,255,.03);border:1px solid var(--rule);border-radius:10px;padding:9px 14px;cursor:pointer;font:inherit;font-size:13px;color:var(--muted);transition:all .15s var(--ease);display:flex;align-items:center;gap:7px}
+.opt:hover{border-color:var(--rule-2);color:var(--ink)}
+.opt.sel{background:rgba(232,163,61,.12);border-color:var(--amber);color:var(--amber);font-weight:600}
+.opt .sw{width:16px;height:16px;border-radius:5px;border:1px solid var(--rule-2)}
+
+.actionbar{position:fixed;bottom:0;left:0;right:0;height:72px;background:rgba(14,26,43,.92);backdrop-filter:blur(18px);border-top:1px solid var(--rule);display:flex;align-items:center;gap:12px;padding:0 24px;z-index:40}
+.actionbar .ab-info{font-size:12px;color:var(--muted);margin-right:auto}
+.actionbar .ab-info b{color:var(--ink);font-family:var(--serif)}
+.btn-ghost2{background:transparent;border:1px solid var(--rule-2);color:var(--ink);font:inherit;font-weight:500;font-size:14px;padding:11px 20px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:center;gap:7px}
+.btn-ghost2:hover{border-color:var(--amber);color:var(--amber)}
+.btn-primary2{background:var(--grad);border:none;color:var(--bg);font:inherit;font-weight:700;font-size:14px;padding:11px 28px;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(232,163,61,.25);transition:all .2s var(--ease);display:flex;align-items:center;gap:7px}
+.btn-primary2:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(232,163,61,.35)}
+
+@media(max-width:880px){.main{flex-direction:column}.studio{flex:0 0 42%}.config{flex:1}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back">← 返回</button>
+  <span class="crumb">捏出<i>你的领导</i></span>
+  <div class="spacer"></div>
+  <div class="pts">积分 <b>300</b></div>
+</div>
+
+<div class="main">
+  <div class="studio">
+    <div class="studio-hint">拖动可 360° 旋转 · 滚轮缩放</div>
+    <canvas id="three-canvas"></canvas>
+    <div class="rotate-ring">
+      <span class="dot"></span>
+      <button class="on" id="autoBtn">自动旋转</button>
+      <span style="color:var(--tertiary)">|</span>
+      <button id="resetBtn">复位</button>
+    </div>
+  </div>
+
+  <div class="config">
+    <div class="cfg-head">
+      <h3>八维捏脸</h3>
+      <p>实时驱动 3D 模型 · 当前维度高亮</p>
+    </div>
+    <div class="dim-list" id="dimList"></div>
+  </div>
+</div>
+
+<div class="actionbar">
+  <div class="ab-info"><b>暴躁打工人 · 领导</b> · 已自动保存</div>
+  <button class="btn-ghost2" id="randBtn">🎲 随机一位</button>
+  <button class="btn-ghost2" id="defBtn">恢复默认</button>
+  <button class="btn-ghost2">复制分享链接</button>
+  <button class="btn-primary2" id="saveBtn">保存领导</button>
+</div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== 配置 =====
+const DIMS=[
+  {key:'face',icon:'😊',name:'脸型',opts:['圆脸','方脸','长脸']},
+  {key:'hair',icon:'💇',name:'发型',opts:['背头','中分','寸头','地中海']},
+  {key:'glasses',icon:'👓',name:'眼镜',opts:['无','圆框','方框']},
+  {key:'beard',icon:'🧔',name:'胡子',opts:['无','八字胡','络腮']},
+  {key:'expr',icon:'😤',name:'表情',opts:['微笑','皱眉','惊讶','生气']},
+  {key:'suit',icon:'👔',name:'西装',opts:['深蓝','黑','灰','棕'],swatch:['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F']},
+  {key:'belly',icon:'🫃',name:'基础肚子',opts:['标准','微胖','发福']},
+  {key:'skin',icon:'🤚',name:'肤色',opts:['白','黄','棕','黑'],swatch:['#F0C8A0','#E8B98A','#D4A574','#9C7B5A']},
+];
+let cfg={face:0,hair:0,glasses:1,beard:0,expr:3,suit:0,belly:0,skin:1};
+let activeDim='face';
+const SKINS=[0xF0C8A0,0xE8B98A,0xD4A574,0x9C7B5A];
+const SUITS=[0x2E3A4A,0x1A1A1A,0x4A4A4A,0x3D2E1F];
+
+// ===== Three.js 初始化 =====
+const canvas=document.getElementById('three-canvas');
+const scene=new THREE.Scene();
+scene.background=null;
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+camera.position.set(0,2.6,9);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.05;
+
+function resize(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+window.addEventListener('resize',resize);
+
+// 灯光：摄影棚
+scene.add(new THREE.AmbientLight(0x3A4A66,0.55));
+const key=new THREE.SpotLight(0xFFE0B0,2.2,30,Math.PI/5,0.4,1.5);
+key.position.set(2,9,6);key.castShadow=true;
+key.shadow.mapSize.set(1024,1024);key.shadow.bias=-0.0005;
+scene.add(key);
+const rim=new THREE.DirectionalLight(0x6B9FD4,0.9);
+rim.position.set(-4,5,-5);scene.add(rim);
+const fill=new THREE.DirectionalLight(0xE8A33D,0.35);
+fill.position.set(4,2,4);scene.add(fill);
+
+// 地面（接收阴影）
+const ground=new THREE.Mesh(new THREE.CircleGeometry(6,48),new THREE.ShadowMaterial({opacity:0.45}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-1.6;ground.receiveShadow=true;
+scene.add(ground);
+// 底座圆盘
+const base=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.4,0.18,48),new THREE.MeshStandardMaterial({color:0x1A2536,roughness:.7,metalness:.2}));
+base.position.y=-1.5;base.receiveShadow=true;scene.add(base);
+const baseRing=new THREE.Mesh(new THREE.TorusGeometry(2.2,0.04,12,48),new THREE.MeshStandardMaterial({color:0xE8A33D,emissive:0xE8A33D,emissiveIntensity:0.4}));
+baseRing.position.y=-1.4;baseRing.rotation.x=-Math.PI/2;scene.add(baseRing);
+
+const charGroup=new THREE.Group();
+scene.add(charGroup);
+
+const darkMat=()=>new THREE.MeshStandardMaterial({color:0x15131A,roughness:.55});
+
+// ===== 构建角色 =====
+function disposeGroup(g){g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});while(g.children.length)g.remove(g.children[0])}
+
+function buildChar(){
+  disposeGroup(charGroup);
+  const skin=new THREE.MeshStandardMaterial({color:SKINS[cfg.skin],roughness:.65});
+  const suit=new THREE.MeshStandardMaterial({color:SUITS[cfg.suit],roughness:.82});
+  const dark=new THREE.MeshStandardMaterial({color:0x15131A,roughness:.5});
+  const tieM=new THREE.MeshStandardMaterial({color:0xE8A33D,roughness:.4,metalness:.15});
+  const colM=new THREE.MeshStandardMaterial({color:0xEDE8DD,roughness:.6});
+
+  const fs=[[1,1,1],[1.06,1.16,1.04],[.88,1.32,.88]][cfg.face]; // 脸型缩放
+  const bl=[1,1.14,1.3][cfg.belly]; // 肚子
+
+  // 头
+  const head=new THREE.Mesh(new THREE.SphereGeometry(1,32,32),skin);
+  head.scale.set(fs[0],fs[1],fs[2]);head.position.y=2.5;head.castShadow=true;charGroup.add(head);
+  // 耳
+  const eg=new THREE.SphereGeometry(.2,16,16);
+  const eL=new THREE.Mesh(eg,skin);eL.scale.set(.5,1.1,.5);eL.position.set(-fs[0]*.98,2.5,0);
+  const eR=eL.clone();eR.position.x=fs[0]*.98;charGroup.add(eL,eR);
+  // 脖
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.34,.42,.55,20),skin);
+  neck.position.y=1.7;charGroup.add(neck);
+  // 身体
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.78,1.0,2.1,28),suit);
+  body.scale.x=bl;body.position.y=.55;body.castShadow=true;charGroup.add(body);
+  // 肚子球（发福时）
+  if(cfg.belly>0){const belly=new THREE.Mesh(new THREE.SphereGeometry(.7*bl,24,24),suit);belly.position.set(0,.3,.35);belly.scale.set(1,.9,.7);charGroup.add(belly);}
+  // 领口
+  const collar=new THREE.Mesh(new THREE.ConeGeometry(.5,.55,4),colM);
+  collar.position.y=1.6;collar.rotation.y=Math.PI/4;charGroup.add(collar);
+  // 领带
+  const tie=new THREE.Mesh(new THREE.ConeGeometry(.16,.85,4),tieM);
+  tie.position.y=1.05;tie.rotation.y=Math.PI/4;charGroup.add(tie);
+  // 手臂
+  const ag=new THREE.CapsuleGeometry(.22,1.3,8,14);
+  const aL=new THREE.Mesh(ag,suit);aL.position.set(-(0.82+bl*0.22),.7,0);aL.rotation.z=0.18;aL.castShadow=true;
+  const aR=aL.clone();aR.position.x=(0.82+bl*0.22);aR.rotation.z=-0.18;charGroup.add(aL,aR);
+  // 手
+  const hg=new THREE.SphereGeometry(.26,16,16);
+  const hL=new THREE.Mesh(hg,skin);hL.position.set(-(0.82+bl*0.22),-.05,0);
+  const hR=hL.clone();hR.position.x=(0.82+bl*0.22);charGroup.add(hL,hR);
+
+  // 眼睛
+  const eyeG=new THREE.SphereGeometry(.1,12,12);
+  const eyeY=2.62, eyeZ=fs[2]*.86;
+  const eyL=new THREE.Mesh(eyeG,dark);eyL.position.set(-.36*fs[0],eyeY,eyeZ);
+  const eyR=eyL.clone();eyR.position.x=.36*fs[0];charGroup.add(eyL,eyR);
+  // 眼白高光
+  const hlG=new THREE.SphereGeometry(.03,8,8);
+  const hl=new THREE.Mesh(hlG,new THREE.MeshBasicMaterial({color:0xffffff}));
+  hl.position.set(-.33*fs[0],eyeY+.04,eyeZ+.07);
+  const hl2=hl.clone();hl2.position.x=.39*fs[0];charGroup.add(hl,hl2);
+
+  // 眉毛（按表情）
+  const browG=new THREE.BoxGeometry(.32,.05,.05);
+  const browY=eyeY+.28;
+  const bL=new THREE.Mesh(browG,dark);const bR=new THREE.Mesh(browG,dark);
+  bL.position.set(-.36*fs[0],browY,eyeZ);bR.position.set(.36*fs[0],browY,eyeZ);
+  if(cfg.expr===0){bL.rotation.z=.1;bR.rotation.z=-.1;}
+  else if(cfg.expr===1){bL.rotation.z=-.18;bL.position.y=browY-.04;bR.rotation.z=.18;bR.position.y=browY-.04;}
+  else if(cfg.expr===2){bL.position.y=browY+.1;bR.position.y=browY+.1;bL.rotation.z=.05;bR.rotation.z=-.05;}
+  else{bL.rotation.z=-.35;bR.rotation.z=.35;bL.position.y=browY+.02;bR.position.y=browY+.02;}
+  charGroup.add(bL,bR);
+
+  // 嘴（按表情）
+  const mY=2.28;
+  if(cfg.expr===0){const m=new THREE.Mesh(new THREE.TorusGeometry(.18,.04,8,16,Math.PI),dark);m.position.set(0,mY,eyeZ);m.rotation.z=Math.PI;charGroup.add(m);}
+  else if(cfg.expr===1){const m=new THREE.Mesh(new THREE.BoxGeometry(.34,.06,.05),dark);m.position.set(0,mY,eyeZ);charGroup.add(m);}
+  else if(cfg.expr===2){const m=new THREE.Mesh(new THREE.SphereGeometry(.1,12,12),dark);m.position.set(0,mY-.02,eyeZ);charGroup.add(m);}
+  else{const m=new THREE.Mesh(new THREE.TorusGeometry(.18,.04,8,16,Math.PI),dark);m.position.set(0,mY,eyeZ);charGroup.add(m);}
+
+  // 头发
+  if(cfg.hair===0){ // 背头
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.03,28,28,0,Math.PI*2,0,Math.PI*0.52),dark);
+    h.scale.set(fs[0],fs[1]*1.05,fs[2]);h.position.y=2.5;charGroup.add(h);
+  } else if(cfg.hair===1){ // 中分
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.04,28,28,0,Math.PI*2,0,Math.PI*0.5),dark);
+    h.scale.set(fs[0],fs[1],fs[2]);h.position.y=2.5;charGroup.add(h);
+    const part=new THREE.Mesh(new THREE.BoxGeometry(.06,1.0,1.0),new THREE.MeshStandardMaterial({color:0x0A0A0A}));
+    part.position.y=2.8;part.position.z=fs[2]*.5;charGroup.add(part);
+  } else if(cfg.hair===2){ // 寸头
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.01,28,28,0,Math.PI*2,0,Math.PI*0.38),dark);
+    h.scale.set(fs[0],fs[1],fs[2]);h.position.y=2.5;charGroup.add(h);
+  } else { // 地中海：环
+    const ring=new THREE.Mesh(new THREE.TorusGeometry(.95,.16,14,32),dark);
+    ring.position.y=2.95;ring.rotation.x=Math.PI/2;ring.scale.set(fs[0],1,fs[2]);charGroup.add(ring);
+  }
+
+  // 眼镜
+  if(cfg.glasses>0){
+    const frame=new THREE.Group();
+    if(cfg.glasses===1){ // 圆框
+      const lg=new THREE.TorusGeometry(.3,.045,10,24);
+      const l1=new THREE.Mesh(lg,dark);l1.position.set(-.36*fs[0],eyeY,eyeZ);
+      const l2=l1.clone();l2.position.x=.36*fs[0];
+      frame.add(l1,l2);
+    } else { // 方框
+      const mk=(x)=>{const g=new THREE.Group();const s=.3;const t=.05;
+        const a=new THREE.Mesh(new THREE.BoxGeometry(s*2,t,t),dark);a.position.y=s;
+        const b=a.clone();b.position.y=-s;
+        const c=new THREE.Mesh(new THREE.BoxGeometry(t,s*2,t),dark);c.position.x=-s;
+        const d=c.clone();d.position.x=s;
+        g.add(a,b,c,d);g.position.set(x,eyeY,eyeZ);return g};
+      frame.add(mk(-.36*fs[0]),mk(.36*fs[0]));
+    }
+    const bridge=new THREE.Mesh(new THREE.BoxGeometry(.28*fs[0],.04,.04),dark);
+    bridge.position.set(0,eyeY,eyeZ);frame.add(bridge);
+    charGroup.add(frame);
+  }
+
+  // 胡子
+  if(cfg.beard===1){ // 八字胡
+    const m=new THREE.Mesh(new THREE.TorusGeometry(.2,.05,8,16,Math.PI*1.1),dark);
+    m.position.set(0,mY-.06,eyeZ);m.rotation.z=-Math.PI*1.05;charGroup.add(m);
+  } else if(cfg.beard===2){ // 络腮
+    const bg=new THREE.SphereGeometry(.78,24,20,0,Math.PI*2,Math.PI*0.55,Math.PI*0.45);
+    const beard=new THREE.Mesh(bg,dark);beard.scale.set(fs[0],fs[1]*.95,fs[2]);beard.position.y=2.42;charGroup.add(beard);
+  }
+
+  // 腮红
+  const blushM=new THREE.MeshBasicMaterial({color:0xD97A6C,transparent:true,opacity:.4});
+  const blG=new THREE.SphereGeometry(.14,12,12);
+  const bl1=new THREE.Mesh(blG,blushM);bl1.position.set(-.62*fs[0],2.36,eyeZ*.7);bl1.scale.set(1,1,.3);
+  const bl2=bl1.clone();bl2.position.x=.62*fs[0];charGroup.add(bl1,bl2);
+}
+
+// 控制器
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.dampingFactor=0.08;
+controls.enablePan=false;controls.minDistance=5;controls.maxDistance=14;
+controls.minPolarAngle=Math.PI*0.2;controls.maxPolarAngle=Math.PI*0.62;
+controls.autoRotate=true;controls.autoRotateSpeed=1.2;
+controls.target.set(0,1.2,0);
+
+document.getElementById('autoBtn').addEventListener('click',function(){controls.autoRotate=!controls.autoRotate;this.classList.toggle('on',controls.autoRotate)});
+document.getElementById('resetBtn').addEventListener('click',()=>{camera.position.set(0,2.6,9);controls.target.set(0,1.2,0);controls.update()});
+
+function animate(){requestAnimationFrame(animate);controls.update();renderer.render(scene,camera)}
+resize();buildChar();animate();
+new ResizeObserver(resize).observe(canvas);
+
+// ===== 配置面板 =====
+const list=document.getElementById('dimList');
+DIMS.forEach(dim=>{
+  const card=document.createElement('div');
+  card.className='dim'+(dim.key===activeDim?' active':'');
+  card.dataset.key=dim.key;
+  const optsHtml=dim.opts.map((o,i)=>{
+    const sw=dim.swatch?`<span class="sw" style="background:${dim.swatch[i]}"></span>`:'';
+    return `<div class="opt" data-idx="${i}">${sw}${o}</div>`;
+  }).join('');
+  card.innerHTML=`<div class="dim-head"><div class="di">${dim.icon}</div><div class="dn">${dim.name}</div><div class="dv">${dim.opts[cfg[dim.key]]}</div><div class="chev">›</div></div><div class="dim-body"><div class="opts">${optsHtml}</div></div>`;
+  card.querySelector('.dim-head').addEventListener('click',()=>{activeDim=dim.key;document.querySelectorAll('.dim').forEach(d=>d.classList.toggle('active',d.dataset.key===activeDim))});
+  card.querySelectorAll('.opt').forEach((o,i)=>o.addEventListener('click',()=>{cfg[dim.key]=i;card.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));o.classList.add('sel');buildChar();syncDV()}));
+  list.appendChild(card);
+});
+function syncDV(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;const dim=DIMS.find(x=>x.key===k);d.querySelector('.dv').textContent=dim.opts[cfg[k]]})}
+function syncSel(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;d.querySelectorAll('.opt').forEach((o,i)=>o.classList.toggle('sel',i===cfg[k]))})}
+syncSel();
+
+document.getElementById('randBtn').addEventListener('click',()=>{DIMS.forEach(d=>cfg[d.key]=Math.floor(Math.random()*d.opts.length));syncSel();syncDV();buildChar()});
+const DEF={face:0,hair:0,glasses:1,beard:0,expr:3,suit:0,belly:0,skin:1};
+document.getElementById('defBtn').addEventListener('click',()=>{cfg={...DEF};syncSel();syncDV();buildChar()});
+document.getElementById('saveBtn').addEventListener('click',function(){this.textContent='已保存 ✓';setTimeout(()=>this.textContent='保存领导',1500)});
+</script>
+</body>
+</html>

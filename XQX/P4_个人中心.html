@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · 个人中心</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=DMMono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#0A1320;--surface:#142336;--surface-2:#1A2B44;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--amber-2:#F5B14C;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+  --ease:cubic-bezier(.4,.2,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(720px 480px at 10% -6%,rgba(232,163,61,.08),transparent 60%),radial-gradient(680px 460px at 95% 8%,rgba(107,159,212,.08),transparent 60%)}
+
+/* ===== 顶栏 ===== */
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(14,26,43,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 24px;z-index:40;gap:14px}
+.topbar .back{background:none;border:1px solid var(--rule-2);color:var(--muted);border-radius:10px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px;transition:all .2s}
+.topbar .back:hover{color:var(--amber);border-color:var(--amber)}
+.topbar .crumb{font-family:var(--serif);font-size:18px;font-weight:600}
+.topbar .crumb i{font-style:italic;color:var(--amber)}
+.topbar .spacer{flex:1}
+.topbar .nav-links{display:flex;gap:2px}
+.topbar .nav-links a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s}
+.topbar .nav-links a:hover{color:var(--ink);background:var(--surface)}
+.topbar .pts{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--rule);padding:7px 14px;border-radius:999px}
+.topbar .pts b{color:var(--amber)}
+
+/* ===== 主布局 ===== */
+.main{position:relative;z-index:1;margin-top:56px;padding:32px 24px 64px;max-width:900px;margin-left:auto;margin-right:auto}
+
+/* ===== 概览卡 ===== */
+.overview{background:var(--surface);border:1px solid var(--rule);border-radius:22px;padding:28px 32px;margin-bottom:28px;display:flex;align-items:center;gap:32px;box-shadow:0 8px 32px rgba(0,0,0,.3);position:relative;overflow:hidden}
+.overview::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.overview .avatar-big{width:72px;height:72px;border-radius:50%;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:28px;font-weight:700;flex-shrink:0;box-shadow:0 0 24px rgba(232,163,61,.3)}
+.overview .info{flex:1}
+.overview .info .name{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:4px}
+.overview .info .meta{font-size:13px;color:var(--muted)}
+.overview .points-block{text-align:right}
+.overview .points-block .label{font-size:12px;color:var(--tertiary);margin-bottom:4px}
+.overview .points-block .value{font-family:var(--mono);font-size:42px;font-weight:700;color:var(--amber);line-height:1}
+.overview .points-block .today{font-size:12px;color:var(--calm);margin-top:6px}
+.overview .streak-badge{position:absolute;top:16px;right:24px;background:rgba(111,179,168,.15);border:1px solid var(--calm);color:var(--calm);font-size:12px;padding:4px 12px;border-radius:999px;font-family:var(--mono)}
+
+/* ===== Tab 导航 ===== */
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--rule);margin-bottom:24px}
+.tab{background:none;border:none;color:var(--tertiary);font:inherit;font-size:14px;font-weight:500;padding:12px 20px;cursor:pointer;position:relative;transition:color .2s}
+.tab:hover{color:var(--ink)}
+.tab.active{color:var(--amber);font-weight:600}
+.tab.active::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:2px;background:var(--grad);border-radius:1px}
+
+/* ===== Tab 内容 ===== */
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+/* 积分明细 */
+.timeline{display:flex;flex-direction:column;gap:8px}
+.tl-item{display:flex;align-items:center;gap:16px;padding:14px 18px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;transition:all .2s}
+.tl-item:hover{border-color:var(--rule-2)}
+.tl-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tl-icon.plus{background:rgba(111,179,168,.15);color:var(--calm)}
+.tl-icon.minus{background:rgba(217,122,108,.15);color:var(--rose)}
+.tl-content{flex:1}
+.tl-content .title{font-size:14px;font-weight:500;margin-bottom:2px}
+.tl-content .time{font-size:12px;color:var(--tertiary);font-family:var(--mono)}
+.tl-amount{font-family:var(--mono);font-size:18px;font-weight:700}
+.tl-amount.plus{color:var(--calm)}
+.tl-amount.minus{color:var(--rose)}
+
+/* 我的吐槽 */
+.rant-list{display:flex;flex-direction:column;gap:12px}
+.rant-item{background:var(--surface);border:1px solid var(--rule);border-radius:16px;padding:20px 22px;position:relative}
+.rant-item .rant-text{font-family:var(--serif);font-size:17px;line-height:1.7;margin-bottom:10px}
+.rant-item .rant-meta{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--tertiary)}
+.rant-item .rant-meta .tag{font-family:var(--mono);padding:2px 10px;border-radius:999px;font-size:11px}
+.rant-item .rant-meta .tag.done{background:rgba(111,179,168,.15);color:var(--calm)}
+.rant-item .rant-meta .tag.fading{background:rgba(232,163,61,.15);color:var(--amber-2)}
+.rant-item .rant-rewards{display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--rule)}
+.rant-item .rant-rewards .reward-info{font-size:13px;color:var(--muted)}
+.rant-item .rant-rewards .reward-info b{color:var(--amber);font-family:var(--mono)}
+.rant-item .rant-rewards .claim-btn{margin-left:auto;background:rgba(232,163,61,.12);border:1px solid var(--amber);color:var(--amber);font:inherit;font-weight:600;font-size:12px;padding:6px 14px;border-radius:999px;cursor:pointer;transition:all .2s}
+.rant-item .rant-rewards .claim-btn:hover{background:rgba(232,163,61,.2)}
+.rant-item .rant-rewards .claim-btn.done{background:var(--calm);border-color:var(--calm);color:var(--bg)}
+.empty-state{text-align:center;padding:60px 20px;color:var(--tertiary)}
+.empty-state .icon{font-size:48px;margin-bottom:16px;display:block}
+.empty-state .text{font-size:14px}
+.empty-state a{color:var(--amber);text-decoration:none;font-weight:500}
+
+/* 签到记录 */
+.calendar-card{background:var(--surface);border:1px solid var(--rule);border-radius:18px;padding:28px}
+.cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.cal-head .month{font-family:var(--serif);font-size:20px;font-weight:600}
+.cal-head .nav-btns{display:flex;gap:6px}
+.cal-head .nav-btns button{background:transparent;border:1px solid var(--rule);color:var(--muted);width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.cal-head .nav-btns button:hover{color:var(--amber);border-color:var(--amber)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:20px}
+.cal-grid .dow{text-align:center;font-size:11px;color:var(--tertiary);font-family:var(--mono);padding:8px 0}
+.cal-grid .day{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--muted);border-radius:10px;position:relative}
+.cal-grid .day.signed{background:rgba(232,163,61,.12);color:var(--amber);font-weight:600}
+.cal-grid .day.signed::after{content:'';position:absolute;bottom:3px;width:4px;height:4px;border-radius:50%;background:var(--amber)}
+.cal-grid .day.today{border:1px solid var(--amber)}
+.cal-grid .day.future{opacity:.3}
+.cal-grid .day.empty{visibility:hidden}
+.milestones{display:flex;gap:12px;flex-wrap:wrap}
+.milestone{flex:1;min-width:140px;background:var(--bg);border:1px solid var(--rule);border-radius:12px;padding:14px 16px}
+.milestone .m-label{font-size:12px;color:var(--tertiary);margin-bottom:6px}
+.milestone .m-value{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--calm)}
+.milestone .m-desc{font-size:11px;color:var(--muted);margin-top:4px}
+.milestone.locked .m-value{color:var(--tertiary)}
+.milestone.achieved .m-value{color:var(--amber)}
+.streak-info{margin-top:20px;padding:16px;background:var(--bg);border:1px solid var(--rule);border-radius:12px;font-size:13px;color:var(--muted)}
+.streak-info b{color:var(--amber)}
+
+/* 账号管理 */
+.account-section{display:flex;flex-direction:column;gap:12px}
+.account-item{display:flex;align-items:center;gap:18px;padding:20px 24px;background:var(--surface);border:1px solid var(--rule);border-radius:16px;transition:all .2s}
+.account-item:hover{border-color:var(--rule-2)}
+.account-item .ai-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.account-item .ai-icon.blue{background:rgba(107,159,212,.15);color:var(--blue)}
+.account-item .ai-icon.amber{background:rgba(232,163,61,.15);color:var(--amber)}
+.account-item .ai-icon.rose{background:rgba(217,122,108,.15);color:var(--rose)}
+.account-item .ai-content{flex:1}
+.account-item .ai-content .ai-title{font-size:15px;font-weight:600;margin-bottom:3px}
+.account-item .ai-content .ai-desc{font-size:12px;color:var(--muted)}
+.account-item .ai-arrow{color:var(--tertiary);font-size:14px}
+.account-item.danger{border-color:rgba(217,122,108,.3)}
+.account-item.danger .ai-content .ai-title{color:var(--rose)}
+
+/* ===== 响应式 ===== */
+@media(max-width:640px){
+  .topbar{padding:0 12px}
+  .topbar .nav-links{display:none}
+  .main{padding:20px 16px 48px}
+  .overview{flex-direction:column;text-align:center;gap:16px;padding:24px 20px}
+  .overview .points-block{text-align:center}
+  .overview .streak-badge{position:static;margin-top:8px}
+  .tl-item{padding:12px 14px}
+  .milestones{flex-direction:column}
+}
+
+/* ===== 弹窗（设计系统） ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;animation:maskIn .3s ease-out}
+.modal-mask.show{display:flex}
+@keyframes maskIn{from{opacity:0}to{opacity:1}}
+.modal-card{position:relative;background:var(--surface);border:1px solid var(--rule-2);border-radius:22px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,.4);animation:modalPop .3s cubic-bezier(.2,1.2,.4,1);overflow:hidden}
+@keyframes modalPop{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--tertiary);font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:5}
+.modal-close:hover{color:var(--ink);background:var(--surface-2)}
+.modal-body{padding:32px 28px 24px}
+.modal-title{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:6px}
+.modal-title i{font-style:italic;color:var(--amber)}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn-primary{flex:1;padding:12px 24px;font-size:14px}
+.modal-actions .btn-ghost{flex:1;padding:12px 24px;font-size:14px}
+.recovery-display{background:var(--bg);border:1px dashed var(--amber);border-radius:12px;padding:14px;margin:16px 0;font-family:var(--mono);font-size:14px;color:var(--amber);text-align:center;word-break:break-all;letter-spacing:.08em}
+.recovery-actions{display:flex;gap:8px;justify-content:center;margin-bottom:12px}
+.recovery-actions button{background:transparent;border:1px solid var(--rule-2);color:var(--muted);font:inherit;font-size:12px;padding:6px 14px;border-radius:999px;cursor:pointer;transition:all .2s}
+.recovery-actions button:hover{color:var(--amber);border-color:var(--amber)}
+.modal-pwd-field{margin-bottom:14px}
+.modal-pwd-field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px}
+.modal-pwd-field input{width:100%;background:var(--bg);border:1px solid var(--rule);border-radius:12px;padding:11px 14px;color:var(--ink);font:inherit;font-size:14px;outline:none;transition:border-color .2s}
+.modal-pwd-field input:focus{border-color:var(--amber)}
+.warn-icon{font-size:52px;text-align:center;display:block;margin-bottom:12px}
+
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media(max-width:640px){.modal-card{max-width:calc(100vw - 32px)}.modal-body{padding:24px 20px 20px}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back" onclick="history.back()">← 返回</button>
+  <span class="crumb">我的<i>小确闲</i></span>
+  <div class="spacer"></div>
+  <nav class="nav-links">
+    <a href="P1_首页.html">首页</a>
+    <a href="P2_捏脸DIY.html">捏脸</a>
+    <a href="P3_释怀仪式.html">释怀</a>
+    <a href="P6_规则与隐私.html">规则</a>
+  </nav>
+  <div class="pts">积分 <b>1,250</b></div>
+</div>
+
+<div class="main">
+
+  <!-- 概览卡 -->
+  <div class="overview">
+    <div class="avatar-big">领</div>
+    <div class="info">
+      <div class="name">暴躁打工人</div>
+      <div class="meta">牛马编号 · 已注册 12 天</div>
+    </div>
+    <div class="streak-badge">🔥 连续签到 7 天</div>
+    <div class="spacer" style="flex:1"></div>
+    <div class="points-block">
+      <div class="label">积分余额</div>
+      <div class="value">1,250</div>
+      <div class="today">今日 +130</div>
+    </div>
+  </div>
+
+  <!-- Tab 导航 -->
+  <div class="tabs">
+    <button class="tab active" data-tab="points">积分明细</button>
+    <button class="tab" data-tab="rants">我的吐槽</button>
+    <button class="tab" data-tab="calendar">签到记录</button>
+    <button class="tab" data-tab="account">账号管理</button>
+  </div>
+
+  <!-- Tab: 积分明细 -->
+  <div class="tab-panel active" id="tab-points">
+    <div class="timeline" id="timeline">
+      <!-- JS 动态生成 -->
+    </div>
+  </div>
+
+  <!-- Tab: 我的吐槽 -->
+  <div class="tab-panel" id="tab-rants">
+    <div class="rant-list" id="rantList">
+      <!-- JS 动态生成 -->
+    </div>
+  </div>
+
+  <!-- Tab: 签到记录 -->
+  <div class="tab-panel" id="tab-calendar">
+    <div class="calendar-card">
+      <div class="cal-head">
+        <div class="month" id="calMonth">2026 年 8 月</div>
+        <div class="nav-btns">
+          <button onclick="changeMonth(-1)">‹</button>
+          <button onclick="changeMonth(1)">›</button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calGrid"></div>
+      <div class="milestones">
+        <div class="milestone achieved">
+          <div class="m-label">连续 3 天</div>
+          <div class="m-value">+100</div>
+          <div class="m-desc">已达成</div>
+        </div>
+        <div class="milestone achieved">
+          <div class="m-label">连续 7 天</div>
+          <div class="m-value">+300</div>
+          <div class="m-desc">已达成</div>
+        </div>
+        <div class="milestone">
+          <div class="m-label">连续 14 天</div>
+          <div class="m-value">+600</div>
+          <div class="m-desc">还差 7 天</div>
+        </div>
+        <div class="milestone locked">
+          <div class="m-label">之后每 7 天</div>
+          <div class="m-value">+300</div>
+          <div class="m-desc">持续签到</div>
+        </div>
+      </div>
+      <div class="streak-info">
+        <b>当前连续签到 7 天</b> · 昨天断签了，今天重新开始，没关系。明天记得来哦～
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab: 账号管理 -->
+  <div class="tab-panel" id="tab-account">
+    <div class="account-section">
+      <div class="account-item" onclick="openModal('modal-changepwd')">
+        <div class="ai-icon blue">🔒</div>
+        <div class="ai-content">
+          <div class="ai-title">修改密码</div>
+          <div class="ai-desc">建议定期更换，不要使用真实工号或常用密码</div>
+        </div>
+        <div class="ai-arrow">›</div>
+      </div>
+      <div class="account-item" onclick="openModal('modal-recovery')">
+        <div class="ai-icon amber">🔑</div>
+        <div class="ai-content">
+          <div class="ai-title">查看恢复码</div>
+          <div class="ai-desc">丢失密码时使用，恢复码与密码同时丢失将无法找回</div>
+        </div>
+        <div class="ai-arrow">›</div>
+      </div>
+      <div class="account-item danger" onclick="openModal('modal-delete')">
+        <div class="ai-icon rose">⚠️</div>
+        <div class="ai-content">
+          <div class="ai-title">注销账号</div>
+          <div class="ai-desc">注销后个人数据按规则删除，公开吐槽立即销毁，且无法恢复</div>
+        </div>
+        <div class="ai-arrow">›</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ============ 弹窗：修改密码 ============ -->
+<div class="modal-mask" id="modal-changepwd" role="dialog" aria-modal="true" aria-label="修改密码" onclick="closeModalOnMask(event,'modal-changepwd')">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-changepwd')">×</button>
+    <div class="modal-body">
+      <div class="modal-title">修改<i>密码</i></div>
+      <div class="modal-sub">设置新密码后，旧恢复码作废并生成新的恢复码。</div>
+      <div class="modal-pwd-field">
+        <label>当前密码</label>
+        <input type="password" id="pwd-old" placeholder="输入当前密码" autocomplete="current-password">
+      </div>
+      <div class="modal-pwd-field">
+        <label>新密码</label>
+        <input type="password" id="pwd-new" placeholder="8–32 位，字母/数字/符号任两类" maxlength="32" autocomplete="new-password">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal('modal-changepwd')">取消</button>
+        <button class="btn-primary" onclick="doChangePwd()">确认修改</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：查看恢复码 ============ -->
+<div class="modal-mask" id="modal-recovery" role="dialog" aria-modal="true" aria-label="查看恢复码" onclick="closeModalOnMask(event,'modal-recovery')">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-recovery')">×</button>
+    <div class="modal-body">
+      <div class="modal-title">你的<i>恢复码</i></div>
+      <div class="modal-sub">恢复码是你找回密码的唯一凭证，丢失无法找回。请勿截图分享给他人。</div>
+      <div class="recovery-display" id="recovery-display">XQX-R3C0V-7XK2M-9P4N</div>
+      <div class="recovery-actions">
+        <button onclick="copyRecovery()">📋 复制</button>
+        <button onclick="downloadRecovery()">💾 下载</button>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="closeModal('modal-recovery')">我已安全保存</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 弹窗：注销确认 ============ -->
+<div class="modal-mask" id="modal-delete" role="dialog" aria-modal="true" aria-label="注销账号确认" onclick="closeModalOnMask(event,'modal-delete')">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-delete')">×</button>
+    <div class="modal-body">
+      <span class="warn-icon">⚠️</span>
+      <div class="modal-title" style="text-align:center">确认注销账号？</div>
+      <div class="modal-sub" style="text-align:center">注销后个人数据按规则删除，公开吐槽立即销毁，<b style="color:var(--rose)">且无法恢复</b>。请谨慎操作。</div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeModal('modal-delete')">再想想</button>
+        <button class="btn-primary" style="background:var(--rose);box-shadow:0 6px 18px rgba(217,122,108,.3)" onclick="confirmDelete()">确认注销</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ============ Tab 切换 ============ */
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('tab-'+tab.dataset.tab).classList.add('active');
+  });
+});
+
+/* ============ 积分明细 ============ */
+const transactions = [
+  {icon:'🫶',type:'plus',title:'共鸣收到 · 点赞我的吐槽',time:'今天 14:32',amount:10},
+  {icon:'✅',type:'plus',title:'每日签到',time:'今天 09:15',amount:100},
+  {icon:'💧',type:'plus',title:'喝水打卡',time:'今天 10:30',amount:20},
+  {icon:'✍️',type:'plus',title:'吐槽入墙',time:'昨天 21:04',amount:50},
+  {icon:'🫂',type:'plus',title:'共鸣点击 · 为他人点赞',time:'昨天 18:22',amount:10},
+  {icon:'🐾',type:'plus',title:'戳一戳领导',time:'昨天 15:40',amount:10},
+  {icon:'🗒️',type:'minus',title:'复活领导',time:'前天 11:18',amount:500},
+  {icon:'🌬️',type:'plus',title:'释怀 · 风吹散',time:'3 天前 22:30',amount:100},
+  {icon:'⌛',type:'plus',title:'久坐提醒',time:'3 天前 15:00',amount:30},
+  {icon:'🎉',type:'plus',title:'注册欢迎赠送',time:'12 天前',amount:300},
+];
+
+function renderTimeline(){
+  const tl = document.getElementById('timeline');
+  tl.innerHTML = transactions.map(t=>`
+    <div class="tl-item">
+      <div class="tl-icon ${t.type}">${t.icon}</div>
+      <div class="tl-content">
+        <div class="title">${t.title}</div>
+        <div class="time">${t.time}</div>
+      </div>
+      <div class="tl-amount ${t.type}">${t.type==='plus'?'+':''}${t.amount}</div>
+    </div>
+  `).join('');
+}
+renderTimeline();
+
+/* ============ 我的吐槽 ============ */
+const myRants = [
+  {text:'"今晚就给"听了第八遍，改到凌晨两点',age:2,votes:47,claimed:true,status:'done'},
+  {text:'需求文档只改了名字，内容没变，还说"这是新版本"',age:5,votes:23,claimed:true,status:'fading'},
+  {text:'周五下午三点布置新需求，问能不能周一给——周末没了',age:1,votes:88,claimed:false,status:'done'},
+];
+
+function renderRants(){
+  const list = document.getElementById('rantList');
+  if(myRants.length===0){
+    list.innerHTML = `<div class="empty-state"><span class="icon">📭</span><div class="text">还没发布过吐槽，<a href="P1_首页.html">去墙上看一眼？</a></div></div>`;
+    return;
+  }
+  list.innerHTML = myRants.map((r,i)=>`
+    <div class="rant-item">
+      <div class="rant-text">${r.text}</div>
+      <div class="rant-meta">
+        <span class="tag ${r.status==='done'?'done':'fading'}">${r.status==='done'?'已释怀':'淡忘中'}</span>
+        <span>发布 ${r.age} 天前</span>
+        <span>🫶 ${r.votes} 共鸣</span>
+      </div>
+      ${r.claimed ? `
+        <div class="rant-rewards">
+          <div class="reward-info">已收下 <b>+${r.votes*10}</b> 积分</div>
+          <button class="claim-btn done" disabled>已收下</button>
+        </div>
+      ` : `
+        <div class="rant-rewards">
+          <div class="reward-info">新增 <b>${r.votes}</b> 条共鸣，收下可得 <b>+${r.votes*10}</b> 积分</div>
+          <button class="claim-btn" onclick="claimReward(${i})">收下共鸣</button>
+        </div>
+      `}
+    </div>
+  `).join('');
+}
+
+function claimReward(i){
+  myRants[i].claimed = true;
+  renderRants();
+  toast(`+${myRants[i].votes*10} 积分已到账`,'calm');
+}
+
+/* ============ 日历 ============ */
+let calYear=2026, calMonth=8;
+const signedDays = [1,2,3,4,5,6,7,9,10,11,12]; // 已签到的日期
+
+function renderCalendar(){
+  document.getElementById('calMonth').textContent = `${calYear} 年 ${calMonth} 月`;
+  const grid = document.getElementById('calGrid');
+  const dows = ['日','一','二','三','四','五','六'];
+  let html = dows.map(d=>`<div class="dow">${d}</div>`).join('');
+
+  const firstDay = new Date(calYear, calMonth-1, 1).getDay();
+  const daysInMonth = new Date(calYear, calMonth, 0).getDate();
+  const today = new Date();
+
+  for(let i=0; i<firstDay; i++){
+    html += '<div class="day empty"></div>';
+  }
+  for(let d=1; d<=daysInMonth; d++){
+    const isSigned = signedDays.includes(d);
+    const isToday = today.getFullYear()===calYear && today.getMonth()===calMonth-1 && today.getDate()===d;
+    const isFuture = (today.getFullYear()===calYear && today.getMonth()===calMonth-1 && d>today.getDate()) || (calYear>today.getFullYear() || (calYear===today.getFullYear()&&calMonth>today.getMonth()+1));
+    let cls = 'day';
+    if(isSigned) cls += ' signed';
+    if(isToday) cls += ' today';
+    if(isFuture) cls += ' future';
+    html += `<div class="${cls}">${d}</div>`;
+  }
+  grid.innerHTML = html;
+}
+
+function changeMonth(delta){
+  calMonth += delta;
+  if(calMonth<1){calMonth=12;calYear--;}
+  if(calMonth>12){calMonth=1;calYear++;}
+  renderCalendar();
+}
+renderCalendar();
+
+/* ============ 弹窗管理 ============ */
+function openModal(id){
+  const m=document.getElementById(id);
+  if(!m)return;
+  m.classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeModal(id){
+  const m=document.getElementById(id);
+  if(!m)return;
+  m.classList.remove('show');
+  if(!document.querySelector('.modal-mask.show'))document.body.style.overflow='';
+}
+function closeModalOnMask(e,id){
+  if(e.target.classList.contains('modal-mask'))closeModal(id);
+}
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){
+    document.querySelectorAll('.modal-mask.show').forEach(m=>m.classList.remove('show'));
+    document.body.style.overflow='';
+  }
+});
+
+/* ============ 修改密码 ============ */
+function doChangePwd(){
+  const oldPwd=document.getElementById('pwd-old').value;
+  const newPwd=document.getElementById('pwd-new').value;
+  if(!oldPwd){toast('请输入当前密码','rose');return}
+  if(newPwd.length<8){toast('新密码至少 8 位','rose');return}
+  let types=0;
+  if(/[a-zA-Z]/.test(newPwd))types++;
+  if(/[0-9]/.test(newPwd))types++;
+  if(/[^a-zA-Z0-9]/.test(newPwd))types++;
+  if(types<2){toast('新密码需包含字母/数字/符号中的任两类','rose');return}
+  document.getElementById('pwd-old').value='';
+  document.getElementById('pwd-new').value='';
+  closeModal('modal-changepwd');
+  toast('密码已修改，新恢复码已生成','calm');
+}
+
+/* ============ 恢复码 ============ */
+function copyRecovery(){
+  const code=document.getElementById('recovery-display').textContent;
+  navigator.clipboard.writeText(code).then(()=>toast('恢复码已复制','calm'));
+}
+function downloadRecovery(){
+  const code=document.getElementById('recovery-display').textContent;
+  const blob=new Blob(['小确闲恢复码\n'+code+'\n请妥善保存，丢失无法找回'],{type:'text/plain'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='小确闲_恢复码.txt';a.click();
+  URL.revokeObjectURL(url);
+  toast('恢复码已下载','calm');
+}
+
+/* ============ 注销确认 ============ */
+function confirmDelete(){
+  closeModal('modal-delete');
+  toast('注销功能需服务端对接，暂为演示','amber');
+}
+
+/* ============ Toast ============ */
+function toast(msg,type='amber'){
+  const el = document.createElement('div');
+  el.style.cssText = `position:fixed;top:80px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:999;background:${type==='calm'?'rgba(111,179,168,.15)':type==='rose'?'rgba(217,122,108,.15)':'rgba(232,163,61,.15)'};color:${type==='calm'?'var(--calm)':type==='rose'?'var(--rose)':'var(--amber)'};border:1px solid ${type==='calm'?'var(--calm)':type==='rose'?'var(--rose)':'var(--amber)'};backdrop-filter:blur(12px);transition:all .3s;opacity:0`;
+  el.textContent = msg;
+  document.body.appendChild(el);
+  requestAnimationFrame(()=>{el.style.opacity='1';el.style.transform='translateX(-50%) translateY(4px)';});
+  setTimeout(()=>{el.style.opacity='0';setTimeout(()=>el.remove(),300);},2500);
+}
+</script>
+
+</body>
+</html>

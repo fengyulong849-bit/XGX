@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · 前端设计界面说明书</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&family=DMMono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#142336;--surface:#1A2B44;--surface-2:#213452;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.75;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(720px 480px at 8% -6%,rgba(232,163,61,.08),transparent 60%),radial-gradient(680px 460px at 96% 6%,rgba(107,159,212,.10),transparent 60%)}
+.wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:56px 32px 80px}
+h1,h2,h3,h4{font-family:var(--serif);font-weight:600;letter-spacing:.01em}
+h1{font-size:38px;line-height:1.2;margin-bottom:8px}
+h2{font-size:27px;margin-top:56px;margin-bottom:6px;padding-bottom:10px;border-bottom:1px solid var(--rule-2)}
+h3{font-size:21px;margin-top:32px;margin-bottom:10px;color:var(--amber)}
+h4{font-size:17px;margin-top:20px;margin-bottom:8px;color:var(--blue)}
+p{margin-bottom:10px;color:var(--muted)}
+.meta{font-family:var(--mono);font-size:13px;color:var(--tertiary);margin-bottom:32px}
+.lead{font-size:16px;color:var(--ink);margin-bottom:24px;line-height:1.8}
+ul{margin:6px 0 14px 4px;list-style:none}
+li{margin-bottom:6px;color:var(--muted);padding-left:18px;position:relative}
+li::before{content:'·';position:absolute;left:4px;color:var(--amber)}
+code,.tk{font-family:var(--mono);font-size:13px;background:var(--surface);padding:2px 7px;border-radius:6px;color:var(--amber)}
+/* 文案块：可调整的语句 */
+.copy{background:var(--surface);border:1px solid var(--rule);border-left:3px solid var(--amber);border-radius:10px;padding:14px 18px;margin:12px 0 18px}
+.copy .c-label{font-family:var(--mono);font-size:11px;color:var(--tertiary);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.copy .c-line{margin-bottom:7px}
+.copy .c-line:last-child{margin-bottom:0}
+.copy .c-key{color:var(--blue);font-size:13px;font-weight:600}
+.copy .c-val{color:var(--ink);font-size:14px}
+.copy .c-note{color:var(--tertiary);font-size:12px;font-style:italic;font-family:var(--serif)}
+.tag{display:inline-block;font-family:var(--mono);font-size:11px;padding:3px 10px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.tag.try{background:rgba(232,163,61,.15);color:var(--amber)}
+.tag.login{background:rgba(107,159,212,.15);color:var(--blue)}
+.card{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px 20px;margin:14px 0}
+.swatch{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.swatch .sw{width:64px;height:54px;border-radius:10px;display:flex;align-items:flex-end;padding:6px;font-family:var(--mono);font-size:9px;color:rgba(255,255,255,.7)}
+.toc{background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:18px 24px;margin:24px 0}
+.toc a{color:var(--blue);text-decoration:none;font-size:14px}
+.toc a:hover{color:var(--amber)}
+.toc ul{columns:2;gap:24px}
+.toc li::before{content:'›';color:var(--amber)}
+.divider{height:1px;background:var(--rule);margin:40px 0}
+hr{border:none;border-top:1px solid var(--rule);margin:32px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>小确闲 · 前端设计界面说明书</h1>
+<div class="meta">主题：深夜蓝 + 暖琥珀 + 衬线（Marble 骨架）　|　v1.0　|　2026-08-14　|　覆盖 6 页 + 5 弹窗</div>
+<p class="lead">本文件锁定界面主题与各页布局，并逐页列出全部界面文案（标 <span class="tk">文案</span> 的琥珀色边块）。所有语句均可直接调整，改完交开发套用即可。</p>
+
+<div class="toc">
+<strong style="font-family:var(--serif);font-size:16px">目录</strong>
+<ul>
+<li><a href="#sys">一、设计系统（锁定主题）</a></li>
+<li><a href="#p1">P1 首页</a></li>
+<li><a href="#p2">P2 捏脸DIY</a></li>
+<li><a href="#p3">P3 释怀仪式</a></li>
+<li><a href="#p4">P4 个人中心</a></li>
+<li><a href="#p5">P5 找回密码</a></li>
+<li><a href="#p6">P6 规则与隐私</a></li>
+<li><a href="#modal">弹窗 ×5</a></li>
+</ul>
+</div>
+
+<!-- ============ 设计系统 ============ -->
+<h2 id="sys">一、设计系统（锁定主题）</h2>
+<h3>主题定位</h3>
+<p>深夜蓝负责治愈降躁，暖琥珀负责情绪宣泄的火气。衬线标题让节奏慢下来，呼应"五分钟治愈站"的定位，避免销售感与低幼感。</p>
+
+<h4>色彩 Token</h4>
+<div class="swatch">
+<div class="sw" style="background:#0E1A2B">bg</div>
+<div class="sw" style="background:#1A2B44">surface</div>
+<div class="sw" style="background:#213452">surface-2</div>
+<div class="sw" style="background:#EDE8DD;color:#0E1A2B">ink</div>
+<div class="sw" style="background:#E8A33D">amber</div>
+<div class="sw" style="background:#D97A6C">rose</div>
+<div class="sw" style="background:#6B9FD4">blue</div>
+<div class="sw" style="background:#6FB3A8">calm</div>
+</div>
+<ul>
+<li><span class="tk">--bg #0E1A2B</span> 深夜蓝底　<span class="tk">--ink #EDE8DD</span> 暖米白正文</li>
+<li><span class="tk">--amber #E8A33D</span> 主强调（发泄火气 / CTA / 积分）　<span class="tk">--rose #D97A6C</span> 烦躁/危险</li>
+<li><span class="tk">--blue #6B9FD4</span> 信息辅色（共鸣/链接）　<span class="tk">--calm #6FB3A8</span> 承受值/签到/成功</li>
+<li><span class="tk">--grad</span> = amber→rose，用于标题强调字、主按钮、稀有度条</li>
+</ul>
+
+<h4>字体 · 圆角 · 组件</h4>
+<ul>
+<li>标题：<span class="tk">EB Garamond + 思源宋体</span>（衬线，斜体强调）　正文：<span class="tk">Inter + 思源黑体</span>　数据：<span class="tk">DMMono</span></li>
+<li>圆角：卡片 18–24px / 按钮 999px 胶囊 / 输入 14px</li>
+<li>按钮：主按钮 amber→rose 渐变 + 暖光阴影；次按钮透明描边；幽灵按钮仅文字</li>
+<li>卡片：surface 底 + rule 描边 + 暖色阴影分层；顶部可加 2px 渐变条</li>
+<li>弹窗：磨砂遮罩 + 居中卡 + 顶部渐变条 + scale 进出 300ms</li>
+<li>状态条 pill：承受=calm / 烦躁=amber / 胖度=amber-2 / 脏度=muted</li>
+</ul>
+
+<hr>
+
+<!-- ============ P1 首页 ============ -->
+<h2 id="p1">P1 首页（主页）</h2>
+<h3>定位</h3>
+<p>试用与登录共用的核心页。首屏桌宠在前，吐槽释怀紧随，不做纯营销落地页。承载桌宠互动、倒计时、签到、吐槽墙、释怀入口、关怀提醒。</p>
+<h3>布局</h3>
+<ul>
+<li>顶部：浮动胶囊导航（Logo + 链接 + 下班倒计时胶囊 + 登录/试玩按钮）</li>
+<li>Hero：衬线大标题 + 副标题 + 双 CTA</li>
+<li>桌宠收藏卡：全息卡牌框 + SVG 手办 + 稀有度 + 四状态条 + 四动作</li>
+<li>签到紧凑条 + 柔和吐槽流跑马灯 + 吐槽墙网格 + 释怀三选一 + 关怀提醒</li>
+</ul>
+
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">导航</div>
+<div class="c-line"><span class="c-key">Logo：</span><span class="c-val">小确闲</span></div>
+<div class="c-line"><span class="c-key">导航链接：</span><span class="c-val">桌宠 / 吐槽墙 / 释怀 / 积分</span></div>
+<div class="c-line"><span class="c-key">倒计时胶囊：</span><span class="c-val">下班还有 02:14:30</span></div>
+<div class="c-line"><span class="c-key">按钮（试用态）：</span><span class="c-val">免费试玩</span>　<span class="c-note">登录态显示头像</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">Hero 区</div>
+<div class="c-line"><span class="c-key">眉标：</span><span class="c-val">打工人的五分钟治愈站</span></div>
+<div class="c-line"><span class="c-key">主标题：</span><span class="c-val">捏捏领导，释怀一下</span></div>
+<div class="c-line"><span class="c-key">副标题：</span><span class="c-val">不是又一个让你更高效的工具。而是一个让你慢下来、发泄一下、然后轻一点的地方。</span></div>
+<div class="c-line"><span class="c-key">主按钮：</span><span class="c-val">开始捏领导</span>　<span class="c-key">次按钮：</span><span class="c-val">看看吐槽墙</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">桌宠收藏卡</div>
+<div class="c-line"><span class="c-key">稀有度：</span><span class="c-val">★★★ 试玩版</span>　<span class="c-key">编号：</span><span class="c-val">领导系列 #001</span></div>
+<div class="c-line"><span class="c-key">名条：</span><span class="c-val">暴躁打工人 · 领导</span></div>
+<div class="c-line"><span class="c-key">名条副：</span><span class="c-val">"再改一版，今晚就给"</span> <span class="c-note">（自定义捏脸后显示用户给的名字/口头禅）</span></div>
+<div class="c-line"><span class="c-key">状态标签：</span><span class="c-val">承受 / 烦躁 / 胖度 / 脏度</span></div>
+<div class="c-line"><span class="c-key">动作按钮：</span><span class="c-val">戳一下 / 拍一拍 / 喂食 / 扔东西</span></div>
+<div class="c-line"><span class="c-key">动作气泡（戳）：</span><span class="c-val">嗯？</span>　<span class="c-key">（拍）：</span><span class="c-val">别拍了！</span>　<span class="c-key">（喂）：</span><span class="c-val">嗝～</span>　<span class="c-key">（扔）：</span><span class="c-val">好臭…</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">签到紧凑条</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">每日签到</span></div>
+<div class="c-line"><span class="c-key">副：</span><span class="c-val">连续 5 天 · 下个里程碑 7 天</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">签到领惊喜</span> <span class="c-note">（已签到显示"明日再来"）</span></div>
+<div class="c-line"><span class="c-key">签到结果（普通）：</span><span class="c-val">签到成功 +100</span></div>
+<div class="c-line"><span class="c-key">签到结果（惊喜）：</span><span class="c-val">今天运气不错 +X</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">吐槽墙</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">吐槽墙 · 匿名心声，15 天温柔淡出</span></div>
+<div class="c-line"><span class="c-key">信号流眉标：</span><span class="c-val">此刻，有人在说</span> <span class="c-key">副：</span><span class="c-val">匿名心声，温柔滚动</span></div>
+<div class="c-line"><span class="c-key">换一批：</span><span class="c-val">换一批 ↻</span></div>
+<div class="c-line"><span class="c-key">发布入口（登录态）：</span><span class="c-val">我也要吐槽</span> <span class="c-note">（试用态灰显"登录后可发布"）</span></div>
+<div class="c-line"><span class="c-key">卡片时间：</span><span class="c-val">X 小时前 / X 天前</span></div>
+<div class="c-line"><span class="c-key">共鸣按钮：</span><span class="c-val">🫶 X</span> <span class="c-note">（试用态置灰，hover 提示"登录后可共鸣"）</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">释怀入口</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">释怀仪式 · 把烦心事，亲手销毁</span></div>
+<div class="c-line"><span class="c-key">副：</span><span class="c-val">写下来，选一种方式，看着它消失。满 24 小时 +100 积分。</span></div>
+<div class="c-line"><span class="c-key">三卡：</span><span class="c-val">风吹散 / 揉成团 / 碎纸机</span></div>
+<div class="c-line"><span class="c-key">三卡副：</span><span class="c-val">化作粒子随风而去 / 攥紧揉皱抛掉 / 切成条带了断</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">关怀提醒</div>
+<div class="c-line"><span class="c-key">喝水提醒：</span><span class="c-val">该喝水啦</span>　<span class="c-key">副：</span><span class="c-val">距上次 60 分钟</span>　<span class="c-key">按钮：</span><span class="c-val">喝好啦</span> +20</div>
+<div class="c-line"><span class="c-key">久坐提醒：</span><span class="c-val">起来动一动</span>　<span class="c-key">副：</span><span class="c-val">久坐 45 分钟</span>　<span class="c-key">按钮：</span><span class="c-val">活动好啦</span> +30</div>
+<div class="c-line"><span class="c-key">倒计时下班后共情文案（随机）：</span></div>
+<div class="c-line"><span class="c-val">今天的班下完了，还在卷？抱抱自己</span></div>
+<div class="c-line"><span class="c-val">已经过下班时间了，对自己好一点</span></div>
+<div class="c-line"><span class="c-val">这么晚还在？摸会儿鱼吧</span></div>
+</div>
+
+<h3>状态差异</h3>
+<ul>
+<li><span class="tag try">试用态</span> 预置领导、吐槽墙只读、共鸣/发布置灰、释怀入口显示宣传动画、签到/提醒隐藏或预览</li>
+<li><span class="tag login">登录态</span> 自有领导、全功能开放、签到/提醒激活</li>
+</ul>
+
+<hr>
+
+<!-- ============ P2 捏脸DIY ============ -->
+<h2 id="p2">P2 捏脸DIY</h2>
+<h3>定位</h3>
+<p>登录后权益。8 维捏脸配置驱动 SVG，支持随机/默认/保存/同步/分享。首次注册赠送一次免费捏脸（满血新领导）。</p>
+<h3>布局</h3>
+<ul>
+<li>左侧：360° 实时预览舞台（桌宠自转 + 鼠标接管）</li>
+<li>右侧：8 维配置面板（滑块/选项组）+ 随机/默认/保存按钮 + 分享链接</li>
+</ul>
+
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">页头</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">捏出你的领导</span></div>
+<div class="c-line"><span class="c-key">副：</span><span class="c-val">八维随心调，他归你管。</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">八维配置标签</div>
+<div class="c-line"><span class="c-val">脸型 / 发型 / 眼镜 / 胡子 / 表情 / 西装 / 基础肚子 / 肤色</span></div>
+<div class="c-line"><span class="c-key">眼镜、胡子含"无"选项</span></div>
+<div class="c-line"><span class="c-note">基础肚子与动态胖度分离</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">操作按钮</div>
+<div class="c-line"><span class="c-key">随机生成：</span><span class="c-val">🎲 随机一位</span></div>
+<div class="c-line"><span class="c-key">恢复默认：</span><span class="c-val">恢复默认</span></div>
+<div class="c-line"><span class="c-key">保存：</span><span class="c-val">保存领导</span> <span class="c-note">（自动保存，跨账号同步）</span></div>
+<div class="c-line"><span class="c-key">分享：</span><span class="c-val">复制分享链接</span> <span class="c-note">（仅编码外观，不含状态/积分/账号）</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">分享链接预览</div>
+<div class="c-line"><span class="c-key">打开提示：</span><span class="c-val">有人分享了一位领导给你，要用他替换你的领导吗？</span></div>
+<div class="c-line"><span class="c-key">确认：</span><span class="c-val">替换我的领导</span>　<span class="c-key">取消：</span><span class="c-val">先看看</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">重新捏脸二次确认（替换旧领导）</div>
+<div class="c-line"><span class="c-val">重新捏脸将永久替换当前领导，原领导无法恢复。确认继续？</span></div>
+<div class="c-line"><span class="c-key">确认：</span><span class="c-val">确认替换</span>　<span class="c-key">取消：</span><span class="c-val">再想想</span></div>
+</div>
+
+<hr>
+
+<!-- ============ P3 释怀仪式 ============ -->
+<h2 id="p3">P3 释怀仪式</h2>
+<h3>定位</h3>
+<p>全屏沉浸交互。用户写下/选择自己的吐槽，三选一销毁方式，完整看完动画获释怀积分。满 24 小时才加分。</p>
+<h3>布局</h3>
+<ul>
+<li>步骤条：写下 → 选方式 → 销毁 → 释怀</li>
+<li>烦心事输入卡 + 三选一方式卡 + 全屏销毁动画舞台 + 结果反馈</li>
+</ul>
+
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">步骤条</div>
+<div class="c-line"><span class="c-val">01 写下烦心事 → 02 选择方式 → 03 销毁 → 04 释怀</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">输入卡</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">把最烦的那件事写下来</span></div>
+<div class="c-line"><span class="c-key">输入占位：</span><span class="c-val">写下最想销毁的那件事…</span></div>
+<div class="c-line"><span class="c-key">字数提示：</span><span class="c-val">1–50 字</span></div>
+<div class="c-line"><span class="c-key">下一步：</span><span class="c-val">选一种方式了断</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">三种销毁方式</div>
+<div class="c-line"><span class="c-key">风吹散：</span><span class="c-val">🌬️ 风吹散</span>　<span class="c-key">动作提示：</span><span class="c-val">向任意一侧滑动</span></div>
+<div class="c-line"><span class="c-key">揉成团：</span><span class="c-val">📄 揉成团</span>　<span class="c-key">动作提示：</span><span class="c-val">连续按压后甩出</span></div>
+<div class="c-line"><span class="c-key">碎纸机：</span><span class="c-val">✂️ 碎纸机</span>　<span class="c-key">动作提示：</span><span class="c-val">长按启动直到完成</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">销毁进行中</div>
+<div class="c-line"><span class="c-key">跳过：</span><span class="c-val">跳过</span> <span class="c-note">（跳过仍删除，但不发积分）</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">结果反馈</div>
+<div class="c-line"><span class="c-key">完成（满24h，加分）：</span><span class="c-val">烦心事，归零了。+100 积分</span></div>
+<div class="c-line"><span class="c-key">完成（未满24h，不加分）：</span><span class="c-val">销毁完成。发布未满 24 小时，本次不加积分。</span></div>
+<div class="c-line"><span class="c-key">跳过提示：</span><span class="c-val">跳过不奖励积分，但仍会删除这条吐槽。继续？</span></div>
+<div class="c-line"><span class="c-key">未满24h确认：</span><span class="c-val">这条吐槽发布未满 24 小时，销毁不加积分，仍要继续？</span></div>
+</div>
+
+<hr>
+
+<!-- ============ P4 个人中心 ============ -->
+<h2 id="p4">P4 个人中心</h2>
+<h3>定位</h3>
+<p>登录后个人区，含积分明细、我的吐槽（收共鸣）、签到记录、账号管理（含注销）。Tab 切换。</p>
+<h3>布局</h3>
+<ul>
+<li>顶部：头像区 + 积分余额 + 连续签到天数</li>
+<li>Tab：积分明细 / 我的吐槽 / 签到记录 / 账号管理</li>
+</ul>
+
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">顶部概览</div>
+<div class="c-line"><span class="c-key">积分余额：</span><span class="c-val">当前积分 300</span>　<span class="c-key">今日：</span><span class="c-val">今日获得 +50</span></div>
+<div class="c-line"><span class="c-key">签到：</span><span class="c-val">连续 5 天 · 历史最长 12 天</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">Tab · 积分明细</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">积分流水</span></div>
+<div class="c-line"><span class="c-key">条目示例：</span><span class="c-val">桌宠戳一戳 +10　|　签到 +100　|　共鸣收到 +10　|　复活领导 -500</span></div>
+<div class="c-line"><span class="c-note">复活需 500 积分，约一天活跃积累</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">Tab · 我的吐槽</div>
+<div class="c-line"><span class="c-key">新增共鸣提示：</span><span class="c-val">新增 X 条共鸣，收下可得 +X 积分</span></div>
+<div class="c-line"><span class="c-key">收下按钮：</span><span class="c-val">收下共鸣</span> <span class="c-note">（一次领取全部，不逐条）</span></div>
+<div class="c-line"><span class="c-key">收下后：</span><span class="c-val">已收下 +X 积分</span></div>
+<div class="c-line"><span class="c-key">空状态：</span><span class="c-val">还没发布过吐槽，去墙上看一眼？</span></div>
+<div class="c-line"><span class="c-key">已销毁标记：</span><span class="c-val">已释怀</span>　<span class="c-key">淡忘中标记：</span><span class="c-val">淡忘中</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">Tab · 签到记录</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">签到日历</span></div>
+<div class="c-line"><span class="c-key">里程碑说明：</span><span class="c-val">连续 3 天 +100 / 7 天 +300 / 14 天 +600，之后每 7 天 +300</span></div>
+<div class="c-line"><span class="c-key">断签提示：</span><span class="c-val">昨天断签了，今天重新开始，没关系</span></div>
+</div>
+
+<div class="copy">
+<div class="c-label">Tab · 账号管理</div>
+<div class="c-line"><span class="c-key">修改密码：</span><span class="c-val">修改密码</span></div>
+<div class="c-line"><span class="c-key">恢复码：</span><span class="c-val">查看我的恢复码</span> <span class="c-note">（提示：恢复码丢失无法找回）</span></div>
+<div class="c-line"><span class="c-key">注销：</span><span class="c-val">注销账号</span></div>
+<div class="c-line"><span class="c-key">注销确认：</span><span class="c-val">注销后个人数据按规则删除，公开吐槽立即销毁，且无法恢复。确认注销？</span></div>
+</div>
+
+<hr>
+
+<!-- ============ P5 找回密码 ============ -->
+<h2 id="p5">P5 找回密码</h2>
+<h3>定位</h3>
+<p>未登录可达。账号 + 恢复码 + 新密码重置。成功后旧恢复码作废生成新码。</p>
+<h3>布局</h3>
+<ul>
+<li>居中窄表单卡，三字段 + 提交按钮</li>
+</ul>
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">页头</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">找回密码</span></div>
+<div class="c-line"><span class="c-key">副：</span><span class="c-val">输入注册时生成的恢复码，重置密码。</span></div>
+</div>
+<div class="copy">
+<div class="c-label">表单字段</div>
+<div class="c-line"><span class="c-key">账号：</span><span class="c-val">账号（牛马编号）</span> <span class="c-note">占位：输入你的账号</span></div>
+<div class="c-line"><span class="c-key">恢复码：</span><span class="c-val">恢复码</span> <span class="c-note">占位：粘贴恢复码</span></div>
+<div class="c-line"><span class="c-key">新密码：</span><span class="c-val">新密码</span> <span class="c-note">8–32 位，字母/数字/符号任两类</span></div>
+<div class="c-line"><span class="c-key">提交：</span><span class="c-val">重置密码</span></div>
+</div>
+<div class="copy">
+<div class="c-label">结果反馈</div>
+<div class="c-line"><span class="c-key">成功：</span><span class="c-val">密码已重置。旧恢复码已作废，请保存新的恢复码。</span></div>
+<div class="c-line"><span class="c-key">失败：</span><span class="c-val">恢复码无效或已过期，请检查后重试。</span></div>
+<div class="c-line"><span class="c-key">频率限制：</span><span class="c-val">尝试过于频繁，请稍后再试。</span></div>
+</div>
+
+<hr>
+
+<!-- ============ P6 规则与隐私 ============ -->
+<h2 id="p6">P6 规则与隐私</h2>
+<h3>定位</h3>
+<p>公开可达的说明页。上线硬门槛：隐私说明、内容规则、匿名口径、15 天保存规则、账号注销说明就绪。</p>
+<h3>布局</h3>
+<ul>
+<li>手风琴/分段长文，左侧锚点导航</li>
+</ul>
+<h3>界面文案</h3>
+<div class="copy">
+<div class="c-label">分段标题</div>
+<div class="c-line"><span class="c-val">内容规则 / 匿名口径 / 15 天保存规则 / 积分规则 / 敏感词处理 / 账号与注销</span></div>
+</div>
+<div class="copy">
+<div class="c-label">内容规则</div>
+<div class="c-line"><span class="c-val">每天最多发布 3 条公开吐槽，每条 1–50 字纯文本。</span></div>
+<div class="c-line"><span class="c-val">不设评论、私信、关注与排行榜，只保留共鸣。</span></div>
+<div class="c-line"><span class="c-val">允许正常负面情绪，禁止违法、威胁、隐私、歧视、色情、诈骗与严重伤害性内容。</span></div>
+</div>
+<div class="copy">
+<div class="c-label">匿名口径</div>
+<div class="c-line"><span class="c-val">吐槽不显示账号、昵称或头像，全站匿名。</span></div>
+<div class="c-line"><span class="c-val">禁止填写手机号、邮箱、微信号、身份证、详细地址、工号等可识别信息。</span></div>
+<div class="c-line"><span class="c-val">涉及具体对象请用"某领导""某同事""某公司"代称。</span></div>
+</div>
+<div class="copy">
+<div class="c-label">15 天保存规则</div>
+<div class="c-line"><span class="c-val">吐槽从发布起 15 天自然渐隐：卡片装饰逐渐变淡，正文始终可读。</span></div>
+<div class="c-line"><span class="c-val">满 15 天后静默消失并删除，不提醒、不发积分、不留记录。</span></div>
+</div>
+<div class="copy">
+<div class="c-label">积分规则</div>
+<div class="c-line"><span class="c-val">签到 +100（含随机惊喜），吐槽入墙 +50，共鸣 +10，释怀 +100，喝水 +20，久坐 +30，复活 -500。</span></div>
+<div class="c-line"><span class="c-note">所有数值服务端可配置，上线两周后据真实行为调整</span></div>
+</div>
+<div class="copy">
+<div class="c-label">敏感词处理</div>
+<div class="c-line"><span class="c-val">前端预检即时反馈，服务端复检为入库硬门槛，浏览器无法绕过。</span></div>
+</div>
+<div class="copy">
+<div class="c-label">账号与注销</div>
+<div class="c-line"><span class="c-val">账号不绑手机/邮箱/昵称/头像，仅账号 + 密码 + 恢复码。</span></div>
+<div class="c-line"><span class="c-val">恢复码与密码同时丢失时无法找回，以保护数据安全。</span></div>
+<div class="c-line"><span class="c-val">注销后个人数据按规则删除，公开吐槽立即销毁。</span></div>
+</div>
+
+<hr>
+
+<!-- ============ 弹窗 ============ -->
+<h2 id="modal">弹窗 ×5</h2>
+
+<h3>弹窗 1 · 登录 / 注册</h3>
+<p>首页点击登录/试玩触发。登录注册同一弹窗切换。</p>
+<div class="copy">
+<div class="c-label">登录</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">登录小确闲</span></div>
+<div class="c-line"><span class="c-key">账号：</span><span class="c-val">账号（牛马编号）</span> <span class="c-note">4–20 位字母/数字/下划线</span></div>
+<div class="c-line"><span class="c-key">密码：</span><span class="c-val">密码</span></div>
+<div class="c-line"><span class="c-key">提交：</span><span class="c-val">登录</span>　<span class="c-key">切换：</span><span class="c-val">没有账号？注册一个</span>　<span class="c-key">找回：</span><span class="c-val">忘记密码</span></div>
+</div>
+<div class="copy">
+<div class="c-label">注册</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">注册小确闲</span></div>
+<div class="c-line"><span class="c-key">安全提示：</span><span class="c-val">请勿使用真实工号或常用密码</span></div>
+<div class="c-line"><span class="c-key">随机账号：</span><span class="c-val">🎲 随机生成账号</span></div>
+<div class="c-line"><span class="c-key">提交：</span><span class="c-val">注册</span></div>
+</div>
+<div class="copy">
+<div class="c-label">注册成功 · 恢复码</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">保存你的恢复码</span></div>
+<div class="c-line"><span class="c-key">说明：</span><span class="c-val">恢复码是你找回密码的唯一凭证，丢失无法找回，请复制或下载保存。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">复制恢复码 / 下载保存 / 我已保存</span></div>
+</div>
+<div class="copy">
+<div class="c-label">注册成功 · 权益引导</div>
+<div class="c-line"><span class="c-val">欢迎加入！赠送一次免费捏脸 + 300 欢迎积分。</span></div>
+<div class="c-line"><span class="c-val">下次复活领导需要 500 积分，去签到、吐槽、共鸣或完成关怀任务赚积分吧。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">去捏我的领导</span></div>
+</div>
+
+<h3>弹窗 2 · 软提示（每 5 次动作）</h3>
+<p>试用态每完成 5 次桌宠动作弹一次，可关闭继续玩。</p>
+<div class="copy">
+<div class="c-label">文案</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">登录后，玩得更爽</span></div>
+<div class="c-line"><span class="c-key">权益列表：</span><span class="c-val">DIY 自己的领导 / 赚积分签到 / 吐槽共鸣 / 同步权益</span></div>
+<div class="c-line"><span class="c-key">主按钮：</span><span class="c-val">登录解锁</span>　<span class="c-key">次按钮：</span><span class="c-val">继续试玩</span></div>
+</div>
+
+<h3>弹窗 3 · 倒地复活引导</h3>
+<p>领导承受值归零倒地后触发。试用态硬转化点。</p>
+<div class="copy">
+<div class="c-label">试用态</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">领导倒地了！</span></div>
+<div class="c-line"><span class="c-key">说明：</span><span class="c-val">登录即可复活领导，或免费重新捏一位满血的领导。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">登录继续</span></div>
+</div>
+<div class="copy">
+<div class="c-label">登录态 · 积分足够</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">领导倒地了</span></div>
+<div class="c-line"><span class="c-key">说明：</span><span class="c-val">消耗 500 积分复活原领导（状态清零，外观保留）。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">500 积分复活</span>　<span class="c-key">次：</span><span class="c-val">免费重新捏脸</span></div>
+</div>
+<div class="copy">
+<div class="c-label">登录态 · 积分不足</div>
+<div class="c-line"><span class="c-key">说明：</span><span class="c-val">积分不足，去签到、吐槽、共鸣或完成关怀任务赚积分吧。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">去赚积分</span>　<span class="c-key">次：</span><span class="c-val">免费重新捏脸</span></div>
+</div>
+
+<h3>弹窗 4 · 吐槽发布</h3>
+<p>吐槽墙"我也要吐槽"触发。</p>
+<div class="copy">
+<div class="c-label">文案</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">说点啥</span></div>
+<div class="c-line"><span class="c-key">占位：</span><span class="c-val">1–50 字，写下你想说的…</span></div>
+<div class="c-line"><span class="c-key">名额提示：</span><span class="c-val">今日剩余 X 条</span> <span class="c-note">（0 条时：今日已发满，明天再来）</span></div>
+<div class="c-line"><span class="c-key">敏感词拦截：</span><span class="c-val">内容含敏感信息，请修改后再发布</span></div>
+<div class="c-line"><span class="c-key">提交：</span><span class="c-val">扔上墙</span></div>
+<div class="c-line"><span class="c-key">成功：</span><span class="c-val">吐槽已入墙 +50</span></div>
+</div>
+
+<h3>弹窗 5 · 销毁预览（试用态）</h3>
+<p>试用态点击释怀入口触发，8–12 秒预置宣传动画，默认静音，可跳过。</p>
+<div class="copy">
+<div class="c-label">文案</div>
+<div class="c-line"><span class="c-key">标题：</span><span class="c-val">释怀仪式</span></div>
+<div class="c-line"><span class="c-key">说明：</span><span class="c-val">登录后，你可以亲手销毁自己的吐槽，看着它消失，+100 积分。</span></div>
+<div class="c-line"><span class="c-key">按钮：</span><span class="c-val">登录体验</span>　<span class="c-key">跳过：</span><span class="c-val">跳过</span></div>
+</div>
+
+<div class="divider"></div>
+<p style="text-align:center;color:var(--tertiary);font-family:var(--serif);font-style:italic">小确闲 · 前端设计界面说明书　|　主题已锁定：深夜蓝 + 暖琥珀 + 衬线　|　调整文案后交开发套用</p>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · 找回密码</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=DMMono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#0A1320;--surface:#142336;--surface-2:#1A2B44;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--amber-2:#F5B14C;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+  --ease:cubic-bezier(.4,.2,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);display:flex;align-items:center;justify-content:center;min-height:100vh;padding:24px;-webkit-font-smoothing:antialiased}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(720px 480px at 50% -6%,rgba(232,163,61,.08),transparent 60%),radial-gradient(680px 460px at 50% 110%,rgba(107,159,212,.08),transparent 60%)}
+
+/* ===== 返回按钮 ===== */
+.back-btn{position:fixed;top:20px;left:24px;background:rgba(20,35,54,.8);backdrop-filter:blur(12px);border:1px solid var(--rule);color:var(--muted);border-radius:10px;padding:8px 16px;cursor:pointer;font:inherit;font-size:13px;transition:all .2s;z-index:10}
+.back-btn:hover{color:var(--amber);border-color:var(--amber)}
+
+/* ===== 表单卡 ===== */
+.form-card{position:relative;z-index:1;width:100%;max-width:420px;background:var(--surface);border:1px solid var(--rule);border-radius:22px;padding:40px 36px;box-shadow:0 24px 64px rgba(0,0,0,.4);overflow:hidden}
+.form-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+
+.form-card .logo-mark{width:44px;height:44px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:20px;font-weight:700;margin:0 auto 20px;font-family:var(--sans);box-shadow:0 0 24px rgba(232,163,61,.3)}
+.form-card h1{font-family:var(--serif);font-size:28px;font-weight:600;text-align:center;margin-bottom:8px}
+.form-card h1 i{font-style:italic;color:var(--amber)}
+.form-card .subtitle{text-align:center;font-size:13px;color:var(--muted);margin-bottom:28px}
+
+/* ===== 表单字段 ===== */
+.field{margin-bottom:18px}
+.field label{display:block;font-size:13px;font-weight:500;color:var(--ink);margin-bottom:8px}
+.field label .req{color:var(--rose)}
+.field input{width:100%;background:var(--bg-2);border:1px solid var(--rule);border-radius:14px;padding:12px 16px;color:var(--ink);font:inherit;font-size:14px;outline:none;transition:border-color .2s}
+.field input::placeholder{color:var(--tertiary)}
+.field input:focus{border-color:var(--amber)}
+.field .hint{font-size:12px;color:var(--tertiary);margin-top:6px}
+.field .error{font-size:12px;color:var(--rose);margin-top:6px;display:none}
+.field.error input{border-color:var(--rose)}
+.field.error .error{display:block}
+
+/* ===== 密码强度 ===== */
+.pwd-strength{display:flex;gap:4px;margin-top:8px}
+.pwd-strength span{flex:1;height:4px;border-radius:2px;background:var(--rule);transition:background .3s}
+.pwd-strength.weak span:nth-child(1){background:var(--rose)}
+.pwd-strength.mid span:nth-child(1),.pwd-strength.mid span:nth-child(2){background:var(--amber)}
+.pwd-strength.strong span{background:var(--calm)}
+
+/* ===== 提交按钮 ===== */
+.submit-btn{width:100%;background:var(--grad);border:none;color:var(--bg);font:inherit;font-weight:700;font-size:15px;padding:14px;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(232,163,61,.25);transition:all .2s;margin-top:8px}
+.submit-btn:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(232,163,61,.35)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* ===== 底部链接 ===== */
+.form-footer{text-align:center;margin-top:20px;font-size:13px;color:var(--muted)}
+.form-footer a{color:var(--blue);text-decoration:none;font-weight:500}
+.form-footer a:hover{color:var(--amber)}
+
+/* ===== 成功/失败状态 ===== */
+.result-state{text-align:center;padding:20px 0}
+.result-state .icon{font-size:56px;margin-bottom:16px;display:block}
+.result-state.success .icon{animation:popIn .5s cubic-bezier(.3,1.6,.5,1)}
+.result-state.error .icon{animation:shake .4s ease}
+@keyframes popIn{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+.result-state .title{font-family:var(--serif);font-size:22px;font-weight:600;margin-bottom:8px}
+.result-state.success .title{color:var(--calm)}
+.result-state.error .title{color:var(--rose)}
+.result-state .desc{font-size:13px;color:var(--muted);line-height:1.7}
+.result-state .recovery-box{background:var(--bg-2);border:1px solid var(--rule);border-radius:12px;padding:14px;margin:16px 0;font-family:var(--mono);font-size:13px;color:var(--amber);word-break:break-all}
+.result-state .copy-btn{background:transparent;border:1px solid var(--rule-2);color:var(--muted);font:inherit;font-size:12px;padding:6px 14px;border-radius:999px;cursor:pointer;transition:all .2s;margin-top:12px}
+.result-state .copy-btn:hover{color:var(--amber);border-color:var(--amber)}
+.result-state .action-links{display:flex;gap:12px;justify-content:center;margin-top:20px}
+
+.hidden{display:none !important}
+
+/* ===== Toast ===== */
+.toast{position:fixed;top:24px;left:50%;transform:translateX(-50%);padding:10px 20px;border-radius:999px;font-size:13px;font-weight:600;z-index:999;backdrop-filter:blur(12px);transition:all .3s;opacity:0}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
+.toast.amber{background:rgba(232,163,61,.15);color:var(--amber);border:1px solid var(--amber)}
+.toast.calm{background:rgba(111,179,168,.15);color:var(--calm);border:1px solid var(--calm)}
+.toast.rose{background:rgba(217,122,108,.15);color:var(--rose);border:1px solid var(--rose)}
+
+/* ===== 限流倒计时 ===== */
+.rate-limit{display:none;font-size:12px;color:var(--tertiary);text-align:center;margin-top:12px;font-family:var(--mono)}
+.rate-limit.show{display:block}
+
+/* ===== 无障碍 / 降级 ===== */
+button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){
+  .result-state.success .icon{animation:none}
+  .result-state.error .icon{animation:none}
+  *{transition-duration:.01ms!important}
+}
+@media(max-width:480px){
+  .form-card{padding:32px 22px}
+  body{padding:16px}
+  .back-btn{top:14px;left:14px}
+}
+</style>
+</head>
+<body>
+
+<button class="back-btn" onclick="history.back()">← 返回</button>
+
+<!-- 找回密码表单 -->
+<div class="form-card" id="formCard">
+  <div class="logo-mark">小</div>
+  <h1>找回<i>密码</i></h1>
+  <p class="subtitle">输入注册时生成的恢复码，重置密码</p>
+
+  <form id="resetForm" onsubmit="handleSubmit(event)">
+    <div class="field" id="f-account">
+      <label>账号（牛马编号）</label>
+      <input type="text" id="account" placeholder="输入你的账号" maxlength="20" autocomplete="username">
+      <div class="error">账号格式不正确</div>
+    </div>
+
+    <div class="field" id="f-recovery">
+      <label>恢复码</label>
+      <input type="text" id="recovery" placeholder="粘贴恢复码" autocomplete="off" spellcheck="false">
+      <div class="hint">恢复码是注册时生成的唯一凭证，请妥善保存</div>
+      <div class="error">恢复码无效或已过期</div>
+    </div>
+
+    <div class="field" id="f-password">
+      <label>新密码</label>
+      <input type="password" id="newPassword" placeholder="8–32 位，字母/数字/符号任两类" maxlength="32" autocomplete="new-password">
+      <div class="pwd-strength" id="pwdStrength"><span></span><span></span><span></span></div>
+      <div class="error">密码不符合要求</div>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submitBtn">重置密码</button>
+
+    <div class="rate-limit" id="rateLimit">尝试过于频繁，请 <span id="rateCount">60</span> 秒后重试</div>
+
+    <div class="form-footer">
+      想起密码了？<a href="P1_首页.html">返回首页登录</a>
+    </div>
+  </form>
+</div>
+
+<!-- 成功状态 -->
+<div class="form-card hidden" id="successCard">
+  <div class="result-state success">
+    <span class="icon">✅</span>
+    <div class="title">密码已重置</div>
+    <div class="desc">旧恢复码已作废，请保存新的恢复码：</div>
+    <div class="recovery-box" id="newRecoveryCode">XQX-NEW-R3C0V-7XK2M-9P4N</div>
+    <button class="copy-btn" onclick="copyRecovery()">📋 复制恢复码</button>
+    <div class="action-links">
+      <a href="P1_首页.html" style="color:var(--amber);font-weight:600;text-decoration:none">去登录 →</a>
+    </div>
+  </div>
+</div>
+
+<!-- 失败状态 -->
+<div class="form-card hidden" id="errorCard">
+  <div class="result-state error">
+    <span class="icon">❌</span>
+    <div class="title">恢复码无效</div>
+    <div class="desc">恢复码无效或已过期，请检查后重试。<br>如果恢复码已丢失，请联系客服。</div>
+    <div class="action-links">
+      <button class="submit-btn" style="width:auto;padding:10px 28px" onclick="backToForm()">重新输入</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 密码强度检测 ============ */
+const pwdInput = document.getElementById('newPassword');
+const pwdStrength = document.getElementById('pwdStrength');
+
+pwdInput.addEventListener('input', ()=>{
+  const val = pwdInput.value;
+  let strength = 0;
+  if(val.length >= 8) strength++;
+  if(/[a-zA-Z]/.test(val) && /[0-9]/.test(val)) strength++;
+  if(/[^a-zA-Z0-9]/.test(val)) strength++;
+  pwdStrength.className = 'pwd-strength';
+  if(val.length === 0) return;
+  if(strength <= 1) pwdStrength.classList.add('weak');
+  else if(strength === 2) pwdStrength.classList.add('mid');
+  else pwdStrength.classList.add('strong');
+});
+
+/* ============ 粘贴检测 + 自动清理 ============ */
+const recoveryInput = document.getElementById('recovery');
+recoveryInput.addEventListener('paste', (e)=>{
+  const text = (e.clipboardData || window.clipboardData).getData('text');
+  if(text){
+    setTimeout(()=>toast('恢复码已粘贴','amber'),100);
+  }
+});
+// 粘贴或输入时自动去除空格/换行，统一为大写（提升恢复码可用性）
+recoveryInput.addEventListener('input', ()=>{
+  const cleaned = recoveryInput.value.replace(/[\s\-]+/g,'').toUpperCase();
+  if(recoveryInput.value !== cleaned){
+    recoveryInput.value = cleaned;
+  }
+});
+
+/* ============ 表单提交 ============ */
+let rateLimited = false;
+
+function handleSubmit(e){
+  e.preventDefault();
+  if(rateLimited){
+    toast('尝试过于频繁，请稍后再试','rose');
+    return;
+  }
+
+  const account = document.getElementById('account').value.trim();
+  const recovery = document.getElementById('recovery').value.trim();
+  const newPwd = pwdInput.value;
+
+  let hasError = false;
+
+  // 校验账号
+  if(!account || account.length < 4 || account.length > 20){
+    document.getElementById('f-account').classList.add('error');
+    hasError = true;
+  } else {
+    document.getElementById('f-account').classList.remove('error');
+  }
+
+  // 校验恢复码
+  if(!recovery || recovery.length < 10){
+    document.getElementById('f-recovery').classList.add('error');
+    hasError = true;
+  } else {
+    document.getElementById('f-recovery').classList.remove('error');
+  }
+
+  // 校验密码
+  let pwdValid = true;
+  if(newPwd.length < 8 || newPwd.length > 32) pwdValid = false;
+  let types = 0;
+  if(/[a-zA-Z]/.test(newPwd)) types++;
+  if(/[0-9]/.test(newPwd)) types++;
+  if(/[^a-zA-Z0-9]/.test(newPwd)) types++;
+  if(types < 2) pwdValid = false;
+
+  if(!pwdValid){
+    document.getElementById('f-password').classList.add('error');
+    hasError = true;
+  } else {
+    document.getElementById('f-password').classList.remove('error');
+  }
+
+  if(hasError){
+    toast('请检查输入','rose');
+    return;
+  }
+
+  // 模拟提交
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.textContent = '提交中…';
+
+  setTimeout(()=>{
+    // 模拟：恢复码以 "XQX" 开头且足够长即视为有效（输入已自动清理为无分隔大写）
+    if(recovery.startsWith('XQX') && recovery.length >= 10){
+      showSuccess();
+    } else {
+      showError();
+      // 限流
+      rateLimited = true;
+      let count = 60;
+      const rl = document.getElementById('rateLimit');
+      const rc = document.getElementById('rateCount');
+      rl.classList.add('show');
+      rc.textContent = count;
+      const timer = setInterval(()=>{
+        count--;
+        rc.textContent = count;
+        if(count <= 0){
+          clearInterval(timer);
+          rateLimited = false;
+          rl.classList.remove('show');
+        }
+      }, 1000);
+    }
+    btn.disabled = false;
+    btn.textContent = '重置密码';
+  }, 800);
+}
+
+/* ============ 状态切换 ============ */
+function showSuccess(){
+  document.getElementById('formCard').classList.add('hidden');
+  document.getElementById('successCard').classList.remove('hidden');
+  // 生成新恢复码
+  const code = 'XQX-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' +
+    Math.random().toString(36).substring(2,6).toUpperCase() + '-' +
+    Math.random().toString(36).substring(2,6).toUpperCase();
+  document.getElementById('newRecoveryCode').textContent = code;
+}
+
+function showError(){
+  document.getElementById('formCard').classList.add('hidden');
+  document.getElementById('errorCard').classList.remove('hidden');
+}
+
+function backToForm(){
+  document.getElementById('errorCard').classList.add('hidden');
+  document.getElementById('formCard').classList.remove('hidden');
+}
+
+/* ============ 复制恢复码 ============ */
+function copyRecovery(){
+  const code = document.getElementById('newRecoveryCode').textContent;
+  navigator.clipboard.writeText(code).then(()=>{
+    toast('恢复码已复制','calm');
+  }).catch(()=>{
+    toast('请手动复制','amber');
+  });
+}
+
+/* ============ Toast ============ */
+function toast(msg,type='amber'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast ' + type;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2500);
+}
+
+/* ============ 实时清除错误状态 ============ */
+['account','recovery','newPassword'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',()=>{
+    document.getElementById('f-'+id).classList.remove('error');
+  });
+});
+</script>
+
+</body>
+</html>

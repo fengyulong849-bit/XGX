@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · P2 捏脸DIY</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&amp;family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=DMMono:wght@400;500&amp;display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+}}
+</script>
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#0A1320;--surface:#142336;--surface-2:#1A2B44;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--amber-2:#F5B14C;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;
+  --grad:linear-gradient(120deg,#E8A33D,#D97A6C);
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+  --mono:'DMMono',monospace;
+  --ease:cubic-bezier(.4,.2,.2,1);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;background:rgba(14,26,43,.85);backdrop-filter:blur(18px);border-bottom:1px solid var(--rule);display:flex;align-items:center;padding:0 24px;z-index:40;gap:14px}
+.topbar .back{background:none;border:1px solid var(--rule-2);color:var(--muted);border-radius:10px;padding:7px 14px;cursor:pointer;font:inherit;font-size:13px;transition:all .2s}
+.topbar .back:hover{color:var(--amber);border-color:var(--amber)}
+.topbar .crumb{font-family:var(--serif);font-size:18px;font-weight:600}
+.topbar .crumb i{font-style:italic;color:var(--amber)}
+.topbar .spacer{flex:1}
+.topbar .pts{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--surface);border:1px solid var(--rule);padding:7px 14px;border-radius:999px}
+.topbar .pts b{color:var(--amber)}
+
+.main{position:fixed;top:56px;bottom:64px;left:0;right:0;display:flex}
+
+.studio{flex:0 0 58%;background:
+  radial-gradient(ellipse 70% 60% at 50% 30%,rgba(232,163,61,.10),transparent 65%),
+  radial-gradient(ellipse 50% 40% at 78% 18%,rgba(107,159,212,.08),transparent 60%),
+  var(--bg-2);position:relative;border-right:1px solid var(--rule);overflow:hidden}
+/* 地面网格（3D 摄影棚质感） */
+.studio::before{
+  content:'';position:absolute;left:50%;bottom:-30%;width:130%;height:70%;
+  transform:translateX(-50%) perspective(600px) rotateX(62deg);
+  background:
+    linear-gradient(rgba(232,163,61,.05) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(232,163,61,.05) 1px,transparent 1px);
+  background-size:44px 44px;
+  -webkit-mask:radial-gradient(ellipse 60% 55% at 50% 50%,#000 30%,transparent 72%);
+  mask:radial-gradient(ellipse 60% 55% at 50% 50%,#000 30%,transparent 72%);
+  pointer-events:none;z-index:1;
+}
+/* 漂浮光点氛围 */
+.studio::after{
+  content:'';position:absolute;inset:0;pointer-events:none;z-index:1;
+  background-image:radial-gradient(rgba(232,163,61,.5) 1px,transparent 1.5px),radial-gradient(rgba(107,159,212,.45) 1px,transparent 1.5px),radial-gradient(rgba(111,179,168,.4) 1px,transparent 1.5px);
+  background-size:120px 120px,180px 180px,240px 240px;
+  background-position:0 0,40px 60px,110px 30px;
+  opacity:.5;animation:studioDrift 14s ease-in-out infinite alternate;
+}
+@keyframes studioDrift{
+  0%{background-position:0 0,40px 60px,110px 30px;opacity:.35}
+  100%{background-position:-60px 40px,20px 90px,80px 10px;opacity:.6}
+}
+#three-canvas{display:block;width:100%;height:100%;cursor:grab;position:relative;z-index:2}
+#three-canvas:active{cursor:grabbing}
+.studio-hint{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:13px;color:var(--tertiary);z-index:5;pointer-events:none}
+.rotate-ring{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(20,35,54,.8);backdrop-filter:blur(12px);border:1px solid var(--rule);border-radius:999px;padding:8px 16px;font-size:12px;color:var(--muted);z-index:5}
+.rotate-ring .dot{width:6px;height:6px;border-radius:50%;background:var(--calm);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.rotate-ring button{background:none;border:none;color:var(--muted);cursor:pointer;font:inherit;font-size:12px;padding:2px 8px;border-radius:6px}
+.rotate-ring button:hover{color:var(--amber);background:rgba(232,163,61,.1)}
+.rotate-ring button.on{color:var(--amber)}
+
+.config{flex:1;background:var(--bg);overflow-y:auto;padding:20px 22px 24px}
+.config::-webkit-scrollbar{width:6px}
+.config::-webkit-scrollbar-thumb{background:var(--surface-2);border-radius:3px}
+.cfg-head{margin-bottom:16px}
+.cfg-head h3{font-family:var(--serif);font-size:20px;font-weight:600}
+.cfg-head p{font-size:12px;color:var(--muted);margin-top:2px}
+
+.dim-list{display:flex;flex-direction:column;gap:8px}
+.dim{background:var(--surface);border:1px solid var(--rule);border-left:3px solid transparent;border-radius:12px;overflow:hidden;transition:all .2s var(--ease)}
+.dim.active{border-left-color:var(--amber);background:var(--surface-2)}
+.dim-head{display:flex;align-items:center;gap:11px;padding:13px 15px;cursor:pointer;user-select:none}
+.dim-head .di{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.05);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .2s}
+.dim.active .dim-head .di{background:rgba(232,163,61,.15)}
+.dim-head .dn{font-size:14px;font-weight:600;color:var(--ink)}
+.dim-head .dv{font-size:12px;color:var(--muted);margin-left:auto;font-family:var(--mono)}
+.dim.active .dim-head .dv{color:var(--amber)}
+.dim-head .chev{color:var(--tertiary);font-size:12px;transition:transform .2s}
+.dim.active .dim-head .chev{transform:rotate(90deg);color:var(--amber)}
+.dim-body{max-height:0;overflow:hidden;transition:max-height .3s var(--ease)}
+.dim.active .dim-body{max-height:220px}
+.opts{display:flex;flex-wrap:wrap;gap:8px;padding:0 15px 15px}
+.opt{background:rgba(255,255,255,.03);border:1px solid var(--rule);border-radius:10px;padding:9px 14px;cursor:pointer;font:inherit;font-size:13px;color:var(--muted);transition:all .15s var(--ease);display:flex;align-items:center;gap:7px}
+.opt:hover{border-color:var(--rule-2);color:var(--ink);transform:translateY(-1px)}
+.opt.sel{background:rgba(232,163,61,.12);border-color:var(--amber);color:var(--amber);font-weight:600;box-shadow:0 0 16px rgba(232,163,61,.18)}
+.opt .sw{width:16px;height:16px;border-radius:5px;border:1px solid var(--rule-2);transition:transform .15s var(--ease)}
+.opt.sel .sw{transform:scale(1.15);border-color:var(--amber)}
+
+.actionbar{position:fixed;bottom:0;left:0;right:0;height:64px;background:rgba(14,26,43,.92);backdrop-filter:blur(18px);border-top:1px solid var(--rule);display:flex;align-items:center;gap:8px;padding:0 16px;z-index:40}
+.actionbar .ab-info{font-size:12px;color:var(--muted);margin-right:auto;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.actionbar .ab-info b{color:var(--ink);font-family:var(--serif)}
+.btn-ghost2{background:transparent;border:1px solid var(--rule-2);color:var(--ink);font:inherit;font-weight:500;font-size:13px;padding:9px 14px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.btn-ghost2:hover{border-color:var(--amber);color:var(--amber)}
+.btn-primary2{background:var(--grad);border:none;color:var(--bg);font:inherit;font-weight:700;font-size:13px;padding:9px 20px;border-radius:999px;cursor:pointer;box-shadow:0 6px 18px rgba(232,163,61,.25);transition:all .2s var(--ease);display:flex;align-items:center;gap:6px;white-space:nowrap}
+.btn-primary2:hover{transform:translateY(-2px);box-shadow:0 10px 24px rgba(232,163,61,.35)}
+.btn-primary2.saved{background:var(--calm);box-shadow:0 6px 18px rgba(111,179,168,.3)}
+
+/* ===== Toast ===== */
+.toast-wrap{position:fixed;top:70px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:10px;align-items:center;pointer-events:none}
+.toast{background:var(--surface-2);border:1px solid var(--rule-2);border-radius:14px;padding:12px 22px;font-size:14px;font-weight:600;color:var(--ink);box-shadow:0 24px 64px rgba(0,0,0,.4);animation:toastIn .3s var(--ease)}
+.toast.calm{border-color:var(--calm);color:var(--calm)}
+.toast.amber{border-color:var(--amber);color:var(--amber)}
+.toast.rose{border-color:var(--rose);color:var(--rose)}
+@keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
+
+/* ===== 分享预览确认弹窗 ===== */
+.modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;animation:maskIn .3s ease-out}
+.modal-mask.show{display:flex}
+@keyframes maskIn{from{opacity:0}to{opacity:1}}
+.modal-card{position:relative;background:var(--surface);border:1px solid var(--rule-2);border-radius:22px;width:100%;max-width:440px;box-shadow:0 24px 64px rgba(0,0,0,.4);animation:modalPop .3s cubic-bezier(.2,1.2,.4,1);overflow:hidden}
+@keyframes modalPop{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--tertiary);font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:5}
+.modal-close:hover{color:var(--ink);background:var(--surface-2)}
+.modal-body{padding:32px 28px 24px}
+.modal-title{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:6px}
+.modal-title i{font-style:italic;color:var(--amber)}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;margin-top:20px}
+.modal-actions .btn-ghost2{flex:1;justify-content:center;padding:12px 24px;font-size:14px}
+.modal-actions .btn-primary2{flex:1;justify-content:center;padding:12px 24px;font-size:14px}
+.avatar-preview-list{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:16px 0}
+.avatar-preview-list span{font-family:var(--mono);font-size:11px;color:var(--tertiary);background:var(--bg);border:1px solid var(--rule);border-radius:8px;padding:6px 4px;text-align:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.avatar-preview-list span b{color:var(--amber)}
+
+button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
+@media(prefers-reduced-motion:reduce){*{transition-duration:.01ms!important;animation-duration:.01ms!important}}
+
+@media(max-width:880px){
+  .main{flex-direction:column}
+  .studio{flex:none;height:44vh;border-right:none;border-bottom:1px solid var(--rule)}
+  .studio::before{bottom:-20%;height:55%}
+  .config{flex:1}
+  .actionbar .ab-info{display:none}
+  .btn-ghost2{padding:9px 10px;font-size:12px}
+  .btn-primary2{padding:9px 14px;font-size:12px}
+  .rotate-ring{bottom:12px}
+}
+@media(max-width:480px){
+  .topbar{padding:0 12px}
+  .topbar nav{display:none!important}
+  .studio{height:40vh}
+  .actionbar{gap:6px;padding:0 10px}
+  .actionbar .btn-ghost2{flex:1;justify-content:center}
+  .actionbar .btn-primary2{flex:1.4;justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <button class="back" onclick="window.location.href='P1_首页.html'">← 返回</button>
+  <span class="crumb">捏出<i>你的领导</i></span>
+  <div class="spacer"></div>
+  <nav style="display:flex;gap:2px;margin-right:12px">
+    <a href="P1_首页.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">首页</a>
+    <a href="P3_释怀仪式.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">释怀</a>
+    <a href="P4_个人中心.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">我的</a>
+    <a href="P6_规则与隐私.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">规则</a>
+  </nav>
+  <div class="pts">积分 <b>300</b></div>
+</div>
+
+<div class="main">
+  <div class="studio">
+    <div class="studio-hint">拖动可 360° 旋转 · 滚轮缩放</div>
+    <canvas id="three-canvas"></canvas>
+    <div class="rotate-ring">
+      <span class="dot"></span>
+      <button class="on" id="autoBtn">自动旋转</button>
+      <span style="color:var(--tertiary)">|</span>
+      <button id="resetBtn">复位</button>
+    </div>
+  </div>
+
+  <div class="config">
+    <div class="cfg-head">
+      <h3>八维捏脸</h3>
+      <p>实时驱动 3D 模型 · 当前维度高亮</p>
+    </div>
+    <div class="dim-list" id="dimList"></div>
+  </div>
+</div>
+
+<div class="actionbar">
+  <div class="ab-info"><b>暴躁打工人 · 领导</b> · 已自动保存</div>
+  <button class="btn-ghost2" id="randBtn">🎲 随机</button>
+  <button class="btn-ghost2" id="defBtn">默认</button>
+  <button class="btn-ghost2" id="shareBtn">分享</button>
+  <button class="btn-primary2" id="saveBtn">保存领导</button>
+</div>
+
+<!-- 分享预览确认弹窗 -->
+<div class="modal-mask" id="modal-share" role="dialog" aria-modal="true" aria-label="分享的领导预览" onclick="closeShareModalOnMask(event)">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeShareModal()">×</button>
+    <div class="modal-body">
+      <div class="modal-title">有人分享了<i>一位领导</i>给你</div>
+      <div class="modal-sub">要用他替换你的领导吗？外观如下（不包含状态、积分或吐槽）：</div>
+      <div class="avatar-preview-list" id="share-preview"></div>
+      <div class="modal-actions">
+        <button class="btn-ghost2" onclick="closeShareModal()">先看看，不要</button>
+        <button class="btn-primary2" id="share-apply" onclick="applyShared()">用他替换</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast 容器 -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+// ===== 配置 =====
+const DIMS=[
+  {key:'face',icon:'😊',name:'脸型',opts:['圆脸','方脸','长脸']},
+  {key:'hair',icon:'💇',name:'发型',opts:['背头','中分','寸头','地中海']},
+  {key:'glasses',icon:'👓',name:'眼镜',opts:['无','圆框','方框']},
+  {key:'beard',icon:'🧔',name:'胡子',opts:['无','八字胡','络腮']},
+  {key:'expr',icon:'😤',name:'表情',opts:['微笑','皱眉','惊讶','生气']},
+  {key:'suit',icon:'👔',name:'西装',opts:['深蓝','黑','灰','棕'],swatch:['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F']},
+  {key:'belly',icon:'🫃',name:'基础肚子',opts:['标准','微胖','发福']},
+  {key:'skin',icon:'🤚',name:'肤色',opts:['白','黄','棕','黑'],swatch:['#F0C8A0','#E8B98A','#D4A574','#9C7B5A']},
+];
+const SKINS=[0xF0C8A0,0xE8B98A,0xD4A574,0x9C7B5A];
+const SUITS=[0x2E3A4A,0x1A1A1A,0x4A4A4A,0x3D2E1F];
+const DEFAULT_CFG={face:0,hair:0,glasses:1,beard:0,expr:0,suit:0,belly:0,skin:0};
+let cfg={...DEFAULT_CFG};
+let activeDim='face';
+
+// ===== 分享链接编解码（只编码外观，不包含状态/积分/账号/吐槽）=====
+function encodeCfg(c){return Object.values(c).join('-')}
+function decodeCfg(code){
+  const parts=String(code||'').split('-').map(n=>parseInt(n,10));
+  if(parts.length!==DIMS.length)return null;
+  const out={};
+  for(let i=0;i<DIMS.length;i++){
+    const k=DIMS[i].key,v=parts[i];
+    if(!Number.isInteger(v)||v<0||v>=DIMS[i].opts.length)return null;
+    out[k]=v;
+  }
+  return out;
+}
+function applyCfg(c){cfg={...c};syncSel();syncDV();buildChar();popModel(.82,1.1)}
+function applyShared(){
+  const shared=decodeCfg(sharedCode);
+  if(shared){applyCfg(shared);toast('已用分享的领导替换你的领导','calm')}
+  closeShareModal();
+}
+let sharedCode=null;
+function openShareModal(code){
+  sharedCode=code;
+  const list=document.getElementById('share-preview');
+  list.innerHTML=DIMS.map(d=>`<span>${d.name}<br><b>${d.opts[decodeCfg(code)[d.key]]}</b></span>`).join('');
+  document.getElementById('modal-share').classList.add('show');
+  document.body.style.overflow='hidden';
+}
+function closeShareModal(){
+  document.getElementById('modal-share').classList.remove('show');
+  document.body.style.overflow='';
+}
+function closeShareModalOnMask(e){if(e.target.classList.contains('modal-mask'))closeShareModal()}
+
+// ===== Toast =====
+function toast(msg,type='amber'){
+  const el=document.createElement('div');
+  el.className='toast '+type;
+  el.textContent=msg;
+  document.getElementById('toastWrap').appendChild(el);
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-8px)';setTimeout(()=>el.remove(),300)},2600);
+}
+
+// ===== 检测分享参数 =====
+(function checkShared(){
+  const code=new URLSearchParams(location.search).get('avatar');
+  const shared=decodeCfg(code);
+  if(shared)setTimeout(()=>openShareModal(code),400);
+  // 清理 URL，避免刷新后再次弹窗
+  if(code&&history.replaceState)history.replaceState(null,'',location.pathname);
+})();
+
+// ===== Three.js =====
+const canvas=document.getElementById('three-canvas');
+const scene=new THREE.Scene();
+const camera=new THREE.PerspectiveCamera(40,1,0.1,100);
+camera.position.set(0,2.2,5.5);
+const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled=true;
+renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.toneMapping=THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure=1.35;
+
+renderer.outputColorSpace=THREE.SRGBColorSpace;
+
+function resize(){
+  const w=canvas.clientWidth,h=canvas.clientHeight;
+  if(!w||!h)return;
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h;camera.updateProjectionMatrix();
+}
+new ResizeObserver(resize).observe(canvas);
+window.addEventListener('resize',resize);
+
+// 三点布光 — 深夜蓝+暖琥珀摄影棚
+scene.add(new THREE.AmbientLight(0x3A4A66,0.55));
+const keyL=new THREE.SpotLight(0xFFE0B0,2.2,30,Math.PI/5,0.4,1.5);
+keyL.position.set(2,9,6);keyL.castShadow=true;
+keyL.shadow.mapSize.set(1024,1024);keyL.shadow.bias=-0.0005;
+keyL.shadow.camera.near=1;keyL.shadow.camera.far=25;
+scene.add(keyL);
+const rimL=new THREE.DirectionalLight(0x6B9FD4,0.9);
+rimL.position.set(-4,5,-5);scene.add(rimL);
+const fillL=new THREE.DirectionalLight(0xE8A33D,0.35);
+fillL.position.set(4,2,4);scene.add(fillL);
+const bottomL=new THREE.PointLight(0xE8A33D,0.4,8);
+bottomL.position.set(0,-1,3);scene.add(bottomL);
+
+// 底座
+const ground=new THREE.Mesh(new THREE.CircleGeometry(6,48),new THREE.ShadowMaterial({opacity:0.45}));
+ground.rotation.x=-Math.PI/2;ground.position.y=-1.6;ground.receiveShadow=true;scene.add(ground);
+const base=new THREE.Mesh(new THREE.CylinderGeometry(2.2,2.4,0.18,48),new THREE.MeshStandardMaterial({color:0x1A2536,roughness:.7,metalness:.2}));
+base.position.y=-1.5;base.receiveShadow=true;scene.add(base);
+const baseRing=new THREE.Mesh(new THREE.TorusGeometry(2.2,0.04,12,48),new THREE.MeshStandardMaterial({color:0xE8A33D,emissive:0xE8A33D,emissiveIntensity:0.4}));
+baseRing.position.y=-1.4;baseRing.rotation.x=-Math.PI/2;scene.add(baseRing);
+
+const charGroup=new THREE.Group();
+scene.add(charGroup);
+
+// ============================================================
+// buildChar() —— Q版角色重新构建入口
+// 每次配置变化都会调用，先 dispose 旧几何体，再按 cfg 新值重建
+// ============================================================
+function disposeGroup(g){
+  // 释放组内所有几何体和材质的GPU内存，防止内存泄漏
+  g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});
+  while(g.children.length)g.remove(g.children[0]);
+}
+
+function buildChar(){
+  disposeGroup(charGroup);
+
+  // -------------------- 1. 材质（按 cfg 索引取色）--------------------
+  // MeshStandardMaterial: PBR材质，roughness越小越光滑，metalness越大越金属
+  // MeshBasicMaterial: 不受光照影响，纯色显示（适合腮红、眼白这种自发光效果）
+  const skin=new THREE.MeshStandardMaterial({color:SKINS[cfg.skin],roughness:.62,emissive:SKINS[cfg.skin],emissiveIntensity:.04});
+  const suit=new THREE.MeshStandardMaterial({color:SUITS[cfg.suit],roughness:.72,metalness:.06});
+  const dark=new THREE.MeshStandardMaterial({color:0x2A2530,roughness:.55});
+  const tieM=new THREE.MeshStandardMaterial({color:0xE8A33D,roughness:.4,metalness:.12,emissive:0xE8A33D,emissiveIntensity:.03});
+  const shirtM=new THREE.MeshStandardMaterial({color:0xFAF8F4,roughness:.55});           // 衬衫白色
+  const blushM=new THREE.MeshBasicMaterial({color:0xF5A0A0,transparent:true,opacity:.55});// 默认腮红（备用）
+  const frameM=new THREE.MeshStandardMaterial({color:0x1A1A1A,roughness:.4,metalness:.15});// 眼镜框
+
+  // -------------------- 2. 缩放系数（脸型/肚子）--------------------
+  // fs = [X宽, Y高, Z深]  → 决定头的比例
+  //   0圆脸: 正球体
+  //   1方脸: 略宽略高
+  //   2长脸: 窄而高
+  // bl = 肚子胖度系数 1 / 1.14 / 1.3
+  const fs=[[1,1,1],[1.06,1.16,1.04],[.88,1.32,.88]][cfg.face];
+  const bl=[1,1.14,1.3][cfg.belly];
+
+  // -------------------- 3. 头部几何体 --------------------
+  // Q版大头占角色总高60%，半径1.55
+  // 调整数值时：增大 radius → 头更大；改 fs 比例 → 不同脸型
+  const head=new THREE.Mesh(new THREE.SphereGeometry(1.55,32,32),skin);
+  head.scale.set(fs[0]*1.08,fs[1]*1.05,fs[2]);
+  head.position.y=2.25;                           // ★ 头Y位置基准，所有脸部元素以此为锚点
+  head.castShadow=true;charGroup.add(head);
+
+  // 耳朵：小球压扁成半椭圆，X位置 = fs[0]*1.2（随脸型宽度变）
+  const eg=new THREE.SphereGeometry(.28,16,16);
+  const eL=new THREE.Mesh(eg,skin);eL.scale.set(.55,1,.55);eL.position.set(-fs[0]*1.2,2.2,.05);
+  const eR=eL.clone();eR.position.x=fs[0]*1.2;charGroup.add(eL,eR);
+
+  // 脖子：短粗圆柱（Q版特征）
+  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.35,16),skin);
+  neck.position.y=1.05;charGroup.add(neck);
+
+  // -------------------- 4. 身体+肚子 --------------------
+  // 身体：上窄下宽圆柱，半径随 bl 胖度变化
+  const body=new THREE.Mesh(new THREE.CylinderGeometry(.7*bl,.9*bl,1.05,24),suit);
+  body.position.y=.6;body.castShadow=true;charGroup.add(body);
+  if(cfg.belly>0){
+    // 肚子：前凸的球体，Z方向压扁（只向前突）
+    const belly=new THREE.Mesh(new THREE.SphereGeometry(.55*bl,20,20),suit);
+    belly.position.set(0,.45,.48);belly.scale.set(1,.85,.7);charGroup.add(belly);
+  }
+
+  // -------------------- 5. 动态衣服配件（4种西装差异化）--------------------
+  // 索引映射 cfg.suit → 0深蓝/1黑/2灰/3棕
+  const TIE_COLORS   =[0xE8A33D,0xC44536,0x6B9FD4,0x3D2E1F]; // 领带颜色：琥珀/红/蓝/深棕
+  const POCKET_COLORS=[0xE8A33D,0xFFFFFF,0x6FB3A8,0xD97A6C]; // 口袋巾：琥珀/白/青绿/珊瑚
+  const LAPEL_W      =[1,1.15,.9,1.08];                      // 翻领宽度系数
+  const TIE_ANGLES   =[Math.PI/4,Math.PI/4.2,Math.PI/3.8,Math.PI/4]; // 领带旋转角度
+  const tieColor   =TIE_COLORS[cfg.suit];
+  const pocketColor=POCKET_COLORS[cfg.suit];
+  const tieM2   =new THREE.MeshStandardMaterial({color:tieColor,roughness:.35,metalness:.15});
+  const pocketM =new THREE.MeshStandardMaterial({color:pocketColor,roughness:.5});
+
+  // 衬衫领口：左右两片小方块，Z轴旋转模拟外翻
+  const scL=new THREE.Mesh(new THREE.BoxGeometry(.32,.18,.08),shirtM);
+  scL.position.set(-.14,1.05,.48);scL.rotation.z=.2;charGroup.add(scL);
+  const scR=scL.clone();scR.position.x=.14;scR.rotation.z=-.2;charGroup.add(scR);
+
+  // 领带：结(Box) + 身体(Cone四棱锥)，颜色和角度随西装变
+  const tieKnot=new THREE.Mesh(new THREE.BoxGeometry(.14,.16,.12),tieM2);
+  tieKnot.position.set(0,1.05,.52);charGroup.add(tieKnot);
+  const tieBody=new THREE.Mesh(new THREE.ConeGeometry(.14,.6,4),tieM2);
+  tieBody.position.set(0,.72,.5);tieBody.rotation.y=TIE_ANGLES[cfg.suit];charGroup.add(tieBody);
+
+  // 西装翻领：长方块，左右对称向中间倾斜
+  const lw=LAPEL_W[cfg.suit];
+  const lpL=new THREE.Mesh(new THREE.BoxGeometry(.3*lw,.9,.07),suit);
+  lpL.position.set(-.3,1.35,.86);lpL.rotation.set(.05,0,-.28*lw);charGroup.add(lpL);
+  const lpR=new THREE.Mesh(new THREE.BoxGeometry(.3*lw,.9,.07),suit);
+  lpR.position.set(.3,1.35,.86);lpR.rotation.set(.05,0,.28*lw);charGroup.add(lpR);
+
+  // 口袋巾：小方块 + 口袋下横线
+  const pk=new THREE.Mesh(new THREE.BoxGeometry(.34,.14,.05),pocketM);
+  pk.position.set(.46,1.12,.98);pk.rotation.set(.12,.08,.08);charGroup.add(pk);
+  const pktLine=new THREE.Mesh(new THREE.BoxGeometry(.44,.02,.03),dark);
+  pktLine.position.set(.46,.95,.98);charGroup.add(pktLine);
+
+  // 西装扣：两个小球，垂直间隔0.35
+  for(let i=0;i<2;i++){
+    const btn=new THREE.Mesh(new THREE.SphereGeometry(.055,10,10),new THREE.MeshStandardMaterial({color:0x222222,roughness:.4,metalness:.2}));
+    btn.position.set(0,.7-i*.35,.98);charGroup.add(btn);
+  }
+
+  // -------------------- 6. 手臂+手 --------------------
+  // 手臂：胶囊几何体(CapsuleGeometry=两个半球+圆柱)，左右对称向外张35°
+  const armG=new THREE.CapsuleGeometry(.16,.45,6,10);
+  const armX=.72*bl;                                         // X偏移随肚子变大
+  const aL=new THREE.Mesh(armG,suit);aL.position.set(-armX,.68,.05);aL.rotation.z=.35;aL.rotation.x=.08;aL.castShadow=true;
+  const aR=aL.clone();aR.position.x=armX;aR.rotation.z=-.35;charGroup.add(aL,aR);
+
+  // 手：纯圆球体（Q版不做手指）
+  const hg=new THREE.SphereGeometry(.22,14,14);
+  const hL=new THREE.Mesh(hg,skin);hL.position.set(-armX-.1,.32,.02);charGroup.add(hL);
+  const hR=hL.clone();hR.position.x=armX+.1;charGroup.add(hL,hR);
+
+  // -------------------- 7. 脸部锚点坐标（★重点！所有元素围绕此定位）--------------------
+  // headCenterY = 头中心Y = 2.25 （等于 head.position.y）
+  // 调整脸部布局只改下面5个基准值即可！
+  const headCenterY = 2.25;                            // ★ 头部Y基准（核心锚点）
+  const eyeY   = headCenterY + .45,                     // 眼睛Y：中心偏上0.45（脸部上半区）
+        eyeZ   = fs[2] * .88;                           // 眼睛Z（深度）：脸凸出程度
+  const mouthY = headCenterY - .05,                     // 嘴Y：中心微下0.05（脸部中下方）
+        mouthZ = eyeZ;                                  // 嘴Z与眼同深度
+  const eyeOff  = 0.45 * fs[0];                         // 眼睛左右偏移（眼距 = 2 * eyeOff，Q版眼距更宽）
+  const browY   = eyeY + .28;                           // 眉毛在眼睛上方0.28
+
+  // -------------------- 8. 四套表情（cfg.expr = 0/1/2/3）--------------------
+  // 每套表情包含：眼睛组 + 眉毛 + 嘴 + 额外细节（高光/咬牙线/怒气纹等）
+  if(cfg.expr===0){
+    // ===== 表情0：微笑（默认） —— 弯月眼 + 大弧嘴 + 小舌头 =====
+    const smileEye=(side)=>{
+      const g=new THREE.Group();
+      const iris=new THREE.Mesh(new THREE.SphereGeometry(.12,14,14),dark);
+      iris.scale.set(1,.6,1);                             // Y轴压扁 = 弯月形
+      g.add(iris);
+      const lid=new THREE.Mesh(new THREE.SphereGeometry(.14,12,12),new THREE.MeshBasicMaterial({color:0xffffff}));
+      lid.scale.set(1,.4,.5);lid.position.y=.08;lid.scale.y*=-1;
+      g.add(lid);
+      g.position.set(side*eyeOff,eyeY,eyeZ);              // side=-1左眼 side=1右眼
+      g.scale.x=side>0?1:-1;                              // 右眼X镜像
+      return g;
+    };
+    charGroup.add(smileEye(-1));charGroup.add(smileEye(1));
+    // 眼睛高光：小白球偏右上
+    const hl=new THREE.Mesh(new THREE.SphereGeometry(.04,8,8),new THREE.MeshBasicMaterial({color:0xffffff}));
+    hl.position.set(-eyeOff*.9,eyeY+.06,eyeZ+.06);charGroup.add(hl);
+    const hl2=hl.clone();hl2.position.x=eyeOff*.9;charGroup.add(hl2);
+    // 眉毛：温和上扬（Z轴旋转±.1弧度 ≈ 5.7°）
+    const browG=new THREE.BoxGeometry(.3,.05,.04);
+    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
+    bL.position.set(-eyeOff,browY,eyeZ);bR.position.set(eyeOff,browY,eyeZ);
+    bL.rotation.z=.1;bR.rotation.z=-.1;charGroup.add(bL,bR);
+    // 嘴：半圆环（TorusGeometry 取 Math.PI 一半 = 微笑弧），rotation.z=PI翻到向上弯
+    const smile=new THREE.Mesh(new THREE.TorusGeometry(.18,.045,8,18,Math.PI),dark);
+    smile.position.set(0,mouthY,mouthZ);smile.rotation.z=Math.PI;charGroup.add(smile);
+    // 小舌头：微笑弧下露出的小球
+    const tongue=new THREE.Mesh(new THREE.SphereGeometry(.06,10,10),new THREE.MeshStandardMaterial({color:0xD97A6C,roughness:.5}));
+    tongue.position.set(0,mouthY-.06,mouthZ+.08);tongue.scale.set(1,.5,.6);charGroup.add(tongue);
+
+  } else if(cfg.expr===1){
+    // ===== 表情1：皱眉 —— 眯眼下盖 + 咬牙线 =====
+    const angryEye=(side)=>{
+      const g=new THREE.Group();
+      const iris=new THREE.Mesh(new THREE.SphereGeometry(.11,12,12),dark);
+      iris.scale.set(1,.7,1);
+      g.add(iris);
+      const lid=new THREE.Mesh(new THREE.BoxGeometry(.22,.035,.04),dark);
+      lid.position.y=.1;                                           // 上眼皮往下压
+      g.add(lid);
+      g.position.set(side*eyeOff,eyeY,eyeZ);
+      g.scale.x=side>0?1:-1;
+      return g;
+    };
+    charGroup.add(angryEye(-1));charGroup.add(angryEye(1));
+    // 眉毛：大幅下压（旋转-0.35弧度≈20°，且Y降低了0.14，皱眉感）
+    const browG=new THREE.BoxGeometry(.32,.06,.04);
+    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
+    bL.position.set(-eyeOff,eyeY+.14,eyeZ);bR.position.set(eyeOff,eyeY+.14,eyeZ);
+    bL.rotation.z=-.35;bR.rotation.z=.35;charGroup.add(bL,bR);
+    // 嘴：倒弧形（取Math.PI*0.8，不翻转=向下弯=难过）
+    const frown=new THREE.Mesh(new THREE.TorusGeometry(.16,.05,8,16,Math.PI*.8),dark);
+    frown.position.set(0,mouthY,mouthZ);charGroup.add(frown);
+    // 咬牙横线：扁方块，嘴下方0.06
+    const grind=new THREE.Mesh(new THREE.BoxGeometry(.28,.025,.04),dark);
+    grind.position.set(0,mouthY-.06,mouthZ);charGroup.add(grind);
+
+  } else if(cfg.expr===2){
+    // ===== 表情2：惊讶 —— 大圆眼（白眼球+黑瞳孔）+ O型嘴 =====
+    const bigEye=(side)=>{
+      const g=new THREE.Group();
+      const sclera=new THREE.Mesh(new THREE.SphereGeometry(.14,14,14),new THREE.MeshBasicMaterial({color:0xffffff}));
+      g.add(sclera);                                                      // 眼白
+      const iris=new THREE.Mesh(new THREE.SphereGeometry(.09,12,12),dark);
+      iris.position.z=.02;g.add(iris);                                   // 瞳孔（在眼白前凸一点）
+      const hl=new THREE.Mesh(new THREE.SphereGeometry(.025,6,6),new THREE.MeshBasicMaterial({color:0xffffff}));
+      hl.position.set(.03,.03,.04);g.add(hl);                            // 瞳孔上的小高光
+      g.position.set(side*eyeOff,eyeY,eyeZ);
+      g.scale.x=side>0?1:-1;
+      return g;
+    };
+    charGroup.add(bigEye(-1));charGroup.add(bigEye(1));
+    // 眉毛：大幅上抬（Y比browY还高0.04）
+    const browG=new THREE.BoxGeometry(.3,.055,.04);
+    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
+    bL.position.set(-eyeOff,eyeY+.32,eyeZ);bR.position.set(eyeOff,eyeY+.32,eyeZ);
+    bL.rotation.z=.05;bR.rotation.z=-.05;charGroup.add(bL,bR);
+    // 嘴：球+内球=O型（外球=嘴唇轮廓，内球=深色口腔）
+    const oMouth=new THREE.Mesh(new THREE.SphereGeometry(.12,12,12),dark);
+    oMouth.position.set(0,mouthY,mouthZ);charGroup.add(oMouth);
+    const oInner=new THREE.Mesh(new THREE.SphereGeometry(.07,10,10),new THREE.MeshStandardMaterial({color:0x3D1A1A,roughness:.5}));
+    oInner.position.set(0,mouthY,mouthZ+.02);charGroup.add(oInner);
+
+  } else {
+    // ===== 表情3：生气 —— 上下眼睑 + 倒三角嘴 + 怒气纹 =====
+    const rageEye=(side)=>{
+      const g=new THREE.Group();
+      const iris=new THREE.Mesh(new THREE.SphereGeometry(.1,12,12),dark);
+      iris.scale.set(1,.65,1);
+      g.add(iris);
+      const upperLid=new THREE.Mesh(new THREE.BoxGeometry(.24,.04,.04),dark);
+      upperLid.position.y=.09;g.add(upperLid);                             // 上眼皮
+      const lowerLid=new THREE.Mesh(new THREE.BoxGeometry(.2,.035,.04),dark);
+      lowerLid.position.y=-.06;lowerLid.rotation.z=side>0?.2:-.2;g.add(lowerLid); // 下眼皮（左右镜像倾斜）
+      g.position.set(side*eyeOff,eyeY,eyeZ);
+      g.scale.x=side>0?1:-1;
+      return g;
+    };
+    charGroup.add(rageEye(-1));charGroup.add(rageEye(1));
+    // 眉毛：倒八字（内侧高、外侧低）
+    const browG=new THREE.BoxGeometry(.32,.06,.04);
+    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
+    bL.position.set(-eyeOff,eyeY+.12,eyeZ);bR.position.set(eyeOff,eyeY+.12,eyeZ);
+    bL.rotation.z=-.4;bR.rotation.z=.4;charGroup.add(bL,bR);               // 旋转±0.4弧度≈23°
+    // 嘴：圆锥翻转=倒三角形（开口向上，像怒吼）
+    const rageMouth=new THREE.Mesh(new THREE.ConeGeometry(.16,.12,4),dark);
+    rageMouth.position.set(0,mouthY,mouthZ);rageMouth.rotation.set(Math.PI,0,Math.PI);charGroup.add(rageMouth);
+    // 怒气纹：双眼内侧鼻根处的两条短斜线
+    const wrL=new THREE.Mesh(new THREE.BoxGeometry(.14,.025,.03),dark);
+    wrL.position.set(-eyeOff*.55,eyeY+.08,eyeZ);wrL.rotation.z=-.4;
+    const wrR=wrL.clone();wrR.position.x=eyeOff*.55;wrR.rotation.z=.4;
+    charGroup.add(wrL,wrR);
+  }
+
+  // -------------------- 9. 腮红 --------------------
+  // 球压扁成圆盘（scale.y=0.5 scale.z=0.3），位置=嘴外侧偏上
+  if(cfg.expr!==3){
+    const blushM2=new THREE.MeshBasicMaterial({
+      color:cfg.expr===2?0xD97A6C:0xF5A0A0,               // 惊讶时腮红更红=珊瑚色
+      transparent:true,
+      opacity:cfg.expr===2?.45:.55
+    });
+    const blG=new THREE.SphereGeometry(.22,14,14);
+    const bl1=new THREE.Mesh(blG,blushM2);bl1.position.set(-eyeOff*1.4,mouthY+.18,eyeZ*.82);bl1.scale.set(1,.5,.3);
+    const bl2=bl1.clone();bl2.position.x=eyeOff*1.4;charGroup.add(bl1,bl2);
+  }
+
+  // -------------------- 10. 头发（4种）--------------------
+  // 基本思路：SphereGeometry 截取上半部分（phiLength=0.4~0.56π）= 半个头盖
+  // 调整：增加 phiLength → 头发覆盖越多；调 radius → 头发更厚
+  if(cfg.hair===0){
+    // 发型0：背头（全头顶发 + 刘海 + 呆毛）
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.62,28,28,0,Math.PI*2,0,Math.PI*0.56),dark);
+    h.scale.set(fs[0]*1.1,fs[1]*1.12,fs[2]*1.1);h.position.y=2.38;charGroup.add(h);
+    const bang=new THREE.Mesh(new THREE.SphereGeometry(1.46,20,20,Math.PI*.12,Math.PI*.88,0,Math.PI*.38),dark);
+    bang.scale.set(fs[0]*1.08,fs[1]*1.08,fs[2]*1.08);bang.position.set(0,2.58,fs[2]*.38);charGroup.add(bang);
+    const ahoge=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),dark);
+    ahoge.position.set(.15,3.05,-.1);ahoge.scale.set(.6,1.4,.6);ahoge.rotation.z=.3;charGroup.add(ahoge);
+  } else if(cfg.hair===1){
+    // 发型1：中分（头顶发 + 中线隔板）
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.62,28,28,0,Math.PI*2,0,Math.PI*0.53),dark);
+    h.scale.set(fs[0]*1.1,fs[1]*1.1,fs[2]*1.1);h.position.y=2.35;charGroup.add(h);
+    const part=new THREE.Mesh(new THREE.BoxGeometry(.04,1.2,1.1),new THREE.MeshStandardMaterial({color:0x0A0A0A}));
+    part.position.y=2.68;part.position.z=fs[2]*.5;charGroup.add(part);
+  } else if(cfg.hair===2){
+    // 发型2：寸头（覆盖范围小 phiLength=0.42）
+    const h=new THREE.Mesh(new THREE.SphereGeometry(1.58,24,24,0,Math.PI*2,0,Math.PI*0.42),dark);
+    h.scale.set(fs[0]*1.1,fs[1]*1.08,fs[2]*1.1);h.position.y=2.38;charGroup.add(h);
+  } else {
+    // 发型3：地中海（只有两侧发环 + 后脑勺发块）
+    const sideG=new THREE.TorusGeometry(1.54,.15,10,28,Math.PI*1.15);
+    const sideRing=new THREE.Mesh(sideG,dark);
+    sideRing.position.y=2.65;sideRing.rotation.x=Math.PI/2;
+    sideRing.scale.set(fs[0]*1.1,1,fs[2]*1.08);
+    sideRing.rotation.z=Math.PI;charGroup.add(sideRing);
+    const backH=new THREE.Mesh(new THREE.SphereGeometry(1.42,18,18,Math.PI*0.35,Math.PI*0.75,0,Math.PI*0.44),dark);
+    backH.scale.set(fs[0]*1.08,fs[1]*1.12,fs[2]*1.1);backH.position.y=2.52;backH.position.z=-.25;charGroup.add(backH);
+  }
+
+  // -------------------- 11. 眼镜（2种 + 无）--------------------
+  if(cfg.glasses>0){
+    if(cfg.glasses===1){
+      // 眼镜1：圆框 —— 圆环(Torus) + 圆镜片(Circle) + 反光块
+      const lg=new THREE.TorusGeometry(.46,.065,10,28);
+      const l1=new THREE.Mesh(lg,frameM);l1.position.set(-eyeOff*1.1,eyeY,eyeZ+.04);
+      const l2=l1.clone();l2.position.x=eyeOff*1.1;charGroup.add(l1,l2);
+      const lensM=new THREE.MeshStandardMaterial({color:0x99BBDD,transparent:true,opacity:.15,metalness:.15,roughness:.1});
+      const lens1=new THREE.Mesh(new THREE.CircleGeometry(.4,24),lensM);lens1.position.set(-eyeOff*1.1,eyeY,eyeZ+.04);charGroup.add(lens1);
+      const lens2=lens1.clone();lens2.position.x=eyeOff*1.1;charGroup.add(lens2);
+      const refM=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6});
+      const ref1=new THREE.Mesh(new THREE.SphereGeometry(.08,8,8),refM);ref1.scale.set(1,.5,.3);ref1.position.set(-eyeOff*1.26,eyeY+.14,eyeZ+.06);charGroup.add(ref1);
+      const ref2=ref1.clone();ref2.position.x=eyeOff*.95;charGroup.add(ref2);
+    } else {
+      // 眼镜2：方框 —— 4条边拼成方框
+      const mk=(x)=>{const g=new THREE.Group();const s=.48,t=.06;
+        const a=new THREE.Mesh(new THREE.BoxGeometry(s*2,t,t),frameM);a.position.y=s;     // 上边
+        const b=a.clone();b.position.y=-s;                                               // 下边
+        const c=new THREE.Mesh(new THREE.BoxGeometry(t,s*2,t),frameM);c.position.x=-s;   // 左边
+        const d=c.clone();d.position.x=s;                                                // 右边
+        g.add(a,b,c,d);g.position.set(x,eyeY,eyeZ+.04);return g};
+      charGroup.add(mk(-eyeOff*1.1),mk(eyeOff*1.1));
+      const lensM=new THREE.MeshStandardMaterial({color:0xAACCFF,transparent:true,opacity:.12,metalness:.15,roughness:.1});
+      const mkLens=(x)=>{const s=.41;const g=new THREE.Mesh(new THREE.BoxGeometry(s*2,s*2,.01),lensM);g.position.set(x,eyeY,eyeZ+.04);return g;};
+      charGroup.add(mkLens(-eyeOff*1.1),mkLens(eyeOff*1.1));
+    }
+    // 鼻梁
+    const bridge=new THREE.Mesh(new THREE.BoxGeometry(eyeOff*.88,.055,.055),frameM);
+    bridge.position.set(0,eyeY,eyeZ+.04);charGroup.add(bridge);
+  }
+
+  // -------------------- 12. 胡子（2种 + 无）--------------------
+  if(cfg.beard===1){
+    // 胡子1：八字胡 —— 左右两个半圆环（Torus取π*0.5=90°弧）
+    const m1=new THREE.Mesh(new THREE.TorusGeometry(.12,.04,8,12,Math.PI*.5),dark);
+    m1.position.set(-.08,mouthY-.04,eyeZ);m1.rotation.set(0,0,-.8);
+    const m2=m1.clone();m2.position.x=.08;m2.rotation.set(0,0,.8);
+    charGroup.add(m1,m2);
+  } else if(cfg.beard===2){
+    // 胡子2：络腮胡 —— 大球截取下半部分（phiStart=0.55π）
+    const bg=new THREE.SphereGeometry(.62,20,18,0,Math.PI*2,Math.PI*0.55,Math.PI*0.4);
+    const beard=new THREE.Mesh(bg,dark);beard.scale.set(fs[0],fs[1]*.95,fs[2]);beard.position.y=mouthY-.25;charGroup.add(beard);
+  }
+
+  // -------------------- 13. 整体缩放 --------------------
+  // 改这个值：→ 大 0.95 更饱满 / → 小 0.7 更纤细
+  charGroup.scale.setScalar(0.88);
+}
+
+// 控制器
+const controls=new OrbitControls(camera,canvas);
+controls.enableDamping=true;controls.dampingFactor=0.08;
+controls.enablePan=false;controls.minDistance=4;controls.maxDistance=10;
+controls.minPolarAngle=Math.PI*0.15;controls.maxPolarAngle=Math.PI*0.65;
+controls.autoRotate=true;controls.autoRotateSpeed=0.6;
+controls.target.set(0,1.5,0);
+
+document.getElementById('autoBtn').addEventListener('click',function(){controls.autoRotate=!controls.autoRotate;this.classList.toggle('on',controls.autoRotate)});
+document.getElementById('resetBtn').addEventListener('click',()=>{camera.position.set(0,2.2,5.5);controls.target.set(0,1.5,0);controls.update()});
+
+// ===== 动效状态：入场/切换弹跳 =====
+const prm2=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+let popT=0,popFrom=0.5,popTarget=1;       // 弹跳进度 0..1，从 popFrom 缩放到 popTarget
+let lastT2=performance.now();
+function popModel(from,target){popT=0;popFrom=from;popTarget=target}
+const easeOutBack=t=>{const c1=1.70158,c3=c1+1;return 1+c3*Math.pow(t-1,3)+c1*Math.pow(t-1,2)};
+
+function animate(){
+  requestAnimationFrame(animate);
+  const now=performance.now();
+  const dt=Math.min(0.05,(now-lastT2)/1000);lastT2=now;
+  // 弹跳缩放
+  if(popT<1){
+    popT=Math.min(1,popT+dt*2.4);
+    const e=easeOutBack(popT);
+    const s=popFrom+(popTarget-popFrom)*e;
+    charGroup.scale.setScalar(0.88*s);
+  }else{
+    charGroup.scale.setScalar(0.88*popTarget);
+  }
+  controls.update();
+  renderer.render(scene,camera);
+}
+resize();buildChar();popModel(.5,1);animate();
+
+// ===== 配置面板 =====
+const list=document.getElementById('dimList');
+DIMS.forEach(dim=>{
+  const card=document.createElement('div');
+  card.className='dim'+(dim.key===activeDim?' active':'');
+  card.dataset.key=dim.key;
+  const optsHtml=dim.opts.map((o,i)=>{
+    const sw=dim.swatch?`<span class="sw" style="background:${dim.swatch[i]}"></span>`:'';
+    return `<div class="opt" data-idx="${i}">${sw}${o}</div>`;
+  }).join('');
+  card.innerHTML=`<div class="dim-head"><div class="di">${dim.icon}</div><div class="dn">${dim.name}</div><div class="dv">${dim.opts[cfg[dim.key]]}</div><div class="chev">›</div></div><div class="dim-body"><div class="opts">${optsHtml}</div></div>`;
+  card.querySelector('.dim-head').addEventListener('click',(e)=>{
+    e.stopPropagation();
+    activeDim=dim.key;
+    document.querySelectorAll('.dim').forEach(d=>d.classList.toggle('active',d.dataset.key===activeDim));
+  });
+  card.querySelectorAll('.opt').forEach((o,i)=>o.addEventListener('click',(e)=>{
+    e.stopPropagation();
+    cfg[dim.key]=i;
+    card.querySelectorAll('.opt').forEach(x=>x.classList.remove('sel'));
+    o.classList.add('sel');
+    buildChar();
+    popModel(.82,1.1); // 切换选项时轻微弹跳
+    syncDV();
+  }));
+  list.appendChild(card);
+});
+
+function syncDV(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;const dim=DIMS.find(x=>x.key===k);d.querySelector('.dv').textContent=dim.opts[cfg[k]]})}
+function syncSel(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;d.querySelectorAll('.opt').forEach((o,i)=>o.classList.toggle('sel',i===cfg[k]))})}
+syncSel();
+
+// 操作栏
+// 随机洗牌：连续几帧快速切换外观，最后定格，配合弹跳收尾
+let shuffleTimer=null;
+document.getElementById('randBtn').addEventListener('click',()=>{
+  clearTimeout(shuffleTimer);
+  let step=0;
+  const steps=6;
+  (function shuffle(){
+    DIMS.forEach(d=>cfg[d.key]=Math.floor(Math.random()*d.opts.length));
+    syncSel();syncDV();buildChar();
+    step++;
+    if(step<steps){
+      shuffleTimer=setTimeout(shuffle,70);
+    }else{
+      popModel(.6,1.15);
+      toast('随机了一位新领导 🎲','amber');
+    }
+  })();
+});
+document.getElementById('defBtn').addEventListener('click',()=>{
+  cfg={...DEFAULT_CFG};syncSel();syncDV();buildChar();
+  popModel(.82,1.1);
+  toast('已恢复默认','amber');
+});
+document.getElementById('saveBtn').addEventListener('click',function(){
+  this.textContent='已保存 ✓';this.classList.add('saved');
+  try{localStorage.setItem('xqx_avatar',encodeCfg(cfg))}catch(e){}
+  toast('领导已保存，云端同步中 ☁️','calm');
+  setTimeout(()=>{this.textContent='保存领导';this.classList.remove('saved')},1500);
+});
+// 加载本地保存的外观（若存在）
+(function loadSaved(){
+  try{
+    const saved=localStorage.getItem('xqx_avatar');
+    const c=decodeCfg(saved);
+    if(c)applyCfg(c);
+  }catch(e){}
+})();
+document.getElementById('shareBtn').addEventListener('click',function(){
+  const code=encodeCfg(cfg);
+  navigator.clipboard?.writeText(`${location.origin}${location.pathname}?avatar=${code}`).then(()=>{
+    this.textContent='已复制 ✓';setTimeout(()=>this.textContent='分享',1500);
+    toast('分享链接已复制，仅包含外观 🔗','calm');
+  }).catch(()=>{this.textContent='复制失败';setTimeout(()=>this.textContent='分享',1500)});
+});
+</script>
+
+
+</body></html>

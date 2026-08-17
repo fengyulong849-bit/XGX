@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>小确闲 · 深夜治愈版（Marble 骨架）</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Noto+Serif+SC:wght@400;500;600;700&amp;family=Inter:wght@400;500;600&amp;family=Noto+Sans+SC:wght@400;500;600&amp;family=DMMono:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0E1A2B;--bg-2:#142336;--surface:#1A2B44;--surface-2:#213452;--surface-3:#2A3F5F;
+  --ink:#EDE8DD;--muted:#9AA8BC;--tertiary:#6B7A91;
+  --rule:rgba(237,232,221,.08);--rule-2:rgba(237,232,221,.14);
+  --amber:#E8A33D;--amber-2:#F5B14C;--rose:#D97A6C;--blue:#6B9FD4;--calm:#6FB3A8;--info:#7BA7D9;
+  --grad:linear-gradient(120deg,#E8A33D 0%,#D97A6C 100%);
+  --grad-cool:linear-gradient(120deg,#6B9FD4,#6FB3A8);
+  --shadow:0 8px 32px rgba(0,0,0,.3);
+  --shadow-lg:0 24px 64px rgba(0,0,0,.4);
+  --glow-amber:0 0 28px rgba(232,163,61,.25);
+  --ease:cubic-bezier(.4,.2,.2,1);
+  --mono:'DMMono',monospace;
+  --serif:'EB Garamond','Noto Serif SC',serif;
+  --sans:'Inter','Noto Sans SC',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);line-height:1.75;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(720px 480px at 10% -6%,rgba(232,163,61,.10),transparent 60%),
+    radial-gradient(680px 460px at 95% 8%,rgba(107,159,212,.12),transparent 60%),
+    radial-gradient(800px 560px at 50% 112%,rgba(111,179,168,.07),transparent 60%);
+}
+.wrap{position:relative;z-index:1}
+
+/* ============ 导航 ============ */
+.nav{
+  position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:10px;
+  background:rgba(14,26,43,.72);backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--rule);
+  padding:14px 36px;max-width:1200px;margin:0 auto;
+}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--serif);font-weight:600;font-size:22px;letter-spacing:.01em}
+.logo-mark{width:30px;height:30px;border-radius:9px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:16px;font-weight:700;font-family:var(--sans);box-shadow:var(--glow-amber)}
+.nav-links{display:flex;gap:2px;margin-left:20px}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;padding:8px 14px;border-radius:999px;transition:all .2s var(--ease)}
+.nav-links a:hover{color:var(--ink);background:var(--surface)}
+.nav-spacer{flex:1}
+.countdown{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:7px 15px;font-family:var(--mono);font-size:13px}
+.countdown .dot{width:7px;height:7px;border-radius:50%;background:var(--calm);box-shadow:0 0 8px var(--calm);animation:pulse 2.4s infinite}
+.countdown b{color:var(--amber)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
+.nav-cta{background:var(--grad);color:var(--bg);border:none;font:inherit;font-weight:700;font-size:14px;padding:9px 22px;border-radius:999px;cursor:pointer;box-shadow:var(--glow-amber);transition:all .2s var(--ease)}
+.nav-cta:hover{transform:translateY(-2px)}
+
+/* ============ Hero ============ */
+.hero{max-width:880px;margin:0 auto;padding:88px 32px 56px;text-align:center}
+.eyebrow{font-family:var(--serif);font-style:italic;font-size:17px;color:var(--amber);margin-bottom:18px;opacity:.9}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(40px,6.2vw,66px);font-weight:600;line-height:1.15;
+  letter-spacing:.01em;margin-bottom:22px;
+}
+.hero h1 .accent{font-style:italic;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero .lede{font-size:18px;color:var(--muted);max-width:560px;margin:0 auto 36px;line-height:1.8}
+.hero-cta{display:flex;gap:14px;justify-content:center}
+.btn-primary{background:var(--grad);color:var(--bg);border:none;font:inherit;font-weight:700;font-size:15px;padding:14px 32px;border-radius:999px;cursor:pointer;box-shadow:var(--glow-amber);transition:all .2s var(--ease)}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(232,163,61,.4)}
+.btn-ghost{background:transparent;color:var(--ink);border:1px solid var(--rule-2);font:inherit;font-weight:500;font-size:15px;padding:14px 28px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber)}
+
+/* ============ 编号叙事 01-04 ============ */
+.narrative{max-width:1100px;margin:0 auto;padding:48px 32px 72px}
+.nar-intro{text-align:center;margin-bottom:56px}
+.nar-intro .kicker{font-family:var(--serif);font-style:italic;color:var(--blue);font-size:15px;margin-bottom:8px}
+.nar-intro h2{font-family:var(--serif);font-size:clamp(28px,4vw,38px);font-weight:600}
+.nar-step{display:grid;grid-template-columns:80px 1fr 1fr;gap:32px;align-items:center;padding:44px 0;border-top:1px solid var(--rule)}
+.nar-step:last-child{border-bottom:1px solid var(--rule)}
+.nar-num{font-family:var(--serif);font-style:italic;font-size:64px;font-weight:500;color:var(--amber);opacity:.85;line-height:1}
+.nar-text h3{font-family:var(--serif);font-size:26px;font-weight:600;margin-bottom:10px}
+.nar-text p{color:var(--muted);font-size:15px;line-height:1.8}
+.nar-visual{background:var(--surface);border:1px solid var(--rule);border-radius:18px;padding:20px;min-height:140px;display:flex;align-items:center;justify-content:center;box-shadow:var(--shadow)}
+.nar-visual .mock{font-size:13px;color:var(--muted);text-align:center}
+.nar-visual .mock b{color:var(--ink);font-family:var(--serif);font-size:16px;display:block;margin-bottom:6px}
+.nar-visual .actions-mini{display:flex;gap:8px;justify-content:center;margin-top:10px}
+.nar-visual .actions-mini span{background:var(--surface-2);border:1px solid var(--rule);border-radius:10px;padding:8px 12px;font-size:18px}
+
+/* ============ 桌宠收藏卡 ============ */
+.section{max-width:1100px;margin:0 auto;padding:64px 32px}
+.sec-head{text-align:center;margin-bottom:40px}
+.sec-head .kicker{font-family:var(--serif);font-style:italic;color:var(--blue);font-size:15px;margin-bottom:8px;display:block}
+.sec-head h2{font-family:var(--serif);font-size:clamp(28px,4vw,40px);font-weight:600;margin-bottom:10px}
+.sec-head p{color:var(--muted);max-width:520px;margin:0 auto;font-size:15px}
+
+.pet-card{max-width:660px;margin:0 auto;background:var(--surface);border:1px solid var(--rule);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden;position:relative}
+.pet-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
+.holo{position:relative;margin:20px;border-radius:18px;padding:3px;background:conic-gradient(from 0deg,#E8A33D,#D97A6C,#6B9FD4,#6FB3A8,#E8A33D);background-size:200% 200%;animation:holoSpin 10s linear infinite}
+@keyframes holoSpin{0%{background-position:0% 0%}100%{background-position:200% 200%}}
+.holo-inner{position:relative;background:radial-gradient(circle at 50% 30%,var(--surface-2),var(--bg-2));border-radius:16px;padding:24px;overflow:hidden}
+.holo-shine{position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.14) 50%,transparent 58%);background-size:250% 250%;animation:shine 6s ease-in-out infinite}
+@keyframes shine{0%,100%{background-position:200% 0}50%{background-position:-50% 0}}
+.rarity{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;position:relative;z-index:1}
+.rarity .stars{color:var(--amber);font-size:14px;letter-spacing:1px;font-weight:600}
+.rarity .id{font-family:var(--mono);font-size:12px;color:var(--tertiary)}
+.figure-stage{position:relative;height:290px;display:flex;align-items:flex-end;justify-content:center;perspective:800px}
+.figure-glow{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,61,.18),transparent 70%);filter:blur(10px)}
+.figure-shadow{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:150px;height:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent 70%)}
+.figure{position:relative;width:200px;height:270px;transform-style:preserve-3d;animation:figSpin 16s ease-in-out infinite;transform-origin:50% 80%}
+@keyframes figSpin{0%,100%{transform:rotateY(-13deg)}50%{transform:rotateY(13deg)}}
+.figure svg{width:100%;height:100%;filter:drop-shadow(0 14px 22px rgba(0,0,0,.4))}
+.nameplate{text-align:center;padding-top:14px;border-top:1px solid var(--rule);margin-top:6px;position:relative;z-index:1}
+.nameplate .nm{font-family:var(--serif);font-weight:600;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.nameplate .sub{font-size:12px;color:var(--muted);font-style:italic;font-family:var(--serif)}
+.pet-bottom{padding:0 20px 20px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-bottom:18px}
+.stat-row{display:flex;align-items:center;gap:10px}
+.stat-row .lbl{font-size:12px;color:var(--muted);width:30px;font-weight:600}
+.stat-bar{flex:1;height:7px;border-radius:999px;background:rgba(255,255,255,.07);overflow:hidden}
+.stat-bar i{display:block;height:100%;border-radius:999px;transition:width .4s var(--ease)}
+.stat-row .val{font-family:var(--mono);font-size:11px;color:var(--muted);width:24px;text-align:right}
+.actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.act{background:rgba(255,255,255,.04);border:1px solid var(--rule);border-radius:14px;padding:13px 6px;cursor:pointer;text-align:center;transition:all .2s var(--ease);font:inherit;font-weight:600;font-size:13px;color:var(--ink)}
+.act .ico{font-size:20px;display:block;margin-bottom:3px}
+.act:hover{transform:translateY(-3px);border-color:var(--amber);color:var(--amber);box-shadow:var(--glow-amber)}
+
+/* ============ 柔和吐槽流 ============ */
+.signal{padding:24px 0 8px;overflow:hidden;position:relative}
+.signal::before,.signal::after{content:'';position:absolute;top:0;bottom:0;width:140px;z-index:2;pointer-events:none}
+.signal::before{left:0;background:linear-gradient(90deg,var(--bg),transparent)}
+.signal::after{right:0;background:linear-gradient(-90deg,var(--bg),transparent)}
+.signal-head{text-align:center;margin-bottom:20px}
+.signal-head .kicker{font-family:var(--serif);font-style:italic;color:var(--blue);font-size:14px;display:block;margin-bottom:4px}
+.signal-head h2{font-family:var(--serif);font-size:20px;font-weight:600;color:var(--ink)}
+.marquee{display:flex;gap:12px;width:max-content;animation:scrollL 50s linear infinite}
+.marquee.rev{animation:scrollR 55s linear infinite}
+.marquee:hover{animation-play-state:paused}
+@keyframes scrollL{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+@keyframes scrollR{0%{transform:translateX(-50%)}100%{transform:translateX(0)}}
+.sig-chip{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--rule);border-radius:14px;padding:11px 18px;white-space:nowrap;box-shadow:var(--shadow);flex-shrink:0}
+.sig-chip .ico{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;background:rgba(255,255,255,.05)}
+.sig-chip .txt{font-size:13px;color:var(--muted);font-weight:400}
+.sig-chip .txt b{color:var(--ink);font-weight:500}
+.sig-chip .res{font-family:var(--mono);font-size:11px;color:var(--amber);font-weight:600;margin-left:4px}
+
+/* ============ Manifesto 原理 ============ */
+.manifesto{max-width:880px;margin:0 auto;padding:72px 32px;text-align:center}
+.manifesto .quote{font-family:var(--serif);font-style:italic;font-size:clamp(22px,3vw,30px);font-weight:500;line-height:1.5;color:var(--ink);margin-bottom:8px}
+.manifesto .quote .em{color:var(--amber)}
+.manifesto .quote-sub{color:var(--muted);font-size:15px;margin-bottom:48px}
+.principles{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.principle{background:var(--surface);border:1px solid var(--rule);border-radius:18px;padding:28px 24px;text-align:left}
+.principle .p-num{font-family:var(--serif);font-style:italic;font-size:22px;color:var(--blue);margin-bottom:10px}
+.principle h4{font-family:var(--serif);font-size:19px;font-weight:600;margin-bottom:8px}
+.principle p{font-size:14px;color:var(--muted);line-height:1.7}
+
+/* ============ 产品预览 + 转化 ============ */
+.convert{max-width:1100px;margin:0 auto;padding:48px 32px 72px}
+.convert-card{background:var(--surface);border:1px solid var(--rule);border-radius:24px;box-shadow:var(--shadow-lg);overflow:hidden;display:grid;grid-template-columns:1fr 1fr}
+.cc-left{padding:48px 44px;display:flex;flex-direction:column;justify-content:center}
+.cc-left .kicker{font-family:var(--serif);font-style:italic;color:var(--amber);font-size:15px;margin-bottom:10px}
+.cc-left h3{font-family:var(--serif);font-size:32px;font-weight:600;line-height:1.2;margin-bottom:14px}
+.cc-left p{color:var(--muted);font-size:15px;margin-bottom:24px;line-height:1.8}
+.cc-points{display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.cc-points .pt{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--ink)}
+.cc-points .pt .chk{width:22px;height:22px;border-radius:7px;background:var(--grad);display:flex;align-items:center;justify-content:center;color:var(--bg);font-size:13px;font-weight:700;flex-shrink:0}
+.cc-right{background:linear-gradient(160deg,var(--surface-2),var(--bg-2));display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;padding:32px}
+.cc-right::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 40%,rgba(232,163,61,.1),transparent 60%)}
+.cc-pet{width:200px;height:270px;animation:floaty 5s ease-in-out infinite;position:relative;z-index:1}
+@keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.cc-pet svg{width:100%;height:100%;filter:drop-shadow(0 16px 26px rgba(0,0,0,.4))}
+
+/* ============ 统计条 ============ */
+.stat-strip{max-width:1100px;margin:0 auto;padding:0 32px 64px;display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:16px}
+.strip-card{background:var(--surface);border:1px solid var(--rule);border-radius:18px;padding:20px;box-shadow:var(--shadow)}
+.strip-card.checkin{background:linear-gradient(135deg,rgba(232,163,61,.08),rgba(217,122,108,.06));border-color:var(--rule-2)}
+.sc-head{display:flex;align-items:center;gap:11px;margin-bottom:14px}
+.sc-head .sc-ico{width:40px;height:40px;border-radius:12px;background:var(--grad);display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:var(--glow-amber)}
+.sc-head b{font-size:15px;font-family:var(--serif);font-weight:600}
+.sc-head span{font-size:12px;color:var(--muted);display:block}
+.ci-streak{display:flex;gap:4px;margin:10px 0 14px}
+.ci-streak i{width:20px;height:7px;border-radius:999px;background:rgba(255,255,255,.1)}
+.ci-streak i.on{background:var(--grad)}
+.ci-btn{background:var(--grad);color:var(--bg);border:none;font:inherit;font-weight:700;font-size:14px;padding:10px 22px;border-radius:999px;cursor:pointer;box-shadow:var(--glow-amber);transition:all .2s var(--ease)}
+.ci-btn:hover{transform:translateY(-2px)}
+.metric{display:flex;flex-direction:column;justify-content:center}
+.metric .m-val{font-family:var(--mono);font-size:30px;font-weight:600;letter-spacing:-.02em}
+.metric .m-val.amber{color:var(--amber)}.metric .m-val.blue{color:var(--blue)}
+.metric .m-lbl{font-size:13px;color:var(--muted)}
+.metric .m-sub{font-size:12px;color:var(--calm);font-weight:600;margin-top:6px}
+
+/* ============ 底部 ============ */
+footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px solid var(--rule)}
+.f-top{display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap;margin-bottom:28px}
+.f-brand{max-width:300px}
+.f-brand .logo{margin-bottom:12px}
+.f-brand p{font-size:13px;color:var(--muted);line-height:1.7}
+.f-cols{display:flex;gap:48px}
+.f-col h5{font-family:var(--serif);font-size:14px;font-weight:600;margin-bottom:12px}
+.f-col a{display:block;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:8px;transition:color .2s}
+.f-col a:hover{color:var(--amber)}
+.f-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--rule);font-size:12px;color:var(--tertiary)}
+
+@media(max-width:880px){
+  .nav-links{display:none}
+  .nar-step{grid-template-columns:1fr;text-align:center}
+  .nar-num{font-size:48px}
+  .convert-card{grid-template-columns:1fr}
+  .cc-right{display:none}
+  .principles{grid-template-columns:1fr}
+  .stat-strip{grid-template-columns:1fr}
+  .stats{grid-template-columns:1fr}
+  .actions{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 导航 -->
+  <nav class="nav">
+    <div class="logo"><span class="logo-mark">闲</span>小确闲</div>
+    <div class="nav-links"><a href="#">桌宠</a><a href="#">吐槽墙</a><a href="#">释怀</a><a href="#">积分</a></div>
+    <div class="nav-spacer"></div>
+    <div class="countdown"><span class="dot"></span>下班还有 <b>02:14:30</b></div>
+    <button class="nav-cta">免费试玩</button>
+  </nav>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="eyebrow">打工人的五分钟治愈站</div>
+    <h1>捏捏领导，<span class="accent">释怀一下</span><br>今天就没那么难熬</h1>
+    <p class="lede">不是又一个让你更高效的工具。而是一个让你慢下来、发泄一下、然后轻一点的地方。</p>
+    <div class="hero-cta">
+      <button class="btn-primary">开始捏领导</button>
+      <button class="btn-ghost">看看吐槽墙</button>
+    </div>
+  </header>
+
+  <!-- 编号叙事 -->
+  <section class="narrative">
+    <div class="nar-intro">
+      <span class="kicker">四步，完成一次释怀</span>
+      <h2>发泄的闭环</h2>
+    </div>
+
+    <div class="nar-step">
+      <div class="nar-num">01</div>
+      <div class="nar-text"><h3>你设定一位领导</h3><p>八维捏脸，给他你熟悉的那张脸。西装、领带、表情、肚子，全由你定。他 yours，他归你管。</p></div>
+      <div class="nar-visual"><div class="mock"><b>捏脸 DIY</b>脸型 · 发型 · 眼镜 · 胡子 · 表情 · 西装 · 肚子 · 肤色<div class="actions-mini"><span>👤</span><span>👔</span><span>👓</span><span>😡</span></div></div></div>
+    </div>
+
+    <div class="nar-step">
+      <div class="nar-num">02</div>
+      <div class="nar-text"><h3>尽情发泄</h3><p>戳他、拍他、喂他、朝他扔东西。承受值见底他就倒地，补两刀也行——卡通反馈，不加分，只为出气。</p></div>
+      <div class="nar-visual"><div class="mock"><b>四种动作</b>承受 / 烦躁 / 胖度 / 脏度 实时变化<div class="actions-mini"><span>👆</span><span>👋</span><span>🍎</span><span>🗑️</span></div></div></div>
+    </div>
+
+    <div class="nar-step">
+      <div class="nar-num">03</div>
+      <div class="nar-text"><h3>吐槽，被听见</h3><p>把憋着的话写下来，扔上匿名墙。有人共鸣你，你也能共鸣别人。15 天后温柔淡出，不留痕迹。</p></div>
+      <div class="nar-visual"><div class="mock"><b>匿名吐槽墙</b>每日 3 条 · 共鸣 +10 · 15 天渐隐<div class="actions-mini"><span>📝</span><span>🫶</span><span>⏳</span></div></div></div>
+    </div>
+
+    <div class="nar-step">
+      <div class="nar-num">04</div>
+      <div class="nar-text"><h3>亲手了断</h3><p>写下最烦的那件事，选风吹、揉纸、还是碎纸机，看着它消失。满 24 小时，+100 积分。烦心事，归零。</p></div>
+      <div class="nar-visual"><div class="mock"><b>释怀仪式</b>风吹散 · 揉成团 · 碎纸机<div class="actions-mini"><span>🌬️</span><span>📄</span><span>✂️</span></div></div></div>
+    </div>
+  </section>
+
+  <!-- 桌宠收藏卡 -->
+  <section class="section" style="padding-top:0">
+    <div class="sec-head">
+      <span class="kicker">领导桌宠</span>
+      <h2>你的专属领导，全息收藏</h2>
+      <p>登录后自由捏脸，跨账号同步。试玩版先用预置领导，倒地复活即解锁全部。</p>
+    </div>
+    <div class="pet-card">
+      <div class="holo">
+        <div class="holo-inner">
+          <div class="holo-shine"></div>
+          <div class="rarity"><span class="stars">★★★ 试玩版</span><span class="id">领导系列 #001</span></div>
+          <div class="figure-stage">
+            <div class="figure-glow"></div>
+            <div class="figure-shadow"></div>
+            <div class="figure" id="figure">
+              <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="100" cy="262" rx="58" ry="9" fill="#000" opacity=".4"></ellipse>
+                <ellipse cx="100" cy="258" rx="50" ry="8" fill="#1A2536"></ellipse>
+                <ellipse cx="100" cy="254" rx="42" ry="6" fill="#E8A33D" opacity=".5"></ellipse>
+                <path d="M62 150 Q60 200 68 244 L132 244 Q140 200 138 150 Z" fill="#2E3A4A"></path>
+                <path d="M68 150 L100 170 L132 150 L132 158 L100 178 L68 158 Z" fill="#1E2A3A"></path>
+                <path d="M100 170 L94 184 L100 230 L106 184 Z" fill="#E8A33D"></path>
+                <path d="M86 148 L100 170 L114 148 L108 144 L92 144 Z" fill="#EDE8DD"></path>
+                <ellipse cx="58" cy="175" rx="12" ry="26" fill="#2E3A4A" transform="rotate(8 58 175)"></ellipse>
+                <ellipse cx="142" cy="175" rx="12" ry="26" fill="#2E3A4A" transform="rotate(-8 142 175)"></ellipse>
+                <circle cx="52" cy="198" r="9" fill="#E8B98A"></circle>
+                <circle cx="148" cy="198" r="9" fill="#E8B98A"></circle>
+                <rect x="92" y="128" width="16" height="24" rx="4" fill="#E8B98A"></rect>
+                <ellipse cx="100" cy="100" rx="44" ry="46" fill="#E8B98A"></ellipse>
+                <ellipse cx="84" cy="82" rx="14" ry="18" fill="#fff" opacity=".28"></ellipse>
+                <ellipse cx="58" cy="104" rx="7" ry="11" fill="#E8B98A"></ellipse>
+                <ellipse cx="142" cy="104" rx="7" ry="11" fill="#E8B98A"></ellipse>
+                <path d="M56 84 Q60 52 100 50 Q140 52 144 84 Q138 70 100 68 Q62 70 56 84 Z" fill="#15131A"></path>
+                <path d="M74 88 Q82 85 90 89" stroke="#15131A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+                <path d="M110 89 Q118 85 126 88" stroke="#15131A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+                <circle cx="82" cy="100" r="13" fill="none" stroke="#15131A" stroke-width="2.5"></circle>
+                <circle cx="118" cy="100" r="13" fill="none" stroke="#15131A" stroke-width="2.5"></circle>
+                <line x1="95" y1="100" x2="105" y2="100" stroke="#15131A" stroke-width="2.5"></line>
+                <ellipse cx="82" cy="100" rx="3" ry="4" fill="#15131A"></ellipse>
+                <ellipse cx="118" cy="100" rx="3" ry="4" fill="#15131A"></ellipse>
+                <path d="M88 122 Q100 116 112 122" stroke="#15131A" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+                <ellipse cx="72" cy="116" rx="6" ry="4" fill="#D97A6C" opacity=".45"></ellipse>
+                <ellipse cx="128" cy="116" rx="6" ry="4" fill="#D97A6C" opacity=".45"></ellipse>
+              </svg>
+            </div>
+          </div>
+          <div class="nameplate"><div class="nm">暴躁打工人 · 领导</div><div class="sub">"再改一版，今晚就给"</div></div>
+        </div>
+      </div>
+      <div class="pet-bottom">
+        <div class="stats">
+          <div class="stat-row"><span class="lbl">承受</span><div class="stat-bar"><i style="width:62%;background:#6FB3A8"></i></div><span class="val">62</span></div>
+          <div class="stat-row"><span class="lbl">烦躁</span><div class="stat-bar"><i style="width:45%;background:#E8A33D"></i></div><span class="val">45</span></div>
+          <div class="stat-row"><span class="lbl">胖度</span><div class="stat-bar"><i style="width:30%;background:#F5B14C"></i></div><span class="val">30</span></div>
+          <div class="stat-row"><span class="lbl">脏度</span><div class="stat-bar"><i style="width:18%;background:#9AA8BC"></i></div><span class="val">18</span></div>
+        </div>
+        <div class="actions">
+          <button class="act"><span class="ico">👆</span>戳一下</button>
+          <button class="act"><span class="ico">👋</span>拍一拍</button>
+          <button class="act"><span class="ico">🍎</span>喂食</button>
+          <button class="act"><span class="ico">🗑️</span>扔东西</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 柔和吐槽流 -->
+  <section class="signal">
+    <div class="signal-head">
+      <span class="kicker">此刻，有人在说</span>
+      <h2>匿名心声，温柔滚动</h2>
+    </div>
+    <div class="marquee" id="mq1"></div>
+    <div style="height:12px"></div>
+    <div class="marquee rev" id="mq2"></div>
+  </section>
+
+  <!-- Manifesto -->
+  <section class="manifesto">
+    <p class="quote">我们做这个，不是为了让你<span class="em">更用力地活</span>，<br>而是让你在累的时候，<span class="em">有个地方可以轻一点。</span></p>
+    <p class="quote-sub">— 小确闲的三条原则</p>
+    <div class="principles">
+      <div class="principle">
+        <div class="p-num">i.</div>
+        <h4>发泄，而非压抑</h4>
+        <p>压力不会自己消失。与其憋着，不如捏一捏、写一写、撕一撕。情绪需要出口，不是出口。</p>
+      </div>
+      <div class="principle">
+        <div class="p-num">ii.</div>
+        <h4>匿名，而非围观</h4>
+        <p>吐槽不显示账号，共鸣不暴露身份。你说出来，有人懂，就够了。15 天后温柔淡出。</p>
+      </div>
+      <div class="principle">
+        <div class="p-num">iii.</div>
+        <h4>治愈，而非沉溺</h4>
+        <p>下班倒计时、喝水起身提醒。发泄完，记得回到真实生活。这里只借你五分钟。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 产品预览 + 转化 -->
+  <section class="convert">
+    <div class="convert-card">
+      <div class="cc-left">
+        <span class="kicker">现在就开始</span>
+        <h3>先捏一位领导试试</h3>
+        <p>不用注册，预置领导直接玩。戳拍喂扔、吐槽浏览、销毁宣传动画，全开放。倒地复活、捏脸DIY、积分签到——登录即解锁。</p>
+        <div class="cc-points">
+          <div class="pt"><span class="chk">✓</span> 首次注册送免费捏脸 + 300 积分</div>
+          <div class="pt"><span class="chk">✓</span> 不绑手机邮箱，匿名账号 + 恢复码</div>
+          <div class="pt"><span class="chk">✓</span> 每日签到连续里程碑 + 随机惊喜</div>
+        </div>
+        <div><button class="btn-primary">免费试玩 →</button></div>
+      </div>
+      <div class="cc-right">
+        <div class="cc-pet">
+          <svg viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="100" cy="262" rx="58" ry="9" fill="#000" opacity=".4"></ellipse>
+            <ellipse cx="100" cy="258" rx="50" ry="8" fill="#1A2536"></ellipse>
+            <ellipse cx="100" cy="254" rx="42" ry="6" fill="#E8A33D" opacity=".5"></ellipse>
+            <path d="M62 150 Q60 200 68 244 L132 244 Q140 200 138 150 Z" fill="#2E3A4A"></path>
+            <path d="M68 150 L100 170 L132 150 L132 158 L100 178 L68 158 Z" fill="#1E2A3A"></path>
+            <path d="M100 170 L94 184 L100 230 L106 184 Z" fill="#E8A33D"></path>
+            <path d="M86 148 L100 170 L114 148 L108 144 L92 144 Z" fill="#EDE8DD"></path>
+            <ellipse cx="58" cy="175" rx="12" ry="26" fill="#2E3A4A" transform="rotate(8 58 175)"></ellipse>
+            <ellipse cx="142" cy="175" rx="12" ry="26" fill="#2E3A4A" transform="rotate(-8 142 175)"></ellipse>
+            <circle cx="52" cy="198" r="9" fill="#E8B98A"></circle>
+            <circle cx="148" cy="198" r="9" fill="#E8B98A"></circle>
+            <rect x="92" y="128" width="16" height="24" rx="4" fill="#E8B98A"></rect>
+            <ellipse cx="100" cy="100" rx="44" ry="46" fill="#E8B98A"></ellipse>
+            <ellipse cx="84" cy="82" rx="14" ry="18" fill="#fff" opacity=".28"></ellipse>
+            <ellipse cx="58" cy="104" rx="7" ry="11" fill="#E8B98A"></ellipse>
+            <ellipse cx="142" cy="104" rx="7" ry="11" fill="#E8B98A"></ellipse>
+            <path d="M56 84 Q60 52 100 50 Q140 52 144 84 Q138 70 100 68 Q62 70 56 84 Z" fill="#15131A"></path>
+            <path d="M74 88 Q82 85 90 89" stroke="#15131A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+            <path d="M110 89 Q118 85 126 88" stroke="#15131A" stroke-width="3" fill="none" stroke-linecap="round"></path>
+            <circle cx="82" cy="100" r="13" fill="none" stroke="#15131A" stroke-width="2.5"></circle>
+            <circle cx="118" cy="100" r="13" fill="none" stroke="#15131A" stroke-width="2.5"></circle>
+            <line x1="95" y1="100" x2="105" y2="100" stroke="#15131A" stroke-width="2.5"></line>
+            <ellipse cx="82" cy="100" rx="3" ry="4" fill="#15131A"></ellipse>
+            <ellipse cx="118" cy="100" rx="3" ry="4" fill="#15131A"></ellipse>
+            <path d="M88 122 Q100 116 112 122" stroke="#15131A" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+            <ellipse cx="72" cy="116" rx="6" ry="4" fill="#D97A6C" opacity=".45"></ellipse>
+            <ellipse cx="128" cy="116" rx="6" ry="4" fill="#D97A6C" opacity=".45"></ellipse>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 统计条 -->
+  <div class="stat-strip">
+    <div class="strip-card checkin">
+      <div class="sc-head">
+        <div class="sc-ico">📅</div>
+        <div><b>每日签到</b><span>连续 5 天 · 下个里程碑 7 天</span></div>
+      </div>
+      <div class="ci-streak"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div>
+      <button class="ci-btn">签到领惊喜</button>
+    </div>
+    <div class="strip-card metric">
+      <div class="m-val amber">300</div>
+      <div class="m-lbl">当前积分</div>
+      <div class="m-sub">↑ 今日 +50</div>
+    </div>
+    <div class="strip-card metric">
+      <div class="m-val blue">+30</div>
+      <div class="m-lbl">关怀奖励 · 久坐起身</div>
+      <div class="m-sub">喝水 +20 / 久坐 +30</div>
+    </div>
+  </div>
+
+  <!-- 底部 -->
+  <footer>
+    <div class="f-top">
+      <div class="f-brand">
+        <div class="logo"><span class="logo-mark">闲</span>小确闲</div>
+        <p>打工人的五分钟治愈站。捏捏领导，释怀一下，今天就没那么难熬。</p>
+      </div>
+      <div class="f-cols">
+        <div class="f-col"><h5>产品</h5><a href="#">领导桌宠</a><a href="#">捏脸DIY</a><a href="#">吐槽墙</a><a href="#">释怀仪式</a></div>
+        <div class="f-col"><h5>规则</h5><a href="#">内容规则</a><a href="#">隐私说明</a><a href="#">15天淡出</a><a href="#">账号注销</a></div>
+        <div class="f-col"><h5>账户</h5><a href="#">登录注册</a><a href="#">找回密码</a><a href="#">积分明细</a></div>
+      </div>
+    </div>
+    <div class="f-bottom"><span>© 2026 小确闲 · 打工人的五分钟治愈站</span><span>v1.0 效果图 · Marble 骨架</span></div>
+  </footer>
+
+</div>
+
+<script>
+// 柔和吐槽流
+const sig1=[['😤','领导说"简单改一下"，改到下班','302'],['🫠','周报三千字，回了俩字"收到"','96'],['😑','周五下午布置新需求，周末没了','211'],['😴','PPT改了八版，最后用第一版','302'],['🥲','"你先做着，需求我再想想"','64'],['😵','加班到九点，食堂只剩凉鸡腿','47'],['😤','"今晚就给"听了第八遍','158']];
+const sig2=[['🫠','需求文档改了名字，内容没变','88'],['😑','开了一下午会，结论是再开一个','142'],['😴','绩效面谈：你很努力，但…','205'],['🥲','调休被驳，理由是不够忙','73'],['😵','"小需求"做了三周没完','119'],['😤','会议室被占，站了一小时','55'],['😴','年度计划又是我一个人写','167']];
+function fill(id,data){const el=document.getElementById(id);const h=data.map(d=>`<div class="sig-chip"><div class="ico">${d[0]}</div><div class="txt"><b>匿名</b> · ${d[1]}</div><span class="res">🫶${d[2]}</span></div>`).join('');el.innerHTML=h+h}
+fill('mq1',sig1);fill('mq2',sig2);
+// 桌宠视差
+const figure=document.getElementById('figure');const stage=figure.parentElement;let h=false;
+stage.addEventListener('mouseenter',()=>{h=true;figure.style.animationPlayState='paused'});
+stage.addEventListener('mouseleave',()=>{h=false;figure.style.animationPlayState='running';figure.style.transform=''});
+stage.addEventListener('mousemove',(e)=>{if(!h)return;const r=stage.getBoundingClientRect();figure.style.transform=`rotateY(${((e.clientX-r.left)/r.width-.5)*38}deg) rotateX(${ -((e.clientY-r.top)/r.height-.5)*18}deg)`});
+document.querySelectorAll('.act').forEach(b=>b.addEventListener('click',()=>{b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150)}));
+</script>
+
+
+</body></html>
