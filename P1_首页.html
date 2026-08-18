@@ -1625,7 +1625,8 @@ window.xqxApplyCloudProfile=(profile)=>{
   }
   updateUI();
   updateCountdown();
-  if(cloud?.down)setTimeout(promptReviveOnce,250);else sessionStorage.removeItem('xqx_pet_down_prompted');
+  // 云端恢复的是历史状态，不视为“刚刚倒地”；用户可通过卡片内入口主动查看复活费用。
+  if(!cloud?.down)sessionStorage.removeItem('xqx_pet_down_prompted');
 };
 
 function toast(msg,type='amber'){
@@ -2051,7 +2052,6 @@ async function doLogin(){
   closeModal('modal-auth');
   // 切换到真实登录态；不再保留开发用的试用/登录切换器。
   setState('auth');
-  if(document.querySelector('#petCard')?.classList.contains('down'))setTimeout(promptReviveOnce,250);
 }
 
 async function doRegister(){
@@ -2132,7 +2132,7 @@ async function reviveLeader(){
     if(window.pet3D)window.pet3D.revive();
     toast(`领导复活！${result.points_delta||-500} 积分`,'calm');
     closeModal('modal-revive');
-  }catch(error){toast(XQXAuth.message(error.message),'rose');showReviveModal()}
+  }catch(error){toast(XQXAuth.message(error.message),'rose')}
 }
 
 function freeReroll(){
