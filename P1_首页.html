@@ -138,6 +138,7 @@ body::before{
 .human-figure{position:absolute;z-index:1;left:50%;bottom:8px;width:220px;height:278px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
 .human-figure svg{width:100%;height:100%;overflow:visible}
 .human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}
+.human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
 .human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 @keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
 .human-figure .eye{transform-box:fill-box;transform-origin:center;animation:humanBlink 5s infinite}
@@ -595,6 +596,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <ellipse class="blush" cx="79" cy="142" rx="11" ry="5"/><ellipse class="blush" cx="141" cy="142" rx="11" ry="5"/>
               <path fill="none" class="outline" d="M109 123q-4 13 2 15"/>
               <path fill="none" class="ink outline" d="M98 153q12 8 24 0"/>
+              <g class="glasses-round optional" fill="none" stroke="#1B1720" stroke-width="4"><circle cx="96" cy="122" r="15"/><circle cx="124" cy="122" r="15"/><path d="M111 122h-2"/></g>
+              <g class="glasses-square optional" fill="none" stroke="#1B1720" stroke-width="4"><rect x="80" y="107" width="29" height="29" rx="5"/><rect x="111" y="107" width="29" height="29" rx="5"/><path d="M111 121h-2"/></g>
+              <g class="beard-mustache optional" fill="none" stroke="#30251F" stroke-width="5"><path d="M110 146q-10 10-18 2M110 146q10 10 18 2"/></g>
+              <path class="beard-full optional" d="M84 145q26 36 52 0v28H84z"/>
               <!-- 手臂和手 -->
               <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/>
               <circle class="skin-light outline" cx="43" cy="257" r="11"/><circle class="skin-light outline" cx="177" cy="257" r="11"/></g>
@@ -2066,7 +2071,11 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
     figure?.style.setProperty('--human-suit-dark',suits[profile.appearance.suit]||suits[0]);
     figure?.style.setProperty('--human-tie',profile.appearance.suit===1?'#D97A6C':'#E8A33D');
     figure?.style.setProperty('--human-hair',profile.appearance.hair===2?'#201B19':'#30251F');
-    if(figure)figure.dataset.belly=String(profile.appearance.belly||0);
+    if(figure){
+      figure.dataset.belly=String(profile.appearance.belly||0);
+      figure.dataset.glasses=String(profile.appearance.glasses||0);
+      figure.dataset.beard=String(profile.appearance.beard||0);
+    }
   }
   if(window.xqxSetAuth)window.xqxSetAuth();
   else document.documentElement.setAttribute('data-state','auth');
