@@ -69,10 +69,10 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 #three-canvas:active{cursor:default}
 .human-figure{position:absolute;z-index:2;left:50%;bottom:32px;width:250px;height:316px;transform:translateX(-50%);filter:drop-shadow(0 16px 14px rgba(0,0,0,.3));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%;pointer-events:none}
 .human-figure svg{width:100%;height:100%;overflow:visible}
-.human-figure .skin{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:#1B2B42}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.human-figure .skin{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 .human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
 .human-figure[data-expr="2"] .expr-surprise,.human-figure[data-expr="3"] .expr-angry{display:block}.human-figure[data-expr="2"] .expr-default,.human-figure[data-expr="3"] .expr-default{display:none}
-.human-figure[data-belly="1"] .body-belly{transform:scaleX(1.08)}.human-figure[data-belly="2"] .body-belly{transform:scaleX(1.18)}
+.human-figure .body-group{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .body-group{transform:scaleX(1.08)}.human-figure[data-belly="2"] .body-group{transform:scaleX(1.18)}
 @keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:7px}}
 .studio-hint{position:absolute;top:18px;left:50%;transform:translateX(-50%);font-family:var(--serif);font-style:italic;font-size:13px;color:var(--tertiary);z-index:5;pointer-events:none}
 .rotate-ring{position:absolute;bottom:18px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:10px;background:rgba(20,35,54,.8);backdrop-filter:blur(12px);border:1px solid var(--rule);border-radius:999px;padding:8px 16px;font-size:12px;color:var(--muted);z-index:5}
@@ -190,7 +190,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <canvas id="three-canvas"></canvas>
     <div class="human-figure" id="humanFigure" data-glasses="1" data-expr="0" data-beard="0" data-belly="0" aria-label="领导人物预览">
       <svg viewBox="0 0 220 278" role="img" aria-label="卡通领导人物">
-        <path class="suit outline body-belly" d="M42 270c2-48 12-72 40-83h56c28 11 38 35 40 83z"/>
+        <g class="body-group"><path class="suit outline" d="M42 270c2-48 12-72 40-83h56c28 11 38 35 40 83z"/>
         <path class="suit-dark outline" d="M82 188l28 27 28-27 13 82H69z"/><path class="shirt outline" d="M88 184l22 25 22-25 9 20-31 30-31-30z"/>
         <path class="tie outline" d="M104 205h12l5 29-11 12-11-12z"/><circle class="tie" cx="110" cy="204" r="7"/>
         <path class="suit-dark outline" d="M42 270l9-59 25 7-5 52zM178 270l-9-59-25 7 5 52z"/>
@@ -206,7 +206,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <g class="glasses-square optional" fill="none" stroke="#1B1720" stroke-width="4"><rect x="80" y="107" width="29" height="29" rx="5"/><rect x="111" y="107" width="29" height="29" rx="5"/><path d="M111 121h-2"/></g>
         <g class="beard-mustache optional" fill="none" stroke="#30251F" stroke-width="5"><path d="M110 146q-10 10-18 2M110 146q10 10 18 2"/></g>
         <path class="beard-full optional" d="M84 145q26 36 52 0v28H84z"/>
-        <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/><circle class="skin outline" cx="43" cy="257" r="11"/><circle class="skin outline" cx="177" cy="257" r="11"/>
+        <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/><circle class="skin outline" cx="43" cy="257" r="11"/><circle class="skin outline" cx="177" cy="257" r="11"/></g>
       </svg>
     </div>
     <div class="rotate-ring">
@@ -220,7 +220,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <div class="config">
     <div class="cfg-head">
       <h3>八维捏脸</h3>
-      <p>实时驱动 3D 模型 · 当前维度高亮</p>
+      <p>实时预览人物 · 当前维度高亮</p>
     </div>
     <div class="dim-list" id="dimList"></div>
   </div>
@@ -253,6 +253,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 <!-- Toast 容器 -->
 <div class="toast-wrap" id="toastWrap"></div>
 
+<script src="scripts/xqx-config.js"></script>
+<script src="scripts/xqx-auth.js"></script>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -281,6 +283,7 @@ function syncHumanFigure(){
   const suits=['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F'];
   figure.dataset.glasses=String(cfg.glasses);figure.dataset.beard=String(cfg.beard);figure.dataset.expr=String(cfg.expr);figure.dataset.belly=String(cfg.belly);
   figure.style.setProperty('--human-skin',skins[cfg.skin]);figure.style.setProperty('--human-suit',suits[cfg.suit]);
+  figure.style.setProperty('--human-suit-dark',suits[cfg.suit]);
   figure.style.setProperty('--human-hair',cfg.hair===2?'#201B19':cfg.hair===3?'#3A2922':'#30251F');
   figure.style.setProperty('--human-tie',suits[cfg.suit]==='#1A1A1A'?'#D97A6C':'#E8A33D');
 }
@@ -813,11 +816,18 @@ document.getElementById('defBtn').addEventListener('click',()=>{
   popModel(.82,1.1);
   toast('已恢复默认','amber');
 });
-document.getElementById('saveBtn').addEventListener('click',function(){
-  this.textContent='已保存 ✓';this.classList.add('saved');
-  try{localStorage.setItem('xqx_avatar',encodeCfg(cfg))}catch(e){}
-  toast('领导已保存，云端同步中 ☁️','calm');
-  setTimeout(()=>{this.textContent='保存领导';this.classList.remove('saved')},1500);
+document.getElementById('saveBtn').addEventListener('click',async function(){
+  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
+  if(!window.XQXAuth.session()){toast('请先登录后再保存领导形象','rose');window.location.href='P1_首页.html';return}
+  const button=this;
+  button.disabled=true;
+  try{
+    await XQXAuth.saveAppearance(cfg);
+    localStorage.setItem('xqx_avatar',encodeCfg(cfg));
+    button.textContent='已保存 ✓';button.classList.add('saved');
+    toast('领导形象已同步到账号 ☁️','calm');
+  }catch(error){toast(XQXAuth.message(error.message),'rose')}
+  finally{button.disabled=false;setTimeout(()=>{button.textContent='保存领导';button.classList.remove('saved')},1500)}
 });
 // 加载本地保存的外观（若存在）
 (function loadSaved(){
@@ -826,6 +836,12 @@ document.getElementById('saveBtn').addEventListener('click',function(){
     const c=decodeCfg(saved);
     if(c)applyCfg(c);
   }catch(e){}
+})();
+(async function loadCloudAppearance(){
+  if(!window.XQXAuth?.session()){toast('请先登录后再捏脸','rose');setTimeout(()=>window.location.href='P1_首页.html',400);return}
+  const profile=await window.XQXAuth.profile();
+  if(!profile){window.location.href='P1_首页.html';return}
+  if(profile.appearance) applyCfg(profile.appearance);
 })();
 document.getElementById('shareBtn').addEventListener('click',function(){
   const code=encodeCfg(cfg);

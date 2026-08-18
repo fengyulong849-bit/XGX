@@ -56,8 +56,9 @@
     async changePassword(currentPassword, newPassword) { return callAuthenticated("auth-change-password", { current_password: currentPassword, new_password: newPassword }); },
     async profile() {
       const token = await accessToken(); if (!token) return null;
-      const response = await fetch(`${config().supabaseUrl.replace(/\/$/, "")}/rest/v1/profiles?select=points_balance,free_diy_available,created_at`, { headers: { apikey: config().supabaseAnonKey, Authorization: `Bearer ${token}` } });
+      const response = await fetch(`${config().supabaseUrl.replace(/\/$/, "")}/rest/v1/profiles?select=points_balance,free_diy_available,appearance,created_at`, { headers: { apikey: config().supabaseAnonKey, Authorization: `Bearer ${token}` } });
       if (!response.ok) return null; const rows = await response.json(); return rows[0] || null;
     },
+    async saveAppearance(appearance) { return callAuthenticated("profile-save-appearance", { appearance }); },
   };
 })();
