@@ -133,8 +133,16 @@ body::before{
 .figure-stage{position:relative;height:290px;z-index:4;overflow:hidden}
 .figure-glow{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,61,.18),transparent 70%);filter:blur(10px);pointer-events:none}
 .figure-shadow{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:150px;height:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent 70%);pointer-events:none}
-#pet-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;cursor:grab}
-#pet-canvas:active{cursor:grabbing}
+#pet-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;opacity:0;pointer-events:none}
+#pet-canvas:active{cursor:default}
+.human-figure{position:absolute;z-index:1;left:50%;bottom:8px;width:220px;height:278px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
+.human-figure svg{width:100%;height:100%;overflow:visible}
+.human-figure .skin{fill:#DCA47D}.human-figure .skin-light{fill:#E9B995}.human-figure .hair{fill:#30251F}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:#263A55}.human-figure .suit-dark{fill:#1B2B42}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:#E8A33D}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}
+.human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+@keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
+.human-figure .eye{transform-box:fill-box;transform-origin:center;animation:humanBlink 5s infinite}
+@keyframes humanBlink{0%,45%,48%,100%{transform:scaleY(1)}46%,47%{transform:scaleY(.12)}}
+[data-state="auth"] .human-figure{filter:drop-shadow(0 14px 14px rgba(232,163,61,.22))}
 
 /* 动作气泡 */
 .bubble{position:absolute;top:40px;left:50%;transform:translate(-50%,-8px) scale(.6);background:var(--surface-3);border:1px solid var(--rule-2);border-radius:14px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);opacity:0;pointer-events:none;transition:all .25s var(--ease);box-shadow:var(--shadow);z-index:5;white-space:nowrap}
@@ -556,7 +564,42 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="figure-glow"></div>
           <div class="figure-shadow"></div>
           <div class="bubble" id="bubble"></div>
-          <canvas id="pet-canvas" aria-label="3D 领导桌宠"></canvas>
+          <canvas id="pet-canvas" aria-hidden="true"></canvas>
+          <div class="human-figure" aria-label="卡通领导人物">
+            <svg viewBox="0 0 220 278" role="img" aria-labelledby="human-title">
+              <title id="human-title">卡通领导人物</title>
+              <!-- 身体和肩膀 -->
+              <path class="suit outline" d="M42 270c2-48 12-72 40-83h56c28 11 38 35 40 83z"/>
+              <path class="suit-dark outline" d="M82 188l28 27 28-27 13 82H69z"/>
+              <path class="shirt outline" d="M88 184l22 25 22-25 9 20-31 30-31-30z"/>
+              <path class="tie outline" d="M104 205h12l5 29-11 12-11-12z"/>
+              <circle class="tie" cx="110" cy="204" r="7"/>
+              <path class="suit-dark outline" d="M42 270l9-59 25 7-5 52zM178 270l-9-59-25 7 5 52z"/>
+              <!-- 脖子和耳朵 -->
+              <path class="skin-light outline" d="M88 170v28c0 12 44 12 44 0v-28z"/>
+              <ellipse class="skin-light outline" cx="67" cy="119" rx="13" ry="20"/>
+              <ellipse class="skin-light outline" cx="153" cy="119" rx="13" ry="20"/>
+              <!-- 头部 -->
+              <path class="skin-light outline" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
+              <!-- 头发和刘海 -->
+              <path class="hair outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/>
+              <path class="hair-hi" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+              <!-- 眉毛 -->
+              <path class="ink" d="M82 106q12-8 24 0l-2 5q-12-5-22 1zM114 106q12-8 24 0l-1 6q-11-6-22-1z"/>
+              <!-- 眼睛 -->
+              <ellipse class="white outline eye" cx="96" cy="122" rx="10" ry="8"/>
+              <ellipse class="white outline eye" cx="124" cy="122" rx="10" ry="8"/>
+              <circle class="ink eye" cx="98" cy="123" r="4"/><circle class="ink eye" cx="122" cy="123" r="4"/>
+              <circle fill="#fff" cx="99" cy="121" r="1.3"/><circle fill="#fff" cx="123" cy="121" r="1.3"/>
+              <!-- 腮红、鼻子和嘴 -->
+              <ellipse class="blush" cx="79" cy="142" rx="11" ry="5"/><ellipse class="blush" cx="141" cy="142" rx="11" ry="5"/>
+              <path fill="none" class="outline" d="M109 123q-4 13 2 15"/>
+              <path fill="none" class="ink outline" d="M98 153q12 8 24 0"/>
+              <!-- 手臂和手 -->
+              <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/>
+              <circle class="skin-light outline" cx="43" cy="257" r="11"/><circle class="skin-light outline" cx="177" cy="257" r="11"/>
+            </svg>
+          </div>
         </div>
         <div class="nameplate">
           <div class="nm" id="petName">暴躁打工人 · 领导</div>
