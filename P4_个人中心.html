@@ -297,6 +297,14 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         </div>
         <div class="ai-arrow">›</div>
       </div>
+      <div class="account-item" onclick="logoutAccount()">
+        <div class="ai-icon blue">↪</div>
+        <div class="ai-content">
+          <div class="ai-title">退出登录</div>
+          <div class="ai-desc">仅退出当前浏览器，不删除云端账号和数据</div>
+        </div>
+        <div class="ai-arrow">›</div>
+      </div>
     </div>
   </div>
 
@@ -517,7 +525,7 @@ document.addEventListener('keydown',(e)=>{
 });
 
 /* ============ 修改密码 ============ */
-function doChangePwd(){
+async function doChangePwd(){
   const oldPwd=document.getElementById('pwd-old').value;
   const newPwd=document.getElementById('pwd-new').value;
   if(!oldPwd){toast('请输入当前密码','rose');return}
@@ -527,10 +535,20 @@ function doChangePwd(){
   if(/[0-9]/.test(newPwd))types++;
   if(/[^a-zA-Z0-9]/.test(newPwd))types++;
   if(types<2){toast('新密码需包含字母/数字/符号中的任两类','rose');return}
-  document.getElementById('pwd-old').value='';
-  document.getElementById('pwd-new').value='';
-  closeModal('modal-changepwd');
-  toast('密码已修改，新恢复码已生成','calm');
+  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
+  try{
+    const result=await XQXAuth.changePassword(oldPwd,newPwd);
+    document.getElementById('pwd-old').value='';document.getElementById('pwd-new').value='';
+    closeModal('modal-changepwd');
+    document.getElementById('recovery-display').textContent=result.recovery_code;
+    toast('密码已修改，请保存新的恢复码','calm');
+    openModal('modal-recovery');
+  }catch(error){toast(XQXAuth.message(error.message),'rose')}
+}
+
+function logoutAccount(){
+  XQXAuth.clear();
+  window.location.replace('P1_首页.html');
 }
 
 /* ============ 恢复码 ============ */
