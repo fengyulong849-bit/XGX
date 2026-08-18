@@ -409,10 +409,20 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .f-col a:hover{color:var(--amber)}
 .f-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:20px;border-top:1px solid var(--rule);font-size:12px;color:var(--tertiary)}
 
-/* ============ 状态切换器（开发预览用） ============ */
-.state-toggle{position:fixed;right:20px;bottom:20px;z-index:99;display:flex;gap:6px;background:var(--surface);border:1px solid var(--rule-2);border-radius:999px;padding:6px;box-shadow:var(--shadow-lg)}
-.state-toggle button{border:none;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:600;padding:7px 14px;border-radius:999px;cursor:pointer;transition:all .2s}
-.state-toggle button.active{background:var(--grad);color:var(--bg)}
+/* ============ 登录视觉区（素材可替换） ============ */
+#modal-auth .modal-card{max-width:900px;display:grid;grid-template-columns:minmax(280px,.92fr) minmax(360px,1.08fr);background:var(--bg-2);overflow:hidden}
+#modal-auth .modal-close{color:rgba(237,232,221,.72)}
+#modal-auth .modal-body{grid-column:2;padding:40px 48px 34px;background:var(--surface);min-height:430px}
+.auth-visual{grid-column:1;grid-row:1 / span 4;position:relative;min-height:430px;overflow:hidden;padding:34px 30px;background:#102238;color:var(--ink);isolation:isolate}
+.auth-visual::before{content:'';position:absolute;inset:0;background:linear-gradient(145deg,rgba(107,159,212,.25),transparent 45%),linear-gradient(340deg,rgba(232,163,61,.18),transparent 50%);z-index:-2}
+.auth-visual::after{content:'';position:absolute;left:-12%;right:-12%;bottom:-32px;height:145px;background:#0a1524;border-radius:50% 50% 0 0/24% 24% 0 0;z-index:-1;box-shadow:0 -14px 40px rgba(111,179,168,.08)}
+.auth-visual-copy{position:relative;z-index:3;max-width:230px}.auth-visual-copy span{display:block;color:var(--amber);font-family:var(--serif);font-style:italic;font-size:15px;margin-bottom:10px}.auth-visual-copy strong{display:block;font-family:var(--serif);font-size:27px;line-height:1.35;font-weight:600}
+.auth-visual-copy small{display:block;color:rgba(237,232,221,.62);font-size:12px;line-height:1.7;margin-top:12px}
+.auth-art{position:absolute;left:20px;right:20px;bottom:28px;height:230px}.auth-art .window{position:absolute;left:4%;right:4%;top:8px;height:148px;border:1px solid rgba(237,232,221,.18);border-radius:18px 18px 8px 8px;background:linear-gradient(145deg,rgba(107,159,212,.18),rgba(10,19,32,.35));box-shadow:inset 0 0 50px rgba(107,159,212,.08)}.auth-art .window::before,.auth-art .window::after{content:'';position:absolute;background:rgba(237,232,221,.12)}.auth-art .window::before{width:1px;top:0;bottom:0;left:52%}.auth-art .window::after{height:1px;left:0;right:0;top:53%}
+.auth-art .desk{position:absolute;left:8%;right:8%;bottom:28px;height:8px;background:#3a5267;border-radius:99px;box-shadow:0 10px 0 -2px #1c3044,0 25px 0 -3px #1c3044}.auth-art .person{position:absolute;left:40%;bottom:34px;width:54px;height:102px;border-radius:50% 50% 12px 12px;background:#D49A73;transform-origin:bottom center;animation:authBreathe 3.8s ease-in-out infinite;box-shadow:0 24px 0 4px #2d4051}.auth-art .person::before{content:'';position:absolute;left:-4px;top:-20px;width:62px;height:43px;border-radius:50% 50% 40% 40%;background:#30251f;box-shadow:0 28px 0 -18px #171827}.auth-art .laptop{position:absolute;left:29%;bottom:49px;width:104px;height:56px;border:5px solid #6FB3A8;border-bottom-width:9px;border-radius:7px 7px 3px 3px;transform:skewY(-4deg);animation:authLaptop 4.4s ease-in-out infinite}.auth-art .laptop::after{content:'';position:absolute;left:-14px;right:-14px;bottom:-16px;height:8px;border-radius:99px;background:#6FB3A8}.auth-art .paper{position:absolute;right:14%;top:34px;width:30px;height:38px;background:#E8A33D;border-radius:4px;transform:rotate(10deg);animation:authPaper 4.5s ease-in-out infinite}.auth-art .paper::after{content:'';position:absolute;left:7px;right:7px;top:11px;height:2px;background:#102238;box-shadow:0 7px #102238,0 14px #102238}
+.auth-visual.has-asset{background-image:var(--auth-asset);background-size:cover;background-position:center}.auth-visual.has-asset::before{background:linear-gradient(90deg,rgba(10,19,32,.82),rgba(10,19,32,.18))}.auth-visual.has-asset .auth-art{display:none}
+@keyframes authBreathe{0%,100%{transform:rotate(-1deg) translateY(0)}50%{transform:rotate(1deg) translateY(-5px)}}@keyframes authLaptop{0%,100%{transform:skewY(-4deg) translateY(0)}50%{transform:skewY(-4deg) translateY(-3px)}}@keyframes authPaper{0%,100%{transform:rotate(10deg) translateY(0)}50%{transform:rotate(4deg) translateY(-12px)}}
+@media(max-width:720px){#modal-auth .modal-card{display:block;max-height:92vh;overflow:auto}#modal-auth .auth-visual{min-height:220px;height:220px;padding:24px}.auth-visual-copy strong{font-size:22px}.auth-visual-copy small{display:none}#modal-auth .modal-body{min-height:0;padding:30px 24px 24px}.auth-art{bottom:4px;transform:scale(.82);transform-origin:bottom center}}
 
 /* ============ Toast ============ */
 .toast-wrap{position:fixed;top:80px;left:50%;transform:translateX(-50%);z-index:200;display:flex;flex-direction:column;gap:10px;align-items:center}
@@ -881,6 +891,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 <div class="modal-mask" id="modal-auth" role="dialog" aria-modal="true" aria-label="登录或注册" onclick="closeModalOnMask(event,'modal-auth')">
   <div class="modal-card">
     <button class="modal-close" onclick="closeModal('modal-auth')">×</button>
+    <div class="auth-visual" id="auth-visual" aria-label="下班前的片刻喘息">
+      <div class="auth-visual-copy"><span>小确闲 · 片刻喘息</span><strong>把今天的烦心事，轻轻放下。</strong><small>登录后，继续捏你的领导、记录吐槽，也别忘了给自己留一点下班时间。</small></div>
+      <div class="auth-art" aria-hidden="true"><div class="window"></div><div class="paper"></div><div class="person"></div><div class="laptop"></div><div class="desk"></div></div>
+    </div>
     <div class="modal-body" id="auth-login">
       <div class="auth-tabs">
         <button class="active" data-tab="login" onclick="switchAuthTab('login')">登录</button>
@@ -2190,6 +2204,8 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
 <script src="scripts/xqx-p1-auth.js"></script>
 <script>
 window.addEventListener('DOMContentLoaded',async()=>{
+  const visualConfig=window.XQX_AUTH_VISUAL||{},visual=document.getElementById('auth-visual');
+  if(visual&&visualConfig.asset){visual.style.setProperty('--auth-asset',`url("${String(visualConfig.asset).replace(/"/g,'%22')}")`);visual.classList.add('has-asset');visual.setAttribute('aria-label',visualConfig.alt||'登录视觉');}
   const profile=await window.XQXAuth?.profile();
   if(!profile)return;
   if(profile.appearance){

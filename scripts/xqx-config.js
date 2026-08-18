@@ -4,3 +4,9 @@ window.XQX_CONFIG = window.XQX_CONFIG || {
   supabaseUrl: "",
   supabaseAnonKey: "",
 };
+
+// 登录视觉素材可随时替换为本地 GIF/WebP/PNG；留空时使用首页内置的 CSS 动画插画。
+window.XQX_AUTH_VISUAL = window.XQX_AUTH_VISUAL || {
+  asset: "",
+  alt: "下班前的片刻喘息",
+};
