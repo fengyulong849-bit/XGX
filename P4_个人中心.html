@@ -188,7 +188,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <a href="P3_释怀仪式.html">释怀</a>
     <a href="P6_规则与隐私.html">规则</a>
   </nav>
-  <div class="pts">积分 <b>1,250</b></div>
+  <div class="pts">积分 <b id="nav-points">--</b></div>
 </div>
 
 <div class="main">
@@ -197,15 +197,15 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <div class="overview">
     <div class="avatar-big">领</div>
     <div class="info">
-      <div class="name">暴躁打工人</div>
-      <div class="meta">牛马编号 · 已注册 12 天</div>
+      <div class="name" id="profile-name">我的小确闲</div>
+      <div class="meta" id="profile-meta">正在读取账号资料…</div>
     </div>
     <div class="streak-badge">🔥 连续签到 7 天</div>
     <div class="spacer" style="flex:1"></div>
     <div class="points-block">
       <div class="label">积分余额</div>
-      <div class="value">1,250</div>
-      <div class="today">今日 +130</div>
+      <div class="value" id="profile-points">--</div>
+      <div class="today" id="profile-entitlement">正在同步云端权益</div>
     </div>
   </div>
 
@@ -360,7 +360,20 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   </div>
 </div>
 
+<script src="scripts/xqx-config.js"></script>
+<script src="scripts/xqx-auth.js"></script>
 <script>
+async function loadCloudProfile(){
+  if(!window.XQXAuth?.configured()){document.getElementById('profile-meta').textContent='尚未配置 Supabase 公共连接信息';return}
+  const profile=await XQXAuth.profile();
+  if(!profile){window.location.replace('P1_首页.html');return}
+  const points=Number(profile.points_balance||0).toLocaleString('zh-CN');
+  document.getElementById('nav-points').textContent=points;
+  document.getElementById('profile-points').textContent=points;
+  document.getElementById('profile-entitlement').textContent=profile.free_diy_available?'免费 DIY 权益可用':'免费 DIY 权益已使用';
+  document.getElementById('profile-meta').textContent='已登录 · 数据来自云端';
+}
+loadCloudProfile();
 /* ============ Tab 切换 ============ */
 document.querySelectorAll('.tab').forEach(tab=>{
   tab.addEventListener('click',()=>{

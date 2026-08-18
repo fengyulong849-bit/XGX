@@ -1859,19 +1859,18 @@ function switchAuthTab(tab){
 
 function genAccount(){
   const chars='abcdefghjkmnpqrstuvwxyz23456789';
-  let code='XQX-';
-  for(let i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
-  code+='-';
-  for(let i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
+  let code='xqx';
+  for(let i=0;i<9;i++) code+=chars[Math.floor(Math.random()*chars.length)];
   document.getElementById('reg-account').value = code;
   toast('已生成随机账号','amber');
 }
 
-function doLogin(){
+async function doLogin(){
   const acc = document.getElementById('login-account').value.trim();
   const pwd = document.getElementById('login-password').value;
   if(!acc||!pwd){toast('请填写账号和密码','rose');return}
-  toast('登录成功','calm');
+  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
+  try{const result=await XQXAuth.login(acc,pwd);state.points=result.profile.points_balance;toast('登录成功','calm')}catch(error){toast(XQXAuth.message(error.message),'rose');return}
   closeModal('modal-auth');
   // 切换到登录态
   if(document.querySelector('#stateToggle [data-st="auth"]')){
@@ -1879,20 +1878,17 @@ function doLogin(){
   }
 }
 
-function doRegister(){
+async function doRegister(){
   const acc = document.getElementById('reg-account').value.trim();
   const pwd = document.getElementById('reg-password').value;
-  if(!acc||acc.length<4){toast('账号至少 4 位','rose');return}
+  if(!/^[a-z0-9_]{4,20}$/.test(acc.toLowerCase())){toast('账号为 4–20 位小写字母、数字或下划线','rose');return}
   if(!pwd||pwd.length<8){toast('密码至少 8 位','rose');return}
-  // 生成恢复码
-  const chars='ABCDEFGHJKMNPQRSTUVWXYZ23456789';
-  let code='XQX-';
-  for(let i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
-  code+='-';
-  for(let i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
-  code+='-';
-  for(let i=0;i<4;i++) code+=chars[Math.floor(Math.random()*chars.length)];
-  document.getElementById('recovery-code').textContent = code;
+  const pwdTypes=Number(/[a-zA-Z]/.test(pwd))+Number(/\d/.test(pwd))+Number(/[^a-zA-Z\d]/.test(pwd));
+  if(pwdTypes<2){toast('密码需包含字母、数字、符号中的任两类','rose');return}
+  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
+  let result;try{result=await XQXAuth.register(acc,pwd)}catch(error){toast(XQXAuth.message(error.message),'rose');return}
+  state.points=result.profile.points_balance;
+  document.getElementById('recovery-code').textContent = result.recovery_code;
   // 切换到恢复码展示
   document.querySelectorAll('#modal-auth .modal-body').forEach(b=>b.classList.add('hidden'));
   document.getElementById('auth-recovery').classList.remove('hidden');
@@ -1916,8 +1912,7 @@ function downloadRecovery(){
 function recoverySaved(){
   document.querySelectorAll('#modal-auth .modal-body').forEach(b=>b.classList.add('hidden'));
   document.getElementById('auth-welcome').classList.remove('hidden');
-  state.points += 300;
-  toast('欢迎加入！+300 积分','calm');
+  toast('欢迎加入！300 积分已到账','calm');
 }
 
 function goPetDiy(){
@@ -2010,6 +2005,11 @@ function submitRant(){
 
 // ============ 暴露到 window（ES Module 作用域隔离，必须显式挂载）============
 Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAccount,doLogin,doRegister,copyRecovery,downloadRecovery,recoverySaved,goPetDiy,showReviveModal,reviveLeader,freeReroll,submitRant,saveOfftime});
+</script>
+<script src="scripts/xqx-config.js"></script>
+<script src="scripts/xqx-auth.js"></script>
+<script>
+(async()=>{const profile=await window.XQXAuth?.profile();if(profile){state.points=profile.points_balance;setState('auth')}})();
 </script>
 
 

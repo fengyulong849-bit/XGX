@@ -175,6 +175,8 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:2px solid var(-
 
 <div class="toast" id="toast"></div>
 
+<script src="scripts/xqx-config.js"></script>
+<script src="scripts/xqx-auth.js"></script>
 <script>
 /* ============ 密码强度检测 ============ */
 const pwdInput = document.getElementById('newPassword');
@@ -212,7 +214,7 @@ recoveryInput.addEventListener('input', ()=>{
 /* ============ 表单提交 ============ */
 let rateLimited = false;
 
-function handleSubmit(e){
+async function handleSubmit(e){
   e.preventDefault();
   if(rateLimited){
     toast('尝试过于频繁，请稍后再试','rose');
@@ -262,48 +264,31 @@ function handleSubmit(e){
     return;
   }
 
-  // 模拟提交
   const btn = document.getElementById('submitBtn');
   btn.disabled = true;
   btn.textContent = '提交中…';
-
-  setTimeout(()=>{
-    // 模拟：恢复码以 "XQX" 开头且足够长即视为有效（输入已自动清理为无分隔大写）
-    if(recovery.startsWith('XQX') && recovery.length >= 10){
-      showSuccess();
-    } else {
-      showError();
-      // 限流
-      rateLimited = true;
-      let count = 60;
-      const rl = document.getElementById('rateLimit');
-      const rc = document.getElementById('rateCount');
-      rl.classList.add('show');
-      rc.textContent = count;
-      const timer = setInterval(()=>{
-        count--;
-        rc.textContent = count;
-        if(count <= 0){
-          clearInterval(timer);
-          rateLimited = false;
-          rl.classList.remove('show');
-        }
-      }, 1000);
-    }
-    btn.disabled = false;
-    btn.textContent = '重置密码';
-  }, 800);
+  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');btn.disabled=false;btn.textContent='重置密码';return}
+  try{
+    const result=await XQXAuth.resetPassword(account,recovery,newPwd);
+    showSuccess(result.recovery_code);
+  }catch(error){
+    if(error.message==='rate_limited') startRateLimit(error.data?.retry_after_seconds || 60);
+    else if(error.message==='invalid_recovery') showError();
+    else toast(XQXAuth.message(error.message),'rose');
+  }finally{btn.disabled=false;btn.textContent='重置密码';}
 }
 
 /* ============ 状态切换 ============ */
-function showSuccess(){
+function showSuccess(code){
   document.getElementById('formCard').classList.add('hidden');
   document.getElementById('successCard').classList.remove('hidden');
-  // 生成新恢复码
-  const code = 'XQX-' + Math.random().toString(36).substring(2,6).toUpperCase() + '-' +
-    Math.random().toString(36).substring(2,6).toUpperCase() + '-' +
-    Math.random().toString(36).substring(2,6).toUpperCase();
   document.getElementById('newRecoveryCode').textContent = code;
+}
+
+function startRateLimit(seconds){
+  rateLimited=true;let count=Math.max(1,Number(seconds)||60);const rl=document.getElementById('rateLimit');const rc=document.getElementById('rateCount');
+  rl.classList.add('show');rc.textContent=count;
+  const timer=setInterval(()=>{count--;rc.textContent=count;if(count<=0){clearInterval(timer);rateLimited=false;rl.classList.remove('show');}},1000);
 }
 
 function showError(){
