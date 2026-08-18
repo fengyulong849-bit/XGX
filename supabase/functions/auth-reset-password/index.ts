@@ -33,7 +33,17 @@ Deno.serve(async (request) => {
 
     const { data: recoveryRows, error: lookupError } = await admin.rpc("m1_lookup_recovery_code", { p_account: account });
     const recovery = Array.isArray(recoveryRows) ? recoveryRows[0] : null;
-    if (lookupError || !recovery?.code_hash || !await verifyRecoveryCode(recoveryCode, recovery.code_hash)) {
+    if (lookupError || !recovery?.code_hash) {
+      console.warn("auth-reset-password rejected recovery lookup", {
+        account,
+        lookup_error: Boolean(lookupError),
+        recovery_record_found: Boolean(recovery),
+      });
+      return json(request, 401, { ok: false, reason: "invalid_recovery" });
+    }
+
+    if (!await verifyRecoveryCode(recoveryCode, recovery.code_hash)) {
+      console.warn("auth-reset-password rejected recovery hash", { account });
       return json(request, 401, { ok: false, reason: "invalid_recovery" });
     }
 
@@ -42,6 +52,11 @@ Deno.serve(async (request) => {
     });
     const reservation = Array.isArray(reservations) ? reservations[0] : null;
     if (reservationError || !reservation?.reset_id || !reservation?.user_id) {
+      console.warn("auth-reset-password rejected recovery reservation", {
+        account,
+        reservation_error: Boolean(reservationError),
+        reservation_found: Boolean(reservation),
+      });
       return json(request, 401, { ok: false, reason: "invalid_recovery" });
     }
 
