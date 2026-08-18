@@ -144,6 +144,22 @@ body::before{
 .human-figure .eye{transform-box:fill-box;transform-origin:center;animation:humanBlink 5s infinite}
 @keyframes humanBlink{0%,45%,48%,100%{transform:scaleY(1)}46%,47%{transform:scaleY(.12)}}
 [data-state="auth"] .human-figure{filter:drop-shadow(0 14px 14px rgba(232,163,61,.22))}
+.human-figure.action-poke{animation:humanPoke .46s ease-out}
+.human-figure.action-slap{animation:humanSlap .62s cubic-bezier(.2,1.4,.4,1)}
+.human-figure.action-feed{animation:humanFeed .58s ease-out}
+.human-figure.action-throw{animation:humanThrow .62s ease-out}
+@keyframes humanPoke{0%,100%{transform:translateX(-50%) rotate(0)}25%{transform:translateX(calc(-50% + 9px)) rotate(4deg)}55%{transform:translateX(calc(-50% - 7px)) rotate(-3deg)}80%{transform:translateX(calc(-50% + 3px)) rotate(1deg)}}
+@keyframes humanSlap{0%,100%{transform:translateX(-50%) scale(1,1)}28%{transform:translateX(-50%) scale(1.14,.72)}58%{transform:translateX(-50%) scale(.92,1.08)}80%{transform:translateX(-50%) scale(1.03,.97)}}
+@keyframes humanFeed{0%,100%{transform:translateX(-50%) translateY(0)}35%{transform:translateX(-50%) translateY(-15px) rotate(-4deg)}70%{transform:translateX(-50%) translateY(2px) rotate(3deg)}}
+@keyframes humanThrow{0%,100%{transform:translateX(-50%) rotate(0)}30%{transform:translateX(-50%) rotate(-9deg) translateY(-3px)}65%{transform:translateX(-50%) rotate(8deg) translateY(2px)}}
+.holo-card.down .human-figure{animation:none;transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.35) drop-shadow(0 12px 8px rgba(0,0,0,.45));transition:transform .55s ease,filter .3s ease}
+.down-panel{position:absolute;left:18px;right:18px;bottom:18px;z-index:8;display:none;padding:13px 14px;border:1px solid rgba(217,122,108,.65);border-radius:16px;background:rgba(14,26,43,.94);box-shadow:0 12px 32px rgba(0,0,0,.35);text-align:center}
+.holo-card.down .down-panel{display:block}
+.down-panel strong{display:block;color:#F0A398;font-size:14px;margin-bottom:4px}
+.down-panel span{display:block;color:var(--muted);font-size:11px;margin-bottom:10px}
+.down-panel-actions{display:flex;gap:8px}.down-panel button{flex:1;padding:9px 8px;border-radius:999px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.down-panel .down-revive{border:0;background:var(--grad);color:var(--bg)}
+.down-panel .down-redo{border:1px solid var(--rule-2);background:transparent;color:var(--ink)}
 
 /* 动作气泡 */
 .bubble{position:absolute;top:40px;left:50%;transform:translate(-50%,-8px) scale(.6);background:var(--surface-3);border:1px solid var(--rule-2);border-radius:14px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);opacity:0;pointer-events:none;transition:all .25s var(--ease);box-shadow:var(--shadow);z-index:5;white-space:nowrap}
@@ -606,6 +622,14 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/>
               <circle class="skin-light outline" cx="43" cy="257" r="11"/><circle class="skin-light outline" cx="177" cy="257" r="11"/></g>
             </svg>
+          </div>
+          <div class="down-panel" id="downPanel">
+            <strong>领导已经倒下</strong>
+            <span>选择复活原领导，或重新捏一位新的领导</span>
+            <div class="down-panel-actions">
+              <button class="down-revive" onclick="showReviveModal()">复活 / 查看费用</button>
+              <button class="down-redo" onclick="goPetDiyFromDown()">重新捏领导</button>
+            </div>
           </div>
         </div>
         <div class="nameplate">
@@ -1553,13 +1577,6 @@ function setState(st){
   state.mode=st;
   document.documentElement.setAttribute('data-state',st);
   $$('#stateToggle button').forEach(b=>b.classList.toggle('active',b.dataset.st===st));
-  if(st==='auth'&&$('#petCard').classList.contains('down')){
-    $('#petCard').classList.remove('down');
-    pet.endure=100;pet.irritate=30;pet.fat=20;pet.dirty=10;
-    updateBars();
-    if(window.pet3D)window.pet3D.revive();
-    toast('领导复活了！（正式版消耗 500 积分）','calm');
-  }
   updateUI();
 }
 window.xqxSetAuth=()=>setState('auth');
@@ -1579,6 +1596,7 @@ window.xqxApplyCloudProfile=(profile)=>{
     updateBars();
   }
   updateUI();
+  if(cloud?.down)setTimeout(showReviveModal,250);
 };
 $$('#stateToggle button').forEach(b=>b.addEventListener('click',()=>setState(b.dataset.st)));
 
@@ -1745,6 +1763,15 @@ function knockDown(){
   spawnFx(['💫','⭐','🌟','💫','✨'],8); // 倒地卡通星星特效
   setTimeout(showReviveModal, 900);
 }
+function playHumanAction(action,eventName){
+  const figure=document.querySelector('.human-figure');
+  if(!figure)return;
+  figure.classList.remove('action-poke','action-slap','action-feed','action-throw');
+  void figure.offsetWidth;
+  if(eventName==='burst'||eventName==='faint')return;
+  figure.classList.add(`action-${action}`);
+  setTimeout(()=>figure.classList.remove(`action-${action}`),700);
+}
 $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if(pet.locked||$('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
@@ -1758,6 +1785,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
       state.points=Number(result.points_balance??state.points);
       updateBars();updateUI();
       showBubble(ac.bubble);
+      playHumanAction(b.dataset.act,result.event);
       if(window.pet3D&&ac.shake)window.pet3D.shake(ac.shake);
       if(ac.fx==='squash'&&window.pet3D)window.pet3D.squash(5000);
       if(result.event==='burst'){window.pet3D?.burst();showBubble('嗝——爆了！');toast('胖度爆表，领导卡通爆炸了！','amber')}
@@ -1769,6 +1797,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
     return;
   }
   showBubble(ac.bubble);
+  playHumanAction(b.dataset.act);
   b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
   if(pet.endure<=0){toast('补刀：'+ac.bubble,'rose');return}
   pet.endure=Math.max(0,Math.min(100,pet.endure+ac.dEndure));
@@ -1979,6 +2008,7 @@ async function doLogin(){
   if(document.querySelector('#stateToggle [data-st="auth"]')){
     document.querySelector('#stateToggle [data-st="auth"]').click();
   }
+  if(document.querySelector('#petCard')?.classList.contains('down'))setTimeout(showReviveModal,250);
 }
 
 async function doRegister(){
@@ -2023,6 +2053,10 @@ function goPetDiy(){
   closeModal('modal-auth');
   window.location.href = 'P2_捏脸DIY.html';
 }
+function goPetDiyFromDown(){
+  if(state.mode!=='auth'){openModal('modal-auth');return}
+  window.location.href='P2_捏脸DIY.html';
+}
 
 // === 弹窗3: 倒地复活 ===
 function showReviveModal(){
@@ -2038,17 +2072,27 @@ function showReviveModal(){
   openModal('modal-revive');
 }
 
-function reviveLeader(){
-  state.points -= 500;
-  updateBars();
-  if(window.pet3D) window.pet3D.revive();
-  toast('领导复活！-500 积分','calm');
-  closeModal('modal-revive');
+async function reviveLeader(){
+  if(state.mode!=='auth'){openModal('modal-auth');return}
+  try{
+    const result=await XQXAuth.petRevive(crypto.randomUUID());
+    const cloud=result.pet_status||{};
+    state.points=Number(result.points_balance??state.points);
+    pet.endure=Number(cloud.endure??100);pet.irritate=Number(cloud.irritate??20);pet.fat=Number(cloud.fat??10);pet.dirty=Number(cloud.dirty??5);
+    updateBars();updateUI();$('#petCard').classList.remove('down');
+    if(window.pet3D)window.pet3D.revive();
+    toast(`领导复活！${result.points_delta||-500} 积分`,'calm');
+    closeModal('modal-revive');
+  }catch(error){toast(XQXAuth.message(error.message),'rose');showReviveModal()}
 }
 
 function freeReroll(){
   toast('将前往捏脸 DIY（重置为新领导）','amber');
   closeModal('modal-revive');
+  if(state.mode==='auth'){
+    window.location.href='P2_捏脸DIY.html';
+    return;
+  }
   // 重置桌宠
   pet.endure = 100; pet.irritate = 20; pet.fat = 10; pet.dirty = 5;
   updateBars();
@@ -2108,7 +2152,7 @@ function submitRant(){
 // 已在 HTML 中定义，通过 release-card 触发
 
 // ============ 暴露到 window（ES Module 作用域隔离，必须显式挂载）============
-Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAccount,doLogin,doRegister,copyRecovery,downloadRecovery,recoverySaved,goPetDiy,showReviveModal,reviveLeader,freeReroll,submitRant,saveOfftime});
+Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAccount,doLogin,doRegister,copyRecovery,downloadRecovery,recoverySaved,goPetDiy,goPetDiyFromDown,showReviveModal,reviveLeader,freeReroll,submitRant,saveOfftime});
 </script>
 <script src="scripts/xqx-config.js"></script>
 <script src="scripts/xqx-auth.js"></script>
