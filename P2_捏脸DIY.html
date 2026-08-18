@@ -181,7 +181,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <a href="P4_个人中心.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">我的</a>
     <a href="P6_规则与隐私.html" style="color:var(--muted);text-decoration:none;font-size:12px;font-weight:500;padding:6px 12px;border-radius:999px;transition:all .2s">规则</a>
   </nav>
-  <div class="pts">积分 <b>300</b></div>
+  <div class="pts">积分 <b id="p2-points">--</b></div>
 </div>
 
 <div class="main">
@@ -319,7 +319,7 @@ function closeShareModal(){
   document.getElementById('modal-share').classList.remove('show');
   document.body.style.overflow='';
 }
-function closeShareModalOnMask(e){if(e.target.classList.contains('modal-mask'))closeShareModal()}
+function closeShareModalOnMask(e){/* 点击外部不关闭分享弹窗。 */}
 
 // ===== Toast =====
 function toast(msg,type='amber'){
@@ -838,9 +838,9 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
   }catch(e){}
 })();
 (async function loadCloudAppearance(){
-  if(!window.XQXAuth?.session()){toast('请先登录后再捏脸','rose');setTimeout(()=>window.location.href='P1_首页.html',400);return}
-  const profile=await window.XQXAuth.profile();
+  const profile=await window.XQXAuth?.profile();
   if(!profile){window.location.href='P1_首页.html';return}
+  document.getElementById('p2-points').textContent=Number(profile.points_balance||0).toLocaleString('zh-CN');
   if(profile.appearance) applyCfg(profile.appearance);
 })();
 document.getElementById('shareBtn').addEventListener('click',function(){

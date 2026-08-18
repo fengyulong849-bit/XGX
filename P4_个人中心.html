@@ -170,6 +170,8 @@ body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;bac
 .modal-pwd-field label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:6px}
 .modal-pwd-field input{width:100%;background:var(--bg);border:1px solid var(--rule);border-radius:12px;padding:11px 14px;color:var(--ink);font:inherit;font-size:14px;outline:none;transition:border-color .2s}
 .modal-pwd-field input:focus{border-color:var(--amber)}
+.form-error{display:none;margin:12px 0 0;padding:10px 12px;border:1px solid rgba(217,122,108,.45);border-radius:10px;background:rgba(217,122,108,.10);color:#F0A398;font-size:12px;line-height:1.5}
+.form-error.show{display:block}
 .warn-icon{font-size:52px;text-align:center;display:block;margin-bottom:12px}
 
 button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
@@ -325,6 +327,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <label>新密码</label>
         <input type="password" id="pwd-new" placeholder="8–32 位，字母/数字/符号任两类" maxlength="32" autocomplete="new-password">
       </div>
+      <div class="form-error" id="change-pwd-error" role="alert"></div>
       <div class="modal-actions">
         <button class="btn-ghost" onclick="closeModal('modal-changepwd')">取消</button>
         <button class="btn-primary" onclick="doChangePwd()">确认修改</button>
@@ -515,7 +518,7 @@ function closeModal(id){
   if(!document.querySelector('.modal-mask.show'))document.body.style.overflow='';
 }
 function closeModalOnMask(e,id){
-  if(e.target.classList.contains('modal-mask'))closeModal(id);
+  // 点击弹窗外部不关闭，避免表单内容和错误提示被意外清空。
 }
 document.addEventListener('keydown',(e)=>{
   if(e.key==='Escape'){
@@ -525,17 +528,24 @@ document.addEventListener('keydown',(e)=>{
 });
 
 /* ============ 修改密码 ============ */
+function setChangePwdError(message){
+  const el=document.getElementById('change-pwd-error');
+  if(!el)return;
+  el.textContent=message||'';
+  el.classList.toggle('show',Boolean(message));
+}
 async function doChangePwd(){
+  setChangePwdError('');
   const oldPwd=document.getElementById('pwd-old').value;
   const newPwd=document.getElementById('pwd-new').value;
-  if(!oldPwd){toast('请输入当前密码','rose');return}
-  if(newPwd.length<8){toast('新密码至少 8 位','rose');return}
+  if(!oldPwd){setChangePwdError('请输入当前密码');return}
+  if(newPwd.length<8){setChangePwdError('新密码至少 8 位');return}
   let types=0;
   if(/[a-zA-Z]/.test(newPwd))types++;
   if(/[0-9]/.test(newPwd))types++;
   if(/[^a-zA-Z0-9]/.test(newPwd))types++;
-  if(types<2){toast('新密码需包含字母/数字/符号中的任两类','rose');return}
-  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
+  if(types<2){setChangePwdError('新密码需包含字母、数字、符号中的任两类');return}
+  if(!window.XQXAuth?.configured()){setChangePwdError('系统尚未配置云端连接，请稍后再试');return}
   try{
     const result=await XQXAuth.changePassword(oldPwd,newPwd);
     document.getElementById('pwd-old').value='';document.getElementById('pwd-new').value='';
@@ -543,7 +553,7 @@ async function doChangePwd(){
     document.getElementById('recovery-display').textContent=result.recovery_code;
     toast('密码已修改，请保存新的恢复码','calm');
     openModal('modal-recovery');
-  }catch(error){toast(XQXAuth.message(error.message),'rose')}
+  }catch(error){setChangePwdError(XQXAuth.message(error.message))}
 }
 
 function logoutAccount(){

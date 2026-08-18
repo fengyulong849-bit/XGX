@@ -426,6 +426,8 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .auth-field .safety{font-size:11px;color:var(--tertiary);margin-top:4px;display:flex;align-items:center;gap:4px}
 .auth-field .gen-btn{background:transparent;border:1px solid var(--rule-2);color:var(--muted);font:inherit;font-size:12px;padding:6px 12px;border-radius:8px;cursor:pointer;transition:all .2s;margin-top:6px}
 .auth-field .gen-btn:hover{color:var(--amber);border-color:var(--amber)}
+.form-error{display:none;margin:12px 0 0;padding:10px 12px;border:1px solid rgba(217,122,108,.45);border-radius:10px;background:rgba(217,122,108,.10);color:#F0A398;font-size:12px;line-height:1.5}
+.form-error.show{display:block}
 .auth-link{font-size:12px;color:var(--blue);text-decoration:none;font-weight:500}
 .auth-link:hover{color:var(--amber)}
 .auth-bottom{display:flex;justify-content:space-between;align-items:center;margin-top:12px;font-size:12px;color:var(--tertiary)}
@@ -640,6 +642,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i>
       </div>
       <div class="cb-pts" id="cb-pts">基础 +100 · 7 天里程碑 +300</div>
+      <div class="cb-balance">当前积分 <b id="cb-balance">--</b></div>
       <button class="cb-btn" id="cb-btn">签到领惊喜</button>
       <div class="cb-pts-preview" style="display:none">登录后可签到领积分</div>
     </div>
@@ -866,6 +869,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <label>密码</label>
         <input type="password" id="login-password" placeholder="输入密码">
       </div>
+      <div class="form-error" id="auth-login-error" role="alert"></div>
       <div class="auth-bottom">
         <span>还没有账号？<a class="auth-link" onclick="switchAuthTab('register')">注册一个</a></span>
         <a class="auth-link" href="P5_找回密码.html">忘记密码</a>
@@ -890,6 +894,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <label>密码</label>
         <input type="password" id="reg-password" placeholder="8 位以上，字母/数字/符号任两类">
       </div>
+      <div class="form-error" id="auth-register-error" role="alert"></div>
       <div class="modal-actions" style="margin-top:24px">
         <button class="btn-primary" onclick="doRegister()">注册</button>
       </div>
@@ -1568,6 +1573,13 @@ function toast(msg,type='amber'){
   setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-8px)';setTimeout(()=>el.remove(),300)},3000);
 }
 
+function setAuthError(id,message){
+  const el=document.getElementById(id);
+  if(!el)return;
+  el.textContent=message||'';
+  el.classList.toggle('show',Boolean(message));
+}
+
 // ============ 全息卡鼠标跟随 ============
 const holoInner=$('#holoInner');
 holoInner.addEventListener('mousemove',e=>{
@@ -1755,18 +1767,21 @@ $$('.act').forEach(b=>b.addEventListener('click',()=>{
 }));
 
 // ============ 签到 ============
-$('#cb-btn').addEventListener('click',()=>{
+$('#cb-btn').addEventListener('click',async()=>{
   if(state.mode!=='auth'){toast('登录后可签到领积分','amber');return}
   if(state.signedToday){toast('今日已签到，明日再来','calm');return}
-  state.signedToday=true;
-  const r=Math.random();
-  let bonus=0,label='普通';
-  if(r<.05){bonus=50;label='大惊喜'}else if(r<.2){bonus=20;label='中惊喜'}else if(r<.5){bonus=10;label='小惊喜'}
-  state.streak++;
-  state.points+=100+bonus;
-  const btn=$('#cb-btn');btn.classList.add('done');btn.textContent='今日已签到';
-  toast(`签到成功 +${100+bonus}${bonus?' · '+label:''}`,'calm');
-  updateStreak();
+  const btn=$('#cb-btn');
+  btn.disabled=true;
+  try{
+    const result=await XQXAuth.checkin();
+    state.signedToday=true;
+    state.streak=Number(result.streak||state.streak);
+    state.points=Number(result.points_balance||state.points);
+    btn.classList.add('done');btn.textContent='今日已签到';
+    toast(result.already_signed?'今日已签到，明日再来':`签到成功 +${result.points_delta||0}${result.surprise_delta?' · 惊喜':''}`,'calm');
+    updateUI();
+  }catch(error){toast(XQXAuth.message(error.message),'rose');}
+  finally{btn.disabled=false;}
 });
 function updateStreak(){
   const streak=$('#cb-streak');
@@ -1850,6 +1865,8 @@ $('#hero-cta-2').addEventListener('click',()=>{document.querySelector('#wall').s
 
 // ============ UI 同步 ============
 function updateUI(){
+  const balance=$('#cb-balance');
+  if(balance)balance.textContent=state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--';
   if(state.mode==='auth'){
     $('#nav-cta').style.display='none';
     $('#nav-avatar').style.display='flex';
@@ -1888,7 +1905,7 @@ function closeModal(id){
   }
 }
 function closeModalOnMask(e,id){
-  if(e.target.classList.contains('modal-mask')) closeModal(id);
+  // 点击弹窗外部不关闭，避免填写中的内容和错误提示被意外清空。
 }
 
 // Esc 关闭弹窗
@@ -1915,11 +1932,12 @@ function genAccount(){
 }
 
 async function doLogin(){
+  setAuthError('auth-login-error','');
   const acc = document.getElementById('login-account').value.trim();
   const pwd = document.getElementById('login-password').value;
-  if(!acc||!pwd){toast('请填写账号和密码','rose');return}
-  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
-  try{const result=await XQXAuth.login(acc,pwd);state.points=result.profile.points_balance;toast('登录成功','calm')}catch(error){toast(XQXAuth.message(error.message),'rose');return}
+  if(!acc||!pwd){setAuthError('auth-login-error','请填写账号和密码');return}
+  if(!window.XQXAuth?.configured()){setAuthError('auth-login-error','系统尚未配置云端连接，请稍后再试');return}
+  try{const result=await XQXAuth.login(acc,pwd);state.points=result.profile.points_balance;state.signedToday=Boolean(result.profile.signed_today);state.streak=Number(result.profile.streak||state.streak);toast('登录成功','calm')}catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
   closeModal('modal-auth');
   // 切换到登录态
   if(document.querySelector('#stateToggle [data-st="auth"]')){
@@ -1928,14 +1946,15 @@ async function doLogin(){
 }
 
 async function doRegister(){
+  setAuthError('auth-register-error','');
   const acc = document.getElementById('reg-account').value.trim();
   const pwd = document.getElementById('reg-password').value;
-  if(!/^[a-z0-9_]{4,20}$/.test(acc.toLowerCase())){toast('账号为 4–20 位小写字母、数字或下划线','rose');return}
-  if(!pwd||pwd.length<8){toast('密码至少 8 位','rose');return}
+  if(!/^[a-z0-9_]{4,20}$/.test(acc.toLowerCase())){setAuthError('auth-register-error','账号为 4–20 位小写字母、数字或下划线');return}
+  if(!pwd||pwd.length<8){setAuthError('auth-register-error','密码至少 8 位');return}
   const pwdTypes=Number(/[a-zA-Z]/.test(pwd))+Number(/\d/.test(pwd))+Number(/[^a-zA-Z\d]/.test(pwd));
-  if(pwdTypes<2){toast('密码需包含字母、数字、符号中的任两类','rose');return}
-  if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
-  let result;try{result=await XQXAuth.register(acc,pwd)}catch(error){toast(XQXAuth.message(error.message),'rose');return}
+  if(pwdTypes<2){setAuthError('auth-register-error','密码需包含字母、数字、符号中的任两类');return}
+  if(!window.XQXAuth?.configured()){setAuthError('auth-register-error','系统尚未配置云端连接，请稍后再试');return}
+  let result;try{result=await XQXAuth.register(acc,pwd)}catch(error){setAuthError('auth-register-error',XQXAuth.message(error.message));return}
   state.points=result.profile.points_balance;
   document.getElementById('recovery-code').textContent = result.recovery_code;
   // 切换到恢复码展示

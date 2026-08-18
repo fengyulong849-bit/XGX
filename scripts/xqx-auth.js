@@ -54,6 +54,7 @@
     async login(account, password) { const data = await call("auth-login", { account, password }); save({ access_token: data.access_token, refresh_token: data.refresh_token }); return data; },
     async resetPassword(account, recoveryCode, newPassword) { return call("auth-reset-password", { account, recovery_code: recoveryCode, new_password: newPassword, request_id: uuid() }); },
     async changePassword(currentPassword, newPassword) { return callAuthenticated("auth-change-password", { current_password: currentPassword, new_password: newPassword }); },
+    async checkin() { return callAuthenticated("checkin-sign", {}); },
     async profile() {
       const token = await accessToken(); if (!token) return null;
       const response = await fetch(`${config().supabaseUrl.replace(/\/$/, "")}/rest/v1/profiles?select=points_balance,free_diy_available,appearance,created_at`, { headers: { apikey: config().supabaseAnonKey, Authorization: `Bearer ${token}` } });
