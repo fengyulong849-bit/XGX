@@ -2052,6 +2052,8 @@ async function doLogin(){
   closeModal('modal-auth');
   // 切换到真实登录态；不再保留开发用的试用/登录切换器。
   setState('auth');
+  // 登录接口已返回今日签到状态；立即重绘签到卡/下班航线，避免仍显示旧的签到入口。
+  updateCountdown();
 }
 
 async function doRegister(){

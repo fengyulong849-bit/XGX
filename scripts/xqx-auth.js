@@ -73,6 +73,7 @@
     async pointsLedger(limit = 50) { return callAuthenticated("points-ledger", { limit }); },
     async claimResonance(rantId, requestId) { return callAuthenticated("resonance-claim", { rant_id: rantId, request_id: requestId }); },
     async completeCare(careType, requestId) { return callAuthenticated("care-complete", { care_type: careType, request_id: requestId }); },
+    async completeRelease(rantId, requestId) { return callAuthenticated("release-complete", { rant_id: rantId, request_id: requestId }); },
     async profile() {
       const data = await callAuthenticated("profile-me", {});
       return data.profile || null;

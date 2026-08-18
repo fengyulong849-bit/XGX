@@ -223,6 +223,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
     <div class="write-card">
       <div class="title">把最烦的那件事<i>写下来</i></div>
       <div class="subtitle">1–50 字 · 写下最想销毁的那件事…</div>
+      <div id="rant-picker" style="margin:0 0 12px;color:var(--muted);font-size:12px">正在读取你已发布的吐槽…</div>
       <div class="write-area">
         <textarea id="write-input" maxlength="50" placeholder="写下最想销毁的那件事…" autofocus></textarea>
         <div class="counter"><span id="char-count">0</span>/50</div>
@@ -299,15 +300,31 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 
 </div>
 
+<script src="scripts/xqx-config.js"></script>
+<script src="scripts/xqx-auth.js"></script>
 <script>
 /* ============ 状态 ============ */
 const state = {
   text: '',
   method: null,
-  rewarded: false
+  rewarded: false,
+  rantId: '',
+  releaseResult: null
 };
-// 演示开关：URL 带 ?fresh=1 时模拟"发布未满24小时"（不发积分）
-const simulateFresh = new URLSearchParams(location.search).get('fresh') === '1';
+
+function showError(message){const el=document.getElementById('rant-picker');if(el){el.textContent=message;el.style.color='var(--rose)';}}
+async function loadMyRants(){
+  const picker=document.getElementById('rant-picker');
+  if(!window.XQXAuth?.configured()){showError('请先登录并配置云端连接，才能进行释怀。');return}
+  try{
+    const result=await XQXAuth.myRants();
+    const items=(result.rants||[]).filter(r=>r.status==='published'&&new Date(r.created_at).getTime()<=Date.now()-24*3600000);
+    if(!items.length){showError('目前没有满足 24 小时条件的吐槽，先去吐槽墙写下一件烦心事吧。');return}
+    const select=document.createElement('select');select.id='rant-select';select.style.cssText='width:100%;padding:10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit';
+    select.innerHTML='<option value="">选择一件已满 24 小时的烦心事</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
+    picker.replaceChildren(select);select.addEventListener('change',()=>{state.rantId=select.value;const item=items.find(r=>r.id===state.rantId);state.text=item?.content||'';input.value=state.text;countEl.textContent=String(state.text.length);btnToStep2.disabled=!state.rantId;});
+  }catch(error){showError(XQXAuth.message(error.message));}
+}
 
 /* ============ 步骤切换 ============ */
 function goToStep(n){
@@ -344,7 +361,7 @@ input.addEventListener('input', ()=>{
 });
 
 btnToStep2.addEventListener('click', ()=>{
-  if(!state.text) return;
+  if(!state.text||!state.rantId) return;
   document.getElementById('preview-text').textContent = state.text;
   goToStep(2);
 });
@@ -367,10 +384,12 @@ document.getElementById('back-step1').addEventListener('click', ()=>{
   goToStep(1);
 });
 
-btnToStep3.addEventListener('click', ()=>{
+btnToStep3.addEventListener('click', async ()=>{
   if(!selectedMethod) return;
   state.method = selectedMethod;
-  state.rewarded = true;
+  btnToStep3.disabled=true;
+  try{state.releaseResult=await XQXAuth.completeRelease(state.rantId,crypto.randomUUID());state.rewarded=Boolean(state.releaseResult.eligible);}
+  catch(error){showError(XQXAuth.message(error.message));btnToStep3.disabled=false;return}
   goToStep(3);
   playDestroyAnimation(selectedMethod);
 });
@@ -404,17 +423,12 @@ function settleRelease(){
   const sub = document.getElementById('release-sub');
   const plus = document.getElementById('point-plus');
   if(!state.rewarded){
-    sub.textContent = simulateFresh ? '销毁完成。发布未满24小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
+    sub.textContent = state.releaseResult ? '销毁完成。发布未满24小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
     plus.style.visibility = 'hidden';
     return;
   }
-  if(simulateFresh){
-    sub.textContent = '销毁完成。发布未满24小时，本次不加积分。';
-    plus.style.visibility = 'hidden';
-  }else{
-    sub.textContent = '销毁完成 · +100 积分已到账';
-    plus.style.visibility = 'visible';
-  }
+  sub.textContent = `销毁完成 · +${state.releaseResult?.points_delta||0} 积分已到账`;
+  plus.style.visibility = 'visible';
 }
 
 /* ============ Step 3 销毁动画 ============ */
@@ -543,7 +557,7 @@ function playTypewriter(){
       // 显示 +100 积分（仅在满足奖励条件时）
       setTimeout(()=>{
         const plus = document.getElementById('point-plus');
-        if(state.rewarded && !simulateFresh){
+        if(state.rewarded){
           plus.style.visibility = 'visible';
           // 重置动画
           plus.style.animation = 'none';
@@ -563,6 +577,8 @@ document.getElementById('try-again').addEventListener('click', ()=>{
   state.text = '';
   state.method = null;
   state.rewarded = true;
+  state.rantId = '';
+  state.releaseResult = null;
   selectedMethod = null;
   skipArmed = false;
   input.value = '';
@@ -598,6 +614,8 @@ const observer = new MutationObserver(()=>{
   }
 });
 observer.observe(document.getElementById('panel-4'), {attributes:true, attributeFilter:['class']});
+
+loadMyRants();
 
 </script>
 
