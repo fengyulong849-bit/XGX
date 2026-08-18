@@ -15,7 +15,7 @@ export function corsHeaders(request: Request): HeadersInit {
   return {
     "Access-Control-Allow-Origin": originFor(request),
     "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Content-Type": "application/json; charset=utf-8",
     "Vary": "Origin",
   };

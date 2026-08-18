@@ -387,6 +387,7 @@ async function loadCloudProfile(){
   document.getElementById('profile-meta').textContent=`已登录 · 数据来自云端 · ${profile.account_display||'账号信息已隐藏'}`;
   signedDates=Array.isArray(profile.signed_dates)?profile.signed_dates:[];
   renderCalendar();
+  loadPersonalData();
 }
 loadCloudProfile();
 /* ============ Tab 切换 ============ */
@@ -399,22 +400,15 @@ document.querySelectorAll('.tab').forEach(tab=>{
   });
 });
 
-/* ============ 积分明细 ============ */
-const transactions = [
-  {icon:'🫶',type:'plus',title:'共鸣收到 · 点赞我的吐槽',time:'今天 14:32',amount:10},
-  {icon:'✅',type:'plus',title:'每日签到',time:'今天 09:15',amount:100},
-  {icon:'💧',type:'plus',title:'喝水打卡',time:'今天 10:30',amount:20},
-  {icon:'✍️',type:'plus',title:'吐槽入墙',time:'昨天 21:04',amount:50},
-  {icon:'🫂',type:'plus',title:'共鸣点击 · 为他人点赞',time:'昨天 18:22',amount:10},
-  {icon:'🐾',type:'plus',title:'戳一戳领导',time:'昨天 15:40',amount:10},
-  {icon:'🗒️',type:'minus',title:'复活领导',time:'前天 11:18',amount:500},
-  {icon:'🌬️',type:'plus',title:'释怀 · 风吹散',time:'3 天前 22:30',amount:100},
-  {icon:'⌛',type:'plus',title:'久坐提醒',time:'3 天前 15:00',amount:30},
-  {icon:'🎉',type:'plus',title:'注册欢迎赠送',time:'12 天前',amount:300},
-];
+/* ============ 积分明细（云端流水） ============ */
+let transactions = [], myRants = [];
+const eventLabels={welcome:['🎉','注册欢迎赠送'],checkin:['✅','每日签到'],pet_action:['🐾','领导互动'],pet_revive:['🗒️','复活领导'],rant_publish:['✍️','吐槽入墙'],resonance_give:['🫂','为他人送出共鸣'],resonance_claim:['🫶','收下吐槽共鸣'],care_water:['💧','喝水打卡'],care_sit:['⌛','久坐活动'],release_complete:['🌬️','释怀仪式']};
+function relativeTime(value){const mins=Math.max(0,Math.floor((Date.now()-new Date(value).getTime())/60000));if(mins<1)return'刚刚';if(mins<60)return`${mins} 分钟前`;if(mins<1440)return`${Math.floor(mins/60)} 小时前`;return`${Math.floor(mins/1440)} 天前`}
+function escapeHtml(value){return String(value||'').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]))}
 
 function renderTimeline(){
   const tl = document.getElementById('timeline');
+  if(!transactions.length){tl.innerHTML='<div class="empty-state"><span class="icon">🧾</span><div class="text">暂时还没有积分记录。</div></div>';return}
   tl.innerHTML = transactions.map(t=>`
     <div class="tl-item">
       <div class="tl-icon ${t.type}">${t.icon}</div>
@@ -428,13 +422,6 @@ function renderTimeline(){
 }
 renderTimeline();
 
-/* ============ 我的吐槽 ============ */
-const myRants = [
-  {text:'"今晚就给"听了第八遍，改到凌晨两点',age:2,votes:47,claimed:true,status:'done'},
-  {text:'需求文档只改了名字，内容没变，还说"这是新版本"',age:5,votes:23,claimed:true,status:'fading'},
-  {text:'周五下午三点布置新需求，问能不能周一给——周末没了',age:1,votes:88,claimed:false,status:'done'},
-];
-
 function renderRants(){
   const list = document.getElementById('rantList');
   if(myRants.length===0){
@@ -443,31 +430,42 @@ function renderRants(){
   }
   list.innerHTML = myRants.map((r,i)=>`
     <div class="rant-item">
-      <div class="rant-text">${r.text}</div>
+      <div class="rant-text">${escapeHtml(r.content)}</div>
       <div class="rant-meta">
-        <span class="tag ${r.status==='done'?'done':'fading'}">${r.status==='done'?'已释怀':'淡忘中'}</span>
-        <span>发布 ${r.age} 天前</span>
+        <span class="tag ${r.status==='published'?'done':'fading'}">${r.status==='published'?'已入墙':'已结束'}</span>
+        <span>发布 ${relativeTime(r.created_at)}</span>
         <span>🫶 ${r.votes} 共鸣</span>
       </div>
-      ${r.claimed ? `
+      ${Number(r.unclaimed_resonances||0)===0 ? `
         <div class="rant-rewards">
-          <div class="reward-info">已收下 <b>+${r.votes*10}</b> 积分</div>
-          <button class="claim-btn done" disabled>已收下</button>
+          <div class="reward-info">暂无可领取的新共鸣</div>
+          <button class="claim-btn done" disabled>已领取</button>
         </div>
       ` : `
         <div class="rant-rewards">
-          <div class="reward-info">新增 <b>${r.votes}</b> 条共鸣，收下可得 <b>+${r.votes*10}</b> 积分</div>
-          <button class="claim-btn" onclick="claimReward(${i})">收下共鸣</button>
+          <div class="reward-info">新增 <b>${r.unclaimed_resonances}</b> 条共鸣，等待领取</div>
+          <button class="claim-btn" onclick="claimReward('${r.id}')">收下共鸣</button>
         </div>
       `}
     </div>
   `).join('');
 }
 
-function claimReward(i){
-  myRants[i].claimed = true;
-  renderRants();
-  toast(`+${myRants[i].votes*10} 积分已到账`,'calm');
+async function claimReward(rantId){
+  try{const result=await XQXAuth.claimResonance(rantId,crypto.randomUUID());document.getElementById('profile-points').textContent=Number(result.points_balance||0).toLocaleString('zh-CN');document.querySelector('.topbar .pts b').textContent=Number(result.points_balance||0).toLocaleString('zh-CN');toast(`+${result.points_delta||0} 积分已到账`,'calm');loadPersonalData();}
+  catch(error){toast(XQXAuth.message(error.message),'rose');}
+}
+
+async function loadPersonalData(){
+  if(!window.XQXAuth?.configured())return;
+  try{
+    const [ledgerResult,rantsResult]=await Promise.all([XQXAuth.pointsLedger(50),XQXAuth.myRants()]);
+    transactions=(ledgerResult.entries||[]).map(entry=>{const [icon,title]=eventLabels[entry.event_type]||['✨','积分变动'];return {icon,type:Number(entry.delta)>=0?'plus':'minus',title,time:relativeTime(entry.created_at),amount:Math.abs(Number(entry.delta)||0)}});
+    myRants=Array.isArray(rantsResult.rants)?rantsResult.rants:[];renderTimeline();renderRants();
+  }catch(error){
+    document.getElementById('timeline').innerHTML='<div class="empty-state"><span class="icon">⚠️</span><div class="text">积分记录暂时无法加载，请稍后重试。</div></div>';
+    document.getElementById('rantList').innerHTML='<div class="empty-state"><span class="icon">⚠️</span><div class="text">我的吐槽暂时无法加载，请稍后重试。</div></div>';
+  }
 }
 
 /* ============ 日历 ============ */

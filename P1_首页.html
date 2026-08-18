@@ -1857,42 +1857,23 @@ function updateStreak(){
   $('#cb-pts').textContent=`基础 +100 · ${state.streak<7?'7 天 +300':state.streak<14?'14 天 +600':'每 7 天 +300'}`;
 }
 
-// ============ 吐槽墙 ============
-const RANTS=[
-  {c:'"这个需求简单，今天就能给"——已经第三周了',age:0,v:142,t:'2 小时前'},
-  {c:'周报写了三千字，领导回了俩字：收到',age:0,v:88,t:'4 小时前'},
-  {c:'周五下午三点布置新需求，问能不能周一给',age:1,v:211,t:'6 小时前'},
-  {c:'PPT 改了八版，最后说还是第一版好',age:2,v:302,t:'1 天前'},
-  {c:'"你先做着，需求我再想想"——然后就没了',age:3,v:64,t:'1 天前'},
-  {c:'加班到九点，食堂只剩一个凉鸡腿',age:5,v:47,t:'2 天前'},
-  {c:'会议室被占了，站着开了一小时会',age:7,v:55,t:'3 天前'},
-  {c:'调休被驳，理由是"不够忙"',age:9,v:73,t:'4 天前'},
-  {c:'绩效面谈：你很努力，但是……',age:11,v:205,t:'6 天前'},
-  {c:'年度计划又是我一个人写',age:13,v:167,t:'8 天前'},
-  {c:'"今晚就给"听了第八遍',age:14,v:158,t:'13 天前'},
-  {c:'需求文档只改了名字，内容没变',age:0,v:119,t:'5 小时前'},
-];
-function renderWall(){
+// ============ 吐槽墙（云端随机墙；不再回退到本地假数据） ============
+function rantAge(createdAt){return Math.max(0,Math.floor((Date.now()-new Date(createdAt).getTime())/86400000))}
+function rantTime(createdAt){const h=Math.max(0,Math.floor((Date.now()-new Date(createdAt).getTime())/3600000));return h<1?'刚刚':h<24?`${h} 小时前`:`${Math.floor(h/24)} 天前`}
+async function renderWall(){
   const grid=$('#rant-grid');
-  const pool=[...RANTS].sort(()=>Math.random()-.5).slice(0,9);
-  grid.innerHTML=pool.map(r=>`
-    <article class="rant-card" data-age="${Math.min(r.age,14)}">
-      ${r.age>=7?`<span class="fading-tag">淡忘中</span>`:''}
-      <p class="rant-content">${escapeHtml(r.c)}</p>
-      <div class="rant-foot">
-        <span class="rant-time">${r.t} · 发布 ${r.age} 天</span>
-        <button class="btn-res" data-v="${r.v}" ${state.mode==='try'?'disabled':''}>🫶 ${r.v}</button>
-      </div>
-    </article>
-  `).join('');
-  $$('.btn-res').forEach(b=>b.addEventListener('click',()=>{
-    if(state.mode!=='auth'){toast('登录后可共鸣','amber');return}
-    if(b.disabled)return;
-    b.disabled=true;
-    const v=parseInt(b.dataset.v)+1;
-    b.innerHTML=`🫶 ${v}`;
-    toast('共鸣 +10','calm');
-  }));
+  if(!window.XQXAuth?.configured()){grid.innerHTML='<div class="empty-state">云端连接尚未配置，吐槽墙暂不可用。</div>';return}
+  grid.innerHTML='<div class="empty-state">正在从云端取回吐槽墙…</div>';
+  try{
+    const result=await XQXAuth.randomRants(9),pool=Array.isArray(result.rants)?result.rants:[];
+    if(!pool.length){grid.innerHTML='<div class="empty-state">墙上暂时还没有吐槽，成为第一个写下它的人吧。</div>';return}
+    grid.innerHTML=pool.map(r=>{const age=rantAge(r.created_at);return `<article class="rant-card" data-age="${Math.min(age,14)}">${age>=7?'<span class="fading-tag">淡忘中</span>':''}<p class="rant-content">${escapeHtml(r.content)}</p><div class="rant-foot"><span class="rant-time">${rantTime(r.created_at)} · 发布 ${age} 天</span><button class="btn-res" data-id="${r.id}" data-v="${r.votes}" ${state.mode==='try'?'disabled':''}>🫶 ${r.votes}</button></div></article>`}).join('');
+    $$('.btn-res').forEach(b=>b.addEventListener('click',async()=>{
+      if(state.mode!=='auth'){openModal('modal-auth');return} if(b.disabled)return;b.disabled=true;
+      try{const result=await XQXAuth.resonance(b.dataset.id,crypto.randomUUID());state.points=Number(result.points_balance??state.points);b.classList.add('active');b.textContent=`🫶 ${result.votes??Number(b.dataset.v)+1}`;updateUI();toast(result.points_delta?`共鸣 +${result.points_delta}`:'共鸣已送达','calm');}
+      catch(error){toast(XQXAuth.message(error.message),'rose');b.disabled=false;}
+    }));
+  }catch(error){grid.innerHTML='<div class="empty-state">吐槽墙暂时无法加载，请稍后刷新重试。</div>'}
 }
 function escapeHtml(s){return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 renderWall();
@@ -1910,13 +1891,12 @@ $$('.release-card').forEach(c=>c.addEventListener('click',()=>{
 }));
 
 // ============ 关怀提醒 ============
-$$('.btn-care').forEach(b=>b.addEventListener('click',()=>{
+$$('.btn-care').forEach(b=>b.addEventListener('click',async()=>{
   if(state.mode!=='auth'){toast('登录后可领关怀积分','amber');return}
   if(b.classList.contains('done'))return;
-  b.classList.add('done');b.textContent='已完成';
-  const pts=b.dataset.care==='water'?20:30;
-  state.points+=pts;
-  toast(`${b.dataset.care==='water'?'喝水':'久坐'} +${pts}`,'calm');
+  b.disabled=true;
+  try{const result=await XQXAuth.completeCare(b.dataset.care,crypto.randomUUID());state.points=Number(result.points_balance??state.points);b.classList.add('done');b.textContent='已完成';updateUI();toast(`${b.dataset.care==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');}
+  catch(error){toast(XQXAuth.message(error.message),'rose');b.disabled=false;}
 }));
 
 // ============ 导航/CTA ============
@@ -2128,7 +2108,7 @@ if(rantInput){
   });
 }
 
-function submitRant(){
+async function submitRant(){
   const txt = rantInput.value.trim();
   if(!txt) return;
   // 敏感词检测
@@ -2138,14 +2118,10 @@ function submitRant(){
     toast('内容含敏感信息，请修改后再发布','rose');
     return;
   }
-  rantTodayCount++;
-  state.points += 50;
-  toast('吐槽已入墙 +50','calm');
-  rantInput.value = '';
-  rantCount.textContent = '0';
-  // 刷新墙
-  renderWall();
-  closeModal('modal-rant');
+  rantSubmit.disabled=true;
+  try{const result=await XQXAuth.createRant(txt,crypto.randomUUID());state.points=Number(result.points_balance??state.points);rantTodayCount=Math.max(0,3-Number(result.remaining_today??0));toast(`吐槽已入墙 +${result.points_delta||0}`,'calm');rantInput.value='';rantCount.textContent='0';updateUI();renderWall();closeModal('modal-rant');}
+  catch(error){toast(XQXAuth.message(error.message),'rose');}
+  finally{rantSubmit.disabled=false;}
 }
 
 // === 弹窗5: 销毁预览（试用态）===
@@ -2158,7 +2134,7 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
 <script src="scripts/xqx-auth.js"></script>
 <script src="scripts/xqx-p1-auth.js"></script>
 <script>
-(async()=>{
+window.addEventListener('DOMContentLoaded',async()=>{
   const profile=await window.XQXAuth?.profile();
   if(!profile)return;
   if(profile.appearance){
@@ -2181,7 +2157,7 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
   else document.documentElement.setAttribute('data-state','auth');
   document.getElementById('nav-cta')?.style.setProperty('display','none');
   document.getElementById('nav-avatar')?.style.setProperty('display','flex');
-})();
+});
 </script>
 
 

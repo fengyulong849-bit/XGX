@@ -19,14 +19,16 @@ Deno.serve(async (request) => {
     ]);
     if (profileError || accountError || checkinError || !profile) return json(request, 503, { ok: false, reason: "profile_unavailable" });
 
-    const today = new Date().toISOString().slice(0, 10);
+    const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Shanghai", year: "numeric", month: "2-digit", day: "2-digit" })
+      .formatToParts(new Date()).reduce((value, part) => part.type === "literal" ? value : { ...value, [part.type]: part.value }, {} as Record<string, string>);
+    const businessDate = `${today.year}-${today.month}-${today.day}`;
     const latest = checkins?.[0];
     return json(request, 200, {
       ok: true,
       profile: {
         ...profile,
         account_display: account?.account_display || "",
-        signed_today: Boolean(checkins?.some((row) => row.business_date === today)),
+        signed_today: Boolean(checkins?.some((row) => row.business_date === businessDate)),
         streak: latest?.streak || 0,
         signed_dates: (checkins || []).map((row) => row.business_date),
       },
