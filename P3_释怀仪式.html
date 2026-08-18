@@ -318,10 +318,11 @@ async function loadMyRants(){
   if(!window.XQXAuth?.configured()){showError('请先登录并配置云端连接，才能进行释怀。');return}
   try{
     const result=await XQXAuth.myRants();
-    const items=(result.rants||[]).filter(r=>r.status==='published'&&new Date(r.created_at).getTime()<=Date.now()-24*3600000);
-    if(!items.length){showError('目前没有满足 24 小时条件的吐槽，先去吐槽墙写下一件烦心事吧。');return}
+    // 开发测试阶段先展示最近 3 条本人吐槽；是否满足奖励时长仍由服务端最终判断。
+    const items=(result.rants||[]).filter(r=>r.status==='published').slice(0,3);
+    if(!items.length){showError('目前还没有可释怀的吐槽，先去吐槽墙写下一件烦心事吧。');return}
     const select=document.createElement('select');select.id='rant-select';select.style.cssText='width:100%;padding:10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit';
-    select.innerHTML='<option value="">选择一件已满 24 小时的烦心事</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
+    select.innerHTML='<option value="">选择一件烦心事（测试显示最近 3 条）</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
     picker.replaceChildren(select);select.addEventListener('change',()=>{state.rantId=select.value;const item=items.find(r=>r.id===state.rantId);state.text=item?.content||'';input.value=state.text;countEl.textContent=String(state.text.length);btnToStep2.disabled=!state.rantId;});
   }catch(error){showError(XQXAuth.message(error.message));}
 }
