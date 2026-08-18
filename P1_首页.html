@@ -217,6 +217,15 @@ body::before{
 [data-state="try"] .cb-btn{background:var(--surface-3);color:var(--tertiary);box-shadow:none;cursor:not-allowed}
 [data-state="try"] .cb-pts-preview{display:block}
 
+/* 已签到后的下班节奏面板：把领取位置转化为当日工作进度。 */
+.shift-panel{display:flex;flex-direction:column;gap:14px}
+.shift-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.shift-top b{font-family:var(--serif);font-size:17px}.shift-done{background:rgba(111,179,168,.14);border:1px solid rgba(111,179,168,.35);color:var(--calm);font-size:12px;padding:5px 10px;border-radius:999px;white-space:nowrap}
+.shift-time{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--amber);line-height:1}.shift-caption{font-size:12px;color:var(--muted);margin-top:4px}
+.shift-route{position:relative;height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 3px}.shift-route::before{content:'';position:absolute;left:4px;right:4px;height:5px;border-radius:999px;background:rgba(255,255,255,.1)}.shift-route i{position:relative;z-index:1;width:11px;height:11px;border-radius:50%;background:var(--surface-3);border:2px solid var(--muted)}.shift-route i.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 12px rgba(232,163,61,.55)}.shift-marker{position:absolute;z-index:2;top:5px;width:22px;height:22px;border-radius:50%;background:var(--grad);box-shadow:0 0 18px rgba(232,163,61,.55);transform:translateX(-50%);transition:left .6s var(--ease)}
+.shift-foot{display:flex;justify-content:space-between;gap:10px;font-size:12px;color:var(--muted)}.shift-foot b{color:var(--calm);font-family:var(--mono)}
+.reminder-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.reminder-options label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}.reminder-options select{width:100%;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit;padding:9px 10px;border-radius:10px;outline:none}
+.reminder-modal-icon{font-size:38px;margin-bottom:10px}.reminder-modal-actions{display:flex;gap:10px}.reminder-modal-actions button{flex:1}
+
 /* ============ 下班倒计时 SVG 圆环 ============ */
 .countdown-panel{padding:24px}
 .cd-ring-wrap{display:flex;align-items:center;gap:28px}
@@ -792,7 +801,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <div class="care-ico water">💧</div>
               <div>
                 <b>该喝水啦</b>
-                <span>距上次 60 分钟</span>
+                <span id="care-water-status">按设置提醒</span>
               </div>
             </div>
             <div class="care-progress"><i id="care-water-bar" style="width:100%;background:var(--grad-cool)"></i></div>
@@ -810,7 +819,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <div class="care-ico sit">🪑</div>
               <div>
                 <b>起来动一动</b>
-                <span>久坐 45 分钟</span>
+                <span id="care-sit-status">按设置提醒</span>
               </div>
             </div>
             <div class="care-progress"><i id="care-sit-bar" style="width:90%;background:var(--grad)"></i></div>
@@ -863,12 +872,6 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="f-bottom"><span>© 2026 小确闲 · 打工人的五分钟治愈站</span><span>P1 首页 · 深夜蓝 Marble 骨架</span></div>
   </footer>
 
-</div>
-
-<!-- 状态切换器（开发预览用，产品上线移除） -->
-<div class="state-toggle" id="stateToggle" aria-label="开发预览：切换试用/登录态">
-  <button data-st="try" class="active">试用态</button>
-  <button data-st="auth">登录态</button>
 </div>
 
 <!-- Toast 容器 -->
@@ -1084,6 +1087,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <button data-h="18" data-m="30">18:30</button>
           <button data-h="19" data-m="0">19:00</button>
         </div>
+        <div class="reminder-options">
+          <label>喝水提醒频率<select id="water-interval" aria-label="喝水提醒频率"><option value="30">每 30 分钟</option><option value="45">每 45 分钟</option><option value="60">每 60 分钟</option><option value="90">每 90 分钟</option></select></label>
+          <label>久坐提醒频率<select id="sit-interval" aria-label="久坐提醒频率"><option value="30">每 30 分钟</option><option value="45">每 45 分钟</option><option value="60">每 60 分钟</option><option value="90">每 90 分钟</option></select></label>
+        </div>
         <div class="hint">默认 18:00 · 可随时修改，<b>修改后按新时间重新计算</b>。次日首次打开自动归零重来。</div>
       </div>
       <div class="modal-actions">
@@ -1092,6 +1099,15 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
       </div>
     </div>
   </div>
+</div>
+
+<!-- ============ 关怀提醒弹窗 ============ -->
+<div class="modal-mask" id="modal-reminder" role="dialog" aria-modal="true" aria-label="关怀提醒" onclick="closeModalOnMask(event,'modal-reminder')">
+  <div class="modal-card"><button class="modal-close" onclick="closeModal('modal-reminder')">×</button><div class="modal-body">
+    <div class="reminder-modal-icon" id="reminder-icon">💧</div><div class="modal-title" id="reminder-title">该喝水啦</div>
+    <div class="modal-sub" id="reminder-copy">起身接杯水，给自己一分钟喘口气。</div>
+    <div class="reminder-modal-actions"><button class="btn-ghost" onclick="closeModal('modal-reminder')">稍后提醒</button><button class="btn-primary" id="reminder-done">我完成了</button></div>
+  </div></div>
 </div>
 
 <script type="module">
@@ -1576,7 +1592,6 @@ const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 function setState(st){
   state.mode=st;
   document.documentElement.setAttribute('data-state',st);
-  $$('#stateToggle button').forEach(b=>b.classList.toggle('active',b.dataset.st===st));
   updateUI();
 }
 window.xqxSetAuth=()=>setState('auth');
@@ -1584,7 +1599,6 @@ window.xqxApplyCloudProfile=(profile)=>{
   if(!profile)return;
   state.mode='auth';
   document.documentElement.setAttribute('data-state','auth');
-  $$('#stateToggle button').forEach(b=>b.classList.toggle('active',b.dataset.st==='auth'));
   state.points=Number(profile.points_balance||0);
   state.signedToday=Boolean(profile.signed_today);
   state.streak=Number(profile.streak||state.streak);
@@ -1596,9 +1610,9 @@ window.xqxApplyCloudProfile=(profile)=>{
     updateBars();
   }
   updateUI();
-  if(cloud?.down)setTimeout(showReviveModal,250);
+  updateCountdown();
+  if(cloud?.down)setTimeout(promptReviveOnce,250);else sessionStorage.removeItem('xqx_pet_down_prompted');
 };
-$$('#stateToggle button').forEach(b=>b.addEventListener('click',()=>setState(b.dataset.st)));
 
 function toast(msg,type='amber'){
   const el=document.createElement('div');
@@ -1631,16 +1645,21 @@ holoInner.addEventListener('mouseleave',()=>{
   holoInner.style.transform='rotateX(0) rotateY(0)';
 });
 
-// ============ 下班倒计时 ============
-// 下班时间可配置：默认 18:00，localStorage 持久化（登录后可同步 profiles）
+// ============ 下班节奏与关怀提醒 ============
+// 工作时段以“下班时间前 9 小时”为起点，提醒仅在已签到的工作时段内运行。
 let offtime={h:18,m:0};
+let wellbeing={water:60,sit:45,lastWater:'',lastSit:''};
 try{const saved=JSON.parse(localStorage.getItem('xqx_offtime')||'null');if(saved&&saved.h!=null&&saved.m!=null)offtime=saved;}catch(e){}
+try{const saved=JSON.parse(localStorage.getItem('xqx_wellbeing')||'null');if(saved)wellbeing={...wellbeing,...saved};}catch(e){}
 const OFF_HOUR=()=>offtime.h,OFF_MIN=()=>offtime.m;
-let firstOpenTime=Date.now();
 const CIRC=2*Math.PI*58;
+function workBounds(now=new Date()){const off=new Date(now);off.setHours(OFF_HOUR(),OFF_MIN(),0,0);const start=new Date(off.getTime()-9*3600000);return {start,off}}
+function dayKey(now=new Date()){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
+function persistWellbeing(){try{localStorage.setItem('xqx_wellbeing',JSON.stringify(wellbeing))}catch(e){}}
+function formatClock(ms){const h=String(Math.floor(Math.max(0,ms)/3600000)).padStart(2,'0'),m=String(Math.floor(Math.max(0,ms)%3600000/60000)).padStart(2,'0'),s=String(Math.floor(Math.max(0,ms)%60000/1000)).padStart(2,'0');return `${h}:${m}:${s}`}
 function updateCountdown(){
   const now=new Date();
-  const off=new Date(now);off.setHours(OFF_HOUR(),OFF_MIN(),0,0);
+  const {start,off}=workBounds(now);
   const cd=$('#countdown'),txt=$('#cd-text');
   const titleEl=$('#care-cd-title'),subEl=$('#care-cd-sub');
   const ringTime=$('#cdRingTime'),progEl=$('#cdProgress'),liqEl=$('#cdLiquid');
@@ -1648,14 +1667,11 @@ function updateCountdown(){
   const symEl=$('#cdSympathy');
   if(now<off){
     const diff=off-now;
-    const h=String(Math.floor(diff/3600000)).padStart(2,'0');
-    const m=String(Math.floor(diff%3600000/60000)).padStart(2,'0');
-    const s=String(Math.floor(diff%60000/1000)).padStart(2,'0');
-    const str=`${h}:${m}:${s}`;
+    const str=formatClock(diff);
     cd.classList.remove('off');
     txt.innerHTML=`下班还有 <b>${str}</b>`;
-    const total=off-firstOpenTime;
-    const passed=now-firstOpenTime;
+    const total=off-start;
+    const passed=now-start;
     const pct=Math.max(0,Math.min(100,Math.round(passed/total*100)));
     titleEl.textContent=`下班还有 ${str}`;
     subEl.textContent=`一天进度 ${pct}%`;
@@ -1682,22 +1698,24 @@ function updateCountdown(){
     symEl.style.display='block';
     symEl.innerHTML=lines[Math.floor(Math.random()*lines.length)].replace(/(还在卷？抱抱自己|对自己好一点|摸会儿鱼吧)/g,'<span class="em">$1</span>');
   }
+  renderShiftPanel(now,start,off);
+  updateCareReminders(now,start,off);
 }
 function fmtDur(ms){const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return (h>0?h+'时':'')+m+'分'}
 setInterval(updateCountdown,1000);updateCountdown();
 
 // ============ 下班时间设置弹窗 ============
 (function initOfftime(){
-  const hSel=document.getElementById('off-hour'),mSel=document.getElementById('off-min');
-  if(!hSel||!mSel)return;
+  const hSel=document.getElementById('off-hour'),mSel=document.getElementById('off-min'),waterSel=document.getElementById('water-interval'),sitSel=document.getElementById('sit-interval');
+  if(!hSel||!mSel||!waterSel||!sitSel)return;
   for(let h=0;h<24;h++){const o=document.createElement('option');o.value=h;o.textContent=String(h).padStart(2,'0');hSel.appendChild(o)}
   for(let m=0;m<60;m+=5){const o=document.createElement('option');o.value=m;o.textContent=String(m).padStart(2,'0');mSel.appendChild(o)}
-  hSel.value=offtime.h;mSel.value=offtime.m;
+  hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);
   // 胶囊点击打开设置
   $('#countdown').style.cursor='pointer';
   $('#countdown').title='点击设置下班时间';
   $('#countdown').addEventListener('click',()=>{
-    hSel.value=offtime.h;mSel.value=offtime.m;openModal('modal-offtime');
+    hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);openModal('modal-offtime');
   });
   document.querySelectorAll('.offtime-quick button').forEach(b=>b.addEventListener('click',()=>{
     hSel.value=b.dataset.h;mSel.value=b.dataset.m;
@@ -1706,12 +1724,35 @@ setInterval(updateCountdown,1000);updateCountdown();
 function saveOfftime(){
   offtime.h=parseInt(document.getElementById('off-hour').value,10)||18;
   offtime.m=parseInt(document.getElementById('off-min').value,10)||0;
+  wellbeing.water=parseInt(document.getElementById('water-interval').value,10)||60;
+  wellbeing.sit=parseInt(document.getElementById('sit-interval').value,10)||45;
   try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime))}catch(e){}
-  firstOpenTime=Date.now(); // 修改后按新时间重新计算进度
+  persistWellbeing();
   updateCountdown();
-  toast(`下班时间已设为 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')}`,'calm');
+  toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已更新`,'calm');
   closeModal('modal-offtime');
 }
+
+function renderShiftPanel(now,start,off){
+  const panel=$('#checkinBar');if(!panel||!state.signedToday||state.mode!=='auth')return;
+  const diff=off-now,pct=Math.max(0,Math.min(100,Math.round((now-start)/(off-start)*100))),after=diff<=0;
+  const signature=`${dayKey(now)}:${pct}:${after}`;
+  if(panel.dataset.shiftSignature===signature)return;panel.dataset.shiftSignature=signature;
+  const dots=Array.from({length:7},(_,i)=>`<i class="${i<=Math.round(pct/100*6)?'on':''}"></i>`).join('');
+  panel.innerHTML=`<div class="shift-panel"><div class="shift-top"><b>${after?'今日已下班':'今日签到已完成'}</b><span class="shift-done">✓ 已签到</span></div><div><div class="shift-time">${after?'下班啦':formatClock(diff)}</div><div class="shift-caption">${after?'辛苦了，今天可以慢一点。':`距离下班 · 工作进度 ${pct}%`}</div></div><div class="shift-route"><span class="shift-marker" style="left:${pct}%"></span>${dots}</div><div class="shift-foot"><span>上班 ${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}</span><b>${after?'今天收工':'正在驶向下班'}</b><span>下班 ${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}</span></div></div>`;
+}
+
+function updateCareReminders(now,start,off){
+  const active=state.mode==='auth'&&state.signedToday&&now>=start&&now<off;
+  [['water','lastWater','care-water-status','care-water-bar','💧','该喝水啦','起身接杯水，给自己一分钟喘口气。'],['sit','lastSit','care-sit-status','care-sit-bar','🪑','起来动一动','站起来活动一下，让肩颈和眼睛休息片刻。']].forEach(([type,lastKey,statusId,barId,icon,title,copy])=>{
+    const interval=Number(wellbeing[type])*60000,savedLast=wellbeing[lastKey]?new Date(wellbeing[lastKey]):null,last=savedLast&&dayKey(savedLast)===dayKey(now)?savedLast:start,elapsed=Math.max(0,now-last),remaining=Math.max(0,interval-elapsed),due=active&&elapsed>=interval;
+    const status=$('#'+statusId),bar=$('#'+barId);if(status)status.textContent=active?(due?'现在该完成啦':`${Math.ceil(remaining/60000)} 分钟后提醒`):'签到后按工作节奏提醒';if(bar)bar.style.width=`${Math.min(100,elapsed/interval*100)}%`;
+    const button=document.querySelector(`.btn-care[data-care="${type}"]`);if(button&&due){button.classList.remove('done');button.disabled=false;button.textContent=type==='water'?'喝好啦':'活动好啦';}
+    const slot=Math.floor(elapsed/interval),shownKey=`xqx_reminder_${type}_${dayKey(now)}_${slot}`;
+    if(due&&!sessionStorage.getItem(shownKey)&&!$('#modal-reminder').classList.contains('show')){sessionStorage.setItem(shownKey,'1');showWellbeingReminder(type,icon,title,copy);}
+  });
+}
+function showWellbeingReminder(type,icon,title,copy){$('#reminder-icon').textContent=icon;$('#reminder-title').textContent=title;$('#reminder-copy').textContent=copy;$('#reminder-done').onclick=()=>completeCareFromReminder(type);openModal('modal-reminder');}
 
 // ============ 柔和吐槽流 ============
 const sig1=[['😤','领导说"简单改一下"，改到下班','302'],['🫠','周报三千字，回了俩字"收到"','96'],['😑','周五下午布置新需求，周末没了','211'],['😴','PPT改了八版，最后用第一版','302'],['🥲','"你先做着，需求我再想想"','64'],['😵','加班到九点，食堂只剩凉鸡腿','47'],['😤','"今晚就给"听了第八遍','158']];
@@ -1761,7 +1802,7 @@ function knockDown(){
   showBubble('我倒下了…');
   if(window.pet3D)window.pet3D.knockDown();
   spawnFx(['💫','⭐','🌟','💫','✨'],8); // 倒地卡通星星特效
-  setTimeout(showReviveModal, 900);
+  setTimeout(promptReviveOnce, 900);
 }
 function playHumanAction(action,eventName){
   const figure=document.querySelector('.human-figure');
@@ -1832,7 +1873,14 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
 }));
 
 // ============ 签到 ============
-$('#cb-btn').addEventListener('click',async()=>{
+function renderCheckinPanel(){
+  const panel=$('#checkinBar');if(!panel||state.signedToday&&state.mode==='auth')return;
+  panel.dataset.shiftSignature='';
+  panel.innerHTML=`<div class="cb-head"><div class="cb-ico">📅</div><div><b>每日签到</b><span id="cb-sub">连续 ${state.streak} 天 · 下个里程碑</span></div></div><div class="cb-streak" id="cb-streak"></div><div class="cb-pts" id="cb-pts">基础 +100 · 签到后解锁下班节奏</div><div class="cb-balance">当前积分 <b id="cb-balance">${state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--'}</b></div><button class="cb-btn" id="cb-btn" ${state.mode==='auth'?'':'disabled'}>${state.mode==='auth'?'签到领惊喜':'登录后可签到'}</button><div class="cb-pts-preview" style="display:${state.mode==='auth'?'none':'block'}">登录后可签到领积分</div>`;
+  updateStreak();
+}
+$('#checkinBar').addEventListener('click',async(event)=>{
+  if(!event.target.closest('#cb-btn'))return;
   if(state.mode!=='auth'){toast('登录后可签到领积分','amber');return}
   if(state.signedToday){toast('今日已签到，明日再来','calm');return}
   const btn=$('#cb-btn');
@@ -1842,11 +1890,10 @@ $('#cb-btn').addEventListener('click',async()=>{
     state.signedToday=true;
     state.streak=Number(result.streak||state.streak);
     state.points=Number(result.points_balance||state.points);
-    btn.classList.add('done');btn.textContent='今日已签到';
     toast(result.already_signed?'今日已签到，明日再来':`签到成功 +${result.points_delta||0}${result.surprise_delta?' · 惊喜':''}`,'calm');
-    updateUI();
+    updateUI();updateCountdown();
   }catch(error){toast(XQXAuth.message(error.message),'rose');}
-  finally{btn.disabled=false;}
+  finally{if(!state.signedToday)btn.disabled=false;}
 });
 function updateStreak(){
   const streak=$('#cb-streak');
@@ -1891,13 +1938,17 @@ $$('.release-card').forEach(c=>c.addEventListener('click',()=>{
 }));
 
 // ============ 关怀提醒 ============
-$$('.btn-care').forEach(b=>b.addEventListener('click',async()=>{
+async function completeCareTask(b){
   if(state.mode!=='auth'){toast('登录后可领关怀积分','amber');return}
-  if(b.classList.contains('done'))return;
+  if(b.dataset.busy==='1')return;
+  b.dataset.busy='1';
   b.disabled=true;
-  try{const result=await XQXAuth.completeCare(b.dataset.care,crypto.randomUUID());state.points=Number(result.points_balance??state.points);b.classList.add('done');b.textContent='已完成';updateUI();toast(`${b.dataset.care==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');}
+  try{const result=await XQXAuth.completeCare(b.dataset.care,crypto.randomUUID());state.points=Number(result.points_balance??state.points);wellbeing[b.dataset.care==='water'?'lastWater':'lastSit']=new Date().toISOString();persistWellbeing();b.classList.add('done');b.textContent='已记录';updateUI();updateCountdown();toast(`${b.dataset.care==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');}
   catch(error){toast(XQXAuth.message(error.message),'rose');b.disabled=false;}
-}));
+  finally{delete b.dataset.busy;}
+}
+$$('.btn-care').forEach(b=>b.addEventListener('click',()=>completeCareTask(b)));
+function completeCareFromReminder(type){const button=document.querySelector(`.btn-care[data-care="${type}"]`);closeModal('modal-reminder');if(button)completeCareTask(button);}
 
 // ============ 导航/CTA ============
 $('#nav-cta').addEventListener('click',()=>openModal('modal-auth'));
@@ -1917,19 +1968,19 @@ function updateUI(){
     $('#nav-avatar').style.display='flex';
     $('#petStars').textContent='★★★ 我的领导';
     $('#petId').textContent='领导系列 #001';
-    $('.cb-pts-preview').style.display='none';
-    $('#cb-btn').classList.remove('done');
-    $('#cb-btn').textContent=state.signedToday?'今日已签到':'签到领惊喜';
+    const preview=$('.cb-pts-preview');if(preview)preview.style.display='none';
+    if(!state.signedToday)renderCheckinPanel();
     renderWall();
   }else{
     $('#nav-cta').style.display='block';
     $('#nav-avatar').style.display='none';
     $('#petStars').textContent='★★★ 试玩版 / 领导系列 #001';
     $('#petId').textContent='';
-    $('.cb-pts-preview').style.display='block';
+    const preview=$('.cb-pts-preview');if(preview)preview.style.display='block';
+    renderCheckinPanel();
     renderWall();
   }
-  updateStreak();
+  if(!state.signedToday)updateStreak();
 }
 updateUI();
 updateStreak();
@@ -1984,11 +2035,9 @@ async function doLogin(){
   if(!window.XQXAuth?.configured()){setAuthError('auth-login-error','系统尚未配置云端连接，请稍后再试');return}
   try{const result=await XQXAuth.login(acc,pwd);state.points=result.profile.points_balance;state.signedToday=Boolean(result.profile.signed_today);state.streak=Number(result.profile.streak||state.streak);toast('登录成功','calm')}catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
   closeModal('modal-auth');
-  // 切换到登录态
-  if(document.querySelector('#stateToggle [data-st="auth"]')){
-    document.querySelector('#stateToggle [data-st="auth"]').click();
-  }
-  if(document.querySelector('#petCard')?.classList.contains('down'))setTimeout(showReviveModal,250);
+  // 切换到真实登录态；不再保留开发用的试用/登录切换器。
+  setState('auth');
+  if(document.querySelector('#petCard')?.classList.contains('down'))setTimeout(promptReviveOnce,250);
 }
 
 async function doRegister(){
@@ -2026,6 +2075,7 @@ function downloadRecovery(){
 function recoverySaved(){
   document.querySelectorAll('#modal-auth .modal-body').forEach(b=>b.classList.add('hidden'));
   document.getElementById('auth-welcome').classList.remove('hidden');
+  setState('auth');
   toast('欢迎加入！300 积分已到账','calm');
 }
 
@@ -2039,6 +2089,10 @@ function goPetDiyFromDown(){
 }
 
 // === 弹窗3: 倒地复活 ===
+function promptReviveOnce(){
+  if(sessionStorage.getItem('xqx_pet_down_prompted'))return;
+  sessionStorage.setItem('xqx_pet_down_prompted','1');showReviveModal();
+}
 function showReviveModal(){
   document.querySelectorAll('#modal-revive .modal-body').forEach(b=>b.classList.add('hidden'));
   if(state.mode==='try'){
@@ -2060,6 +2114,7 @@ async function reviveLeader(){
     state.points=Number(result.points_balance??state.points);
     pet.endure=Number(cloud.endure??100);pet.irritate=Number(cloud.irritate??20);pet.fat=Number(cloud.fat??10);pet.dirty=Number(cloud.dirty??5);
     updateBars();updateUI();$('#petCard').classList.remove('down');
+    sessionStorage.removeItem('xqx_pet_down_prompted');
     if(window.pet3D)window.pet3D.revive();
     toast(`领导复活！${result.points_delta||-500} 积分`,'calm');
     closeModal('modal-revive');
