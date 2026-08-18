@@ -13,7 +13,7 @@ Deno.serve(async (request) => {
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
 
     const [{ data: profile, error: profileError }, { data: account, error: accountError }, { data: checkins, error: checkinError }] = await Promise.all([
-      admin.from("profiles").select("points_balance,free_diy_available,appearance,created_at").eq("user_id", identity.user.id).maybeSingle(),
+      admin.from("profiles").select("points_balance,free_diy_available,appearance,pet_status,created_at").eq("user_id", identity.user.id).maybeSingle(),
       admin.from("account_credentials").select("account_display").eq("user_id", identity.user.id).maybeSingle(),
       admin.from("checkins").select("business_date,streak").eq("user_id", identity.user.id).order("business_date", { ascending: false }).limit(366),
     ]);

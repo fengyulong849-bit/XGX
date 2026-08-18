@@ -1563,6 +1563,23 @@ function setState(st){
   updateUI();
 }
 window.xqxSetAuth=()=>setState('auth');
+window.xqxApplyCloudProfile=(profile)=>{
+  if(!profile)return;
+  state.mode='auth';
+  document.documentElement.setAttribute('data-state','auth');
+  $$('#stateToggle button').forEach(b=>b.classList.toggle('active',b.dataset.st==='auth'));
+  state.points=Number(profile.points_balance||0);
+  state.signedToday=Boolean(profile.signed_today);
+  state.streak=Number(profile.streak||state.streak);
+  const cloud=profile.pet_status;
+  if(cloud&&typeof cloud==='object'){
+    pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
+    pet.fat=Number(cloud.fat??pet.fat);pet.dirty=Number(cloud.dirty??pet.dirty);
+    if(cloud.down)$('#petCard').classList.add('down');else $('#petCard').classList.remove('down');
+    updateBars();
+  }
+  updateUI();
+};
 $$('#stateToggle button').forEach(b=>b.addEventListener('click',()=>setState(b.dataset.st)));
 
 function toast(msg,type='amber'){
@@ -1728,9 +1745,29 @@ function knockDown(){
   spawnFx(['💫','⭐','🌟','💫','✨'],8); // 倒地卡通星星特效
   setTimeout(showReviveModal, 900);
 }
-$$('.act').forEach(b=>b.addEventListener('click',()=>{
+$$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if(pet.locked||$('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
+  if(state.mode==='auth'){
+    b.disabled=true;
+    try{
+      const result=await XQXAuth.petAction(b.dataset.act,crypto.randomUUID());
+      const cloud=result.pet_status||{};
+      pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
+      pet.fat=Number(cloud.fat??pet.fat);pet.dirty=Number(cloud.dirty??pet.dirty);
+      state.points=Number(result.points_balance??state.points);
+      updateBars();updateUI();
+      showBubble(ac.bubble);
+      if(window.pet3D&&ac.shake)window.pet3D.shake(ac.shake);
+      if(ac.fx==='squash'&&window.pet3D)window.pet3D.squash(5000);
+      if(result.event==='burst'){window.pet3D?.burst();showBubble('嗝——爆了！');toast('胖度爆表，领导卡通爆炸了！','amber')}
+      if(result.event==='faint'){window.pet3D?.faint();showBubble('呕……我臭晕了');toast('太臭了，领导臭晕后爬了起来','rose')}
+      if(cloud.down)knockDown();
+      toast(result.replayed?'动作已同步':`${ac.label} +${result.points_delta||ac.pts}`,'calm');
+    }catch(error){toast(XQXAuth.message(error.message),'rose')}
+    finally{b.disabled=false}
+    return;
+  }
   showBubble(ac.bubble);
   b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
   if(pet.endure<=0){toast('补刀：'+ac.bubble,'rose');return}
@@ -1757,8 +1794,7 @@ $$('.act').forEach(b=>b.addEventListener('click',()=>{
     spawnFx(['💨','🌀','🫠'],7);
     toast('太臭了，领导臭晕后爬了起来','rose');
   }
-  if(state.mode==='auth'){state.points+=ac.pts;toast(`${ac.label} +${ac.pts}`,'calm')}
-  else{
+  if(state.mode!=='auth'){
     actCount++;
     toast(`登录后本次可得 +${ac.pts}`,'amber');
     if(actCount%5===0){setTimeout(()=>openModal('modal-prompt'),400)}
@@ -2096,7 +2132,8 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
       figure.dataset.beard=String(profile.appearance.beard||0);
     }
   }
-  if(window.xqxSetAuth)window.xqxSetAuth();
+  if(window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
+  else if(window.xqxSetAuth)window.xqxSetAuth();
   else document.documentElement.setAttribute('data-state','auth');
   document.getElementById('nav-cta')?.style.setProperty('display','none');
   document.getElementById('nav-avatar')?.style.setProperty('display','flex');
