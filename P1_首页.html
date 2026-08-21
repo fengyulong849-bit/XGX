@@ -570,7 +570,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <!-- ============ 1. 浮动胶囊导航 ============ -->
   <nav class="nav">
     <div class="logo"><span class="logo-mark">闲</span>小确闲</div>
-    <div class="nav-links"><a href="#pet">桌宠</a><a href="P2_捏脸DIY.html">捏脸</a><a href="#wall">吐槽墙</a><a href="P3_释怀仪式.html">释怀</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
+    <div class="nav-links"><a href="#pet">桌宠</a><a href="P2_捏脸DIY.html">捏脸</a><a href="#wall">吐槽墙</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
     <div class="nav-spacer"></div>
     <div class="countdown" id="countdown"><span class="dot"></span><span id="cd-text">下班还有 <b>02:14:30</b></span></div>
     <button class="nav-cta" id="nav-cta">免费试玩</button>
@@ -718,39 +718,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="rant-grid" id="rant-grid"></div>
   </section>
 
-  <!-- ============ 7. 释怀入口三卡 ============ -->
-  <section class="section" id="release">
-    <div class="sec-head">
-      <span class="kicker">释怀仪式</span>
-      <h2>把烦心事，亲手销毁</h2>
-      <p>写下来，选一种方式，看着它消失。满 24 小时 +100 积分。</p>
-    </div>
-    <div class="release-grid">
-      <div class="release-card" data-mode="wind">
-        <span class="release-bonus">+100 积分</span>
-        <div class="rc-ico">🌬️</div>
-        <h3>风吹散</h3>
-        <p>向一侧滑动，文字化作粒子，随风飘散而去。</p>
-        <div class="rc-cta">开始释怀 <span class="arr">→</span></div>
-      </div>
-      <div class="release-card" data-mode="crumple">
-        <span class="release-bonus">+100 积分</span>
-        <div class="rc-ico">📄</div>
-        <h3>揉成团</h3>
-        <p>按压攥紧，揉皱成一团，用力抛飞出去。</p>
-        <div class="rc-cta">开始释怀 <span class="arr">→</span></div>
-      </div>
-      <div class="release-card" data-mode="shred">
-        <span class="release-bonus">+100 积分</span>
-        <div class="rc-ico">✂️</div>
-        <h3>碎纸机</h3>
-        <p>长按启动，卡片切入机器，切成条带了断。</p>
-        <div class="rc-cta">开始释怀 <span class="arr">→</span></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ 8. 关怀提醒（SaaS 渐变背景 + 玻璃态三卡） ============ -->
+  <!-- ============ 7. 关怀提醒（SaaS 渐变背景 + 玻璃态三卡） ============ -->
   <section class="section" id="care" style="padding-top:0">
     <div class="care-section">
       <div class="care-head">
@@ -874,7 +842,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <p>打工人的五分钟治愈站。捏捏领导，释怀一下，今天就没那么难熬。</p>
       </div>
       <div class="f-cols">
-        <div class="f-col"><h5>产品</h5><a href="#pet">领导桌宠</a><a href="P2_捏脸DIY.html">捏脸DIY</a><a href="#wall">吐槽墙</a><a href="P3_释怀仪式.html">释怀仪式</a></div>
+        <div class="f-col"><h5>产品</h5><a href="#pet">领导桌宠</a><a href="P2_捏脸DIY.html">捏脸DIY</a><a href="#wall">匿名发声</a><a href="P4_个人中心.html">我的发声</a></div>
         <div class="f-col"><h5>规则</h5><a href="P6_规则与隐私.html#content">内容规则</a><a href="P6_规则与隐私.html#anon">隐私说明</a><a href="P6_规则与隐私.html#retention">15天淡出</a><a href="P6_规则与隐私.html#account">账号注销</a></div>
         <div class="f-col"><h5>账户</h5><a href="#">登录注册</a><a href="P5_找回密码.html">找回密码</a><a href="P4_个人中心.html">积分明细</a></div>
       </div>
@@ -1973,12 +1941,6 @@ $('#btn-post').addEventListener('click',()=>{
   if(rantInput){rantInput.value='';rantCount.textContent='0';const rem=Math.max(0,3-rantTodayCount);rantRemain.textContent=rem;rantRemain.classList.toggle('zero',rem===0);rantSubmit.disabled=rem===0}
   openModal('modal-rant');
 });
-
-// ============ 释怀入口 ============
-$$('.release-card').forEach(c=>c.addEventListener('click',()=>{
-  if(state.mode!=='auth'){openModal('modal-destroy');return}
-  window.location.href='P3_释怀仪式.html';
-}));
 
 // ============ 关怀提醒 ============
 async function completeCareTask(b){

@@ -187,7 +187,6 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <nav class="nav-links">
     <a href="P1_首页.html">首页</a>
     <a href="P2_捏脸DIY.html">捏脸</a>
-    <a href="P3_释怀仪式.html">释怀</a>
     <a href="P6_规则与隐私.html">规则</a>
   </nav>
   <div class="pts">积分 <b id="nav-points">--</b></div>
@@ -436,6 +435,7 @@ function renderRants(){
         <span>发布 ${relativeTime(r.created_at)}</span>
         <span>🫶 ${r.votes} 共鸣</span>
       </div>
+      ${r.status==='published' ? `<div class="rant-rewards"><div class="reward-info">想让这件事过去吗？</div><button class="claim-btn" onclick="startRelease('${r.id}')">选择释怀方式</button></div>` : ''}
       ${Number(r.unclaimed_resonances||0)===0 ? `
         <div class="rant-rewards">
           <div class="reward-info">暂无可领取的新共鸣</div>
@@ -454,6 +454,10 @@ function renderRants(){
 async function claimReward(rantId){
   try{const result=await XQXAuth.claimResonance(rantId,crypto.randomUUID());document.getElementById('profile-points').textContent=Number(result.points_balance||0).toLocaleString('zh-CN');document.querySelector('.topbar .pts b').textContent=Number(result.points_balance||0).toLocaleString('zh-CN');toast(`+${result.points_delta||0} 积分已到账`,'calm');loadPersonalData();}
   catch(error){toast(XQXAuth.message(error.message),'rose');}
+}
+
+function startRelease(rantId){
+  window.location.href=`P3_释怀仪式.html?rant_id=${encodeURIComponent(rantId)}`;
 }
 
 async function loadPersonalData(){

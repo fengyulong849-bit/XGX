@@ -197,7 +197,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 <div class="steps">
   <div class="step active" data-step="1">
     <div class="dot"><span class="num">1</span><span class="check">✓</span></div>
-    <div class="label">写下</div>
+    <div class="label">选内容</div>
   </div>
   <div class="line" data-line="1"></div>
   <div class="step" data-step="2">
@@ -218,16 +218,12 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 
 <div class="stage">
 
-  <!-- Step 1: 写下 -->
+  <!-- Step 1: 选择已发布的匿名发声 -->
   <div class="panel" id="panel-1">
     <div class="write-card">
-      <div class="title">把最烦的那件事<i>写下来</i></div>
-      <div class="subtitle">1–50 字 · 写下最想销毁的那件事…</div>
-      <div id="rant-picker" style="margin:0 0 12px;color:var(--muted);font-size:12px">可直接写下并释怀，或选择一条已发布的吐槽。</div>
-      <div class="write-area">
-        <textarea id="write-input" maxlength="50" placeholder="写下最想销毁的那件事…" autofocus></textarea>
-        <div class="counter"><span id="char-count">0</span>/50</div>
-      </div>
+      <div class="title">选择一条<i>匿名发声</i></div>
+      <div class="subtitle">只有已发布的内容可以释怀；销毁后会立刻从匿名墙移除。</div>
+      <div id="rant-picker" style="margin:0 0 18px;color:var(--muted);font-size:13px">正在读取你的匿名发声…</div>
       <div class="write-actions">
         <button class="btn-primary" id="to-step2" disabled>下一步 · 选一种方式了断 →</button>
       </div>
@@ -264,7 +260,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
         </div>
       </div>
       <div class="choose-actions">
-        <button class="btn-ghost" id="back-step1">← 回去修改</button>
+        <button class="btn-ghost" id="back-step1">← 重新选择</button>
         <button class="btn-primary" id="to-step3" disabled>开始销毁 →</button>
       </div>
     </div>
@@ -292,8 +288,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
         <span class="plus" id="point-plus" style="visibility:hidden">+100</span>
       </div>
       <div class="release-actions">
-        <button class="btn-secondary" onclick="history.back()">回到首页</button>
-        <button class="btn-primary" id="try-again">再来一次</button>
+        <button class="btn-secondary" onclick="window.location.href='P4_个人中心.html'">回到我的发声</button>
+        <button class="btn-primary" id="try-again">选择另一条</button>
       </div>
     </div>
   </div>
@@ -311,6 +307,7 @@ const state = {
   rantId: '',
   releaseResult: null
 };
+const requestedRantId = new URLSearchParams(window.location.search).get('rant_id') || '';
 
 function showError(message){
   const el=document.getElementById('rant-picker');
@@ -321,13 +318,16 @@ async function loadMyRants(){
   if(!window.XQXAuth?.configured()){showError('请先登录后进行释怀。');return}
   try{
     const result=await XQXAuth.myRants();
-    // 开发测试阶段先展示最近 3 条本人吐槽；是否满足奖励时长仍由服务端最终判断。
-    const items=(result.rants||[]).filter(r=>r.status==='published').slice(0,3);
-    if(!items.length){picker.textContent='直接写下这件烦心事，它不会发布到吐槽墙。';picker.style.color='var(--muted)';return}
+    const items=(result.rants||[]).filter(r=>r.status==='published');
+    if(!items.length){picker.textContent='你还没有可释怀的匿名发声。先去首页发布一条，再回来选择它。';picker.style.color='var(--muted)';return}
     const select=document.createElement('select');
     select.id='rant-select';select.style.cssText='width:100%;padding:10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit';
-    select.innerHTML='<option value="">选择一件烦心事（测试显示最近 3 条）</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
-    picker.replaceChildren(select);select.addEventListener('change',()=>{state.rantId=select.value;const item=items.find(r=>r.id===state.rantId);state.text=item?.content||'';input.value=state.text;countEl.textContent=String(state.text.length);btnToStep2.disabled=!state.text;});
+    select.innerHTML='<option value="">选择一条匿名发声</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
+    picker.replaceChildren(select);
+    const choose=(rantId)=>{state.rantId=rantId;const item=items.find(r=>r.id===rantId);state.text=item?.content||'';btnToStep2.disabled=!state.text;};
+    select.addEventListener('change',()=>choose(select.value));
+    if(requestedRantId && items.some(r=>r.id===requestedRantId)){select.value=requestedRantId;choose(requestedRantId);}
+    else if(requestedRantId){showError('这条匿名发声已结束或不可释怀，请重新选择。');}
   }catch(error){showError(XQXAuth.message(error.message))}
 }
 
@@ -350,26 +350,7 @@ function goToStep(n){
 }
 
 /* ============ Step 1 ============ */
-const input = document.getElementById('write-input');
-const countEl = document.getElementById('char-count');
 const btnToStep2 = document.getElementById('to-step2');
-
-input.addEventListener('input', ()=>{
-  const len = input.value.length;
-  countEl.textContent = len;
-  const counter = countEl.parentElement;
-  counter.classList.toggle('near', len>=40 && len<50);
-  counter.classList.toggle('max', len>=50);
-  state.text = input.value.trim();
-  // 编辑已选公开吐槽即转为一条私密释怀草稿，避免误销毁原内容。
-  if(state.rantId){
-    state.rantId='';
-    const selectedRant=document.getElementById('rant-select');
-    if(selectedRant)selectedRant.value='';
-  }
-  btnToStep2.disabled = state.text.length < 1;
-  btnToStep2.textContent = len >= 50 ? '已满 50 字，继续 →' : '下一步 · 选一种方式了断 →';
-});
 
 btnToStep2.addEventListener('click', ()=>{
   if(!state.text) return;
@@ -400,9 +381,8 @@ btnToStep3.addEventListener('click', async ()=>{
   state.method = selectedMethod;
   btnToStep3.disabled=true;
   try{
-    state.releaseResult=state.rantId
-      ?await XQXAuth.completeRelease(state.rantId,crypto.randomUUID())
-      :await XQXAuth.releaseDraft(state.text,crypto.randomUUID());
+    if(!state.rantId) return;
+    state.releaseResult=await XQXAuth.completeRelease(state.rantId,crypto.randomUUID());
     state.rewarded=Boolean(state.releaseResult.eligible);
   }
   catch(error){showError(XQXAuth.message(error.message));btnToStep3.disabled=false;return}
@@ -439,7 +419,7 @@ function settleRelease(){
   const sub = document.getElementById('release-sub');
   const plus = document.getElementById('point-plus');
   if(!state.rewarded){
-    sub.textContent = state.releaseResult?.is_draft ? '已私密销毁，没有发布到吐槽墙。' : state.releaseResult ? '销毁完成。发布未满24小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
+    sub.textContent = state.releaseResult ? '销毁完成。发布未满 24 小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
     plus.style.visibility = 'hidden';
     return;
   }
@@ -597,10 +577,7 @@ document.getElementById('try-again').addEventListener('click', ()=>{
   state.releaseResult = null;
   selectedMethod = null;
   skipArmed = false;
-  input.value = '';
-  countEl.textContent = '0';
   btnToStep2.disabled = true;
-  btnToStep2.textContent = '下一步 · 选一种方式了断 →';
   methodCards.forEach(c=>c.classList.remove('sel'));
   btnToStep3.disabled = true;
   // 重置释放页面
@@ -618,6 +595,7 @@ document.getElementById('try-again').addEventListener('click', ()=>{
   const p4 = document.getElementById('panel-4');
   if(p4) delete p4.dataset.played;
   goToStep(1);
+  loadMyRants();
 });
 
 // 在 Step4 显示时播放打字机（先结算积分文案，再打字机）
