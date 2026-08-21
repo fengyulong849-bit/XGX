@@ -2061,7 +2061,7 @@ async function doLogin(){
   const pwd = document.getElementById('login-password').value;
   if(!acc||!pwd){setAuthError('auth-login-error','请填写账号和密码');return}
   if(!window.XQXAuth?.configured()){setAuthError('auth-login-error','系统尚未配置云端连接，请稍后再试');return}
-  let profile;
+  let profile,hasModerationAccess=false;
   try{
     const result=await XQXAuth.login(acc,pwd);
     state.points=result.profile.points_balance;
@@ -2069,9 +2069,15 @@ async function doLogin(){
     state.signedToday=Boolean(profile?.signed_today);
     state.streak=Number(profile?.streak||state.streak);
     state.hasAppearance=Boolean(profile?.appearance);
+    // 仅以后端角色校验结果决定是否进入受限审核后台，前端不保存审核账号名单。
+    try{await XQXAuth.moderationQueue(1);hasModerationAccess=true;}catch(accessError){if(accessError.message!=='forbidden')console.warn('审核权限探测暂不可用，已按普通账号进入首页');}
     toast('登录成功','calm');
   }catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
   closeModal('modal-auth');
+  if(hasModerationAccess){
+    window.location.replace('P7_审核后台.html');
+    return;
+  }
   // 切换到真实登录态；不再保留开发用的试用/登录切换器。
   setState('auth');
   if(profile&&window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
