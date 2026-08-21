@@ -22,6 +22,7 @@ const requiredFunctions = [
   'care-complete', 'checkin-sign', 'pet-action', 'pet-get', 'pet-revive', 'points-ledger',
   'profile-me', 'profile-save-appearance', 'rant-report', 'rants-create', 'rants-expire',
   'rants-mine', 'rants-random', 'release-complete', 'resonance-claim', 'resonance-create',
+  'moderation-queue', 'moderation-review',
   'work-preferences-save'
 ];
 for (const name of requiredFunctions) {
@@ -42,4 +43,9 @@ if (!expirationMigration.includes('delete from public.rants') || !expirationMigr
   fail('到期吐槽迁移未执行物理清理');
 }
 
-console.log(`后端契约检查通过：${migrations.length} 个迁移、${requiredFunctions.length} 个关键 Functions、注销与到期清理链路均完整。`);
+const moderationMigration = text('supabase/migrations/202608210024_m8_moderation_workflow.sql').toLowerCase();
+for (const requiredMarker of ['create table if not exists public.user_roles', 'create table if not exists public.rant_moderation_actions', 'revoke all on table public.user_roles', 'm8_moderation_queue', 'm8_review_rant']) {
+  if (!moderationMigration.includes(requiredMarker)) fail(`审核迁移缺少安全标记：${requiredMarker}`);
+}
+
+console.log(`后端契约检查通过：${migrations.length} 个迁移、${requiredFunctions.length} 个关键 Functions、注销/到期清理/审核链路均完整。`);
