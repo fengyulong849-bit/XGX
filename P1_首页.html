@@ -1617,6 +1617,12 @@ window.xqxApplyCloudProfile=(profile)=>{
   state.signedToday=Boolean(profile.signed_today);
   state.streak=Number(profile.streak||state.streak);
   state.hasAppearance=Boolean(profile.appearance);
+  if(Number.isInteger(profile.off_hour)&&Number.isInteger(profile.off_min)){
+    offtime={h:profile.off_hour,m:profile.off_min};
+    wellbeing.water=Number(profile.water_interval)||wellbeing.water;
+    wellbeing.sit=Number(profile.sit_interval)||wellbeing.sit;
+    try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime));persistWellbeing()}catch(e){}
+  }
   const cloud=profile.pet_status;
   if(cloud&&typeof cloud==='object'){
     pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
@@ -1748,16 +1754,25 @@ setInterval(updateCountdown,1000);updateCountdown();
     hSel.value=b.dataset.h;mSel.value=b.dataset.m;
   }));
 })();
-function saveOfftime(){
-  offtime.h=parseInt(document.getElementById('off-hour').value,10)||18;
-  offtime.m=parseInt(document.getElementById('off-min').value,10)||0;
-  wellbeing.water=parseInt(document.getElementById('water-interval').value,10)||60;
-  wellbeing.sit=parseInt(document.getElementById('sit-interval').value,10)||45;
+async function saveOfftime(){
+  const next={
+    off_hour:parseInt(document.getElementById('off-hour').value,10),
+    off_min:parseInt(document.getElementById('off-min').value,10),
+    water_interval:parseInt(document.getElementById('water-interval').value,10),
+    sit_interval:parseInt(document.getElementById('sit-interval').value,10)
+  };
+  if(!Number.isInteger(next.off_hour)||!Number.isInteger(next.off_min)||![30,45,60,90].includes(next.water_interval)||![30,45,60,90].includes(next.sit_interval)){toast('请完整选择下班时间和提醒间隔','rose');return;}
+  if(state.mode==='auth'){
+    try{await XQXAuth.saveWorkPreferences(next)}catch(error){toast(XQXAuth.message(error.message),'rose');return}
+  }
+  offtime={h:next.off_hour,m:next.off_min};
+  wellbeing.water=next.water_interval;
+  wellbeing.sit=next.sit_interval;
   try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime))}catch(e){}
   try{localStorage.setItem('xqx_offtime_setup_v1','1')}catch(e){}
   persistWellbeing();
   updateCountdown();
-  toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已更新`,'calm');
+  toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已同步`,'calm');
   closeModal('modal-offtime');
 }
 
@@ -1991,7 +2006,7 @@ $('#hero-cta-2').addEventListener('click',()=>{document.querySelector('#wall').s
 // ============ UI 同步 ============
 function updateUI(){
   const heroButton=$('#hero-cta-1');
-  if(heroButton)heroButton.textContent=state.mode==='auth'&&state.hasAppearance?'看看我的领导':'开始捏领导';
+  if(heroButton)heroButton.textContent=state.mode==='auth'&&state.hasAppearance?'开始暴揍领导':'开始捏领导';
   const balance=$('#cb-balance');
   if(balance)balance.textContent=state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--';
   if(state.mode==='auth'){
