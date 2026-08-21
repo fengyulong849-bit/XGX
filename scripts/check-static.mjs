@@ -9,6 +9,7 @@ const requiredFiles = [
   'P4_个人中心.html',
   'P5_找回密码.html',
   'P6_规则与隐私.html',
+  'P7_审核后台.html',
   'supabase/migrations/202608170001_m0_extensions_types_and_security.sql',
   '文档/小确闲_后端开发文档.md'
 ];
