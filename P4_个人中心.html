@@ -424,7 +424,7 @@ renderTimeline();
 function renderRants(){
   const list = document.getElementById('rantList');
   if(myRants.length===0){
-    list.innerHTML = `<div class="empty-state"><span class="icon">📭</span><div class="text">还没发布过吐槽，<a href="P1_首页.html">去墙上看一眼？</a></div></div>`;
+    list.innerHTML = `<div class="empty-state"><span class="icon">📭</span><div class="text">没有正在匿名墙里的发声。<a href="P1_首页.html">去说一句？</a></div></div>`;
     return;
   }
   list.innerHTML = myRants.map((r,i)=>`
@@ -465,7 +465,7 @@ async function loadPersonalData(){
   try{
     const [ledgerResult,rantsResult]=await Promise.all([XQXAuth.pointsLedger(50),XQXAuth.myRants()]);
     transactions=(ledgerResult.entries||[]).map(entry=>{const [icon,title]=eventLabels[entry.event_type]||['✨','积分变动'];return {icon,type:Number(entry.delta)>=0?'plus':'minus',title,time:relativeTime(entry.created_at),amount:Math.abs(Number(entry.delta)||0)}});
-    myRants=Array.isArray(rantsResult.rants)?rantsResult.rants:[];renderTimeline();renderRants();
+    myRants=Array.isArray(rantsResult.rants)?rantsResult.rants.filter(r=>r.status==='published'):[];renderTimeline();renderRants();
   }catch(error){
     document.getElementById('timeline').innerHTML='<div class="empty-state"><span class="icon">⚠️</span><div class="text">积分记录暂时无法加载，请稍后重试。</div></div>';
     document.getElementById('rantList').innerHTML='<div class="empty-state"><span class="icon">⚠️</span><div class="text">我的吐槽暂时无法加载，请稍后重试。</div></div>';

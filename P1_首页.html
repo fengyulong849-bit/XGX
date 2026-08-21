@@ -64,6 +64,7 @@ body::before{
 .countdown b{color:var(--amber)}
 .countdown.off .dot{background:var(--amber-2);box-shadow:0 0 8px var(--amber-2)}
 .countdown.off b{color:var(--amber-2)}
+.schedule-settings{background:transparent;border:1px solid var(--rule);color:var(--muted);font:inherit;font-size:12px;font-weight:600;padding:8px 12px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease);white-space:nowrap}.schedule-settings:hover{color:var(--amber);border-color:var(--amber)}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.35}}
 .nav-cta{background:var(--grad);color:var(--bg);border:none;font:inherit;font-weight:700;font-size:14px;padding:9px 22px;border-radius:999px;cursor:pointer;box-shadow:var(--glow-amber);transition:all .2s var(--ease)}
 .nav-cta:hover{transform:translateY(-2px)}
@@ -573,6 +574,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="nav-links"><a href="#pet">桌宠</a><a href="P2_捏脸DIY.html">捏脸</a><a href="#wall">吐槽墙</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
     <div class="nav-spacer"></div>
     <div class="countdown" id="countdown"><span class="dot"></span><span id="cd-text">下班还有 <b>02:14:30</b></span></div>
+    <button class="schedule-settings" id="schedule-settings" type="button" title="设置下班时间、喝水和久坐提醒">调整节奏</button>
     <button class="nav-cta" id="nav-cta">免费试玩</button>
     <div class="avatar" id="nav-avatar" title="个人中心">闲</div>
   </nav>
@@ -1714,10 +1716,12 @@ setInterval(updateCountdown,1000);updateCountdown();
   hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);
   // 胶囊点击打开设置
   $('#countdown').style.cursor='pointer';
-  $('#countdown').title='点击设置下班时间';
-  $('#countdown').addEventListener('click',()=>{
+  $('#countdown').title='点击调整工作节奏';
+  const openWorkSettings=()=>{
     hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);openModal('modal-offtime');
-  });
+  };
+  $('#countdown').addEventListener('click',openWorkSettings);
+  $('#schedule-settings').addEventListener('click',openWorkSettings);
   document.querySelectorAll('.offtime-quick button').forEach(b=>b.addEventListener('click',()=>{
     hSel.value=b.dataset.h;mSel.value=b.dataset.m;
   }));
