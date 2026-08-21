@@ -448,6 +448,7 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .modal-title{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:6px}
 .modal-title i{font-style:italic;color:var(--amber)}
 .modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.modal-error{display:none;margin-top:12px;padding:9px 11px;border:1px solid rgba(217,122,108,.5);border-radius:10px;background:rgba(217,122,108,.11);color:#F0A398;font-size:12px;line-height:1.5}.modal-error.show{display:block}
 .modal-actions{display:flex;gap:10px;margin-top:20px}
 .modal-actions .btn-primary{flex:1;padding:12px 24px;font-size:14px}
 .modal-actions .btn-ghost{flex:1;padding:12px 24px;font-size:14px}
@@ -1038,7 +1039,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
       <div class="modal-sub">举报将匿名提交。达到多人举报阈值后，该内容会暂时从公开墙隐藏，等待核查。</div>
       <label class="field-label" for="report-reason">举报原因</label>
       <select class="auth-input" id="report-reason"><option value="privacy">包含隐私或联系方式</option><option value="abuse">攻击、辱骂或令人不适</option><option value="other">其他不适内容</option></select>
-      <div class="modal-actions"><button class="btn-ghost" onclick="closeModal('modal-report')">取消</button><button class="btn-primary" id="report-submit">提交举报</button></div>
+      <div class="modal-error" id="report-error" role="alert"></div>
+      <div class="modal-actions"><button class="btn-ghost" onclick="closeModal('modal-report')">取消</button><button class="btn-primary" id="report-submit" type="button" onclick="submitRantReport()">提交举报</button></div>
     </div>
   </div>
 </div>
@@ -1946,6 +1948,7 @@ async function renderWall(){
       if(state.mode!=='auth'){openModal('modal-auth');return}
       reportRantId=b.dataset.reportId;
       document.getElementById('report-reason').value='privacy';
+      setReportError('');
       openModal('modal-report');
     }));
   }catch(error){grid.innerHTML='<div class="empty-state">吐槽墙暂时无法加载，请稍后刷新重试。</div>'}
@@ -2217,25 +2220,47 @@ async function submitRant(){
   finally{rantSubmit.disabled=false;}
 }
 
-document.getElementById('report-submit').addEventListener('click',async function(){
-  if(state.mode!=='auth'||!reportRantId)return;
-  const button=this;
+function setReportError(message){
+  const error=document.getElementById('report-error');
+  if(!error)return;
+  error.textContent=message;
+  error.classList.toggle('show',Boolean(message));
+}
+async function submitRantReport(){
+  if(state.mode!=='auth'){
+    setReportError('登录状态未同步，请先关闭此窗口并重新登录。');
+    return;
+  }
+  if(!reportRantId){
+    setReportError('未找到要举报的内容，请关闭后从该吐槽卡重新点击“举报”。');
+    return;
+  }
+  if(!window.XQXAuth?.configured()||typeof window.XQXAuth.reportRant!=='function'){
+    setReportError('举报服务暂未就绪，请稍后重试。');
+    return;
+  }
+  const button=document.getElementById('report-submit');
   button.disabled=true;
+  setReportError('');
   try{
     const result=await XQXAuth.reportRant(reportRantId,document.getElementById('report-reason').value,crypto.randomUUID());
     toast(result.replayed?'这条内容已经举报过了':(result.hidden?'举报已提交，内容已暂时隐藏':'举报已匿名提交，感谢维护友善空间'),'calm');
     closeModal('modal-report');
     reportRantId=null;
     if(result.hidden)renderWall();
-  }catch(error){toast(XQXAuth.message(error.message),'rose');}
+  }catch(error){
+    const message=window.XQXAuth.message(error.message);
+    setReportError(message);
+    toast(message,'rose');
+  }
   finally{button.disabled=false;}
-});
+}
 
 // === 弹窗5: 销毁预览（试用态）===
 // 已在 HTML 中定义，通过 release-card 触发
 
 // ============ 暴露到 window（ES Module 作用域隔离，必须显式挂载）============
-Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAccount,doLogin,doRegister,copyRecovery,downloadRecovery,recoverySaved,goPetDiy,goPetDiyFromDown,showReviveModal,reviveLeader,freeReroll,submitRant,saveOfftime});
+Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAccount,doLogin,doRegister,copyRecovery,downloadRecovery,recoverySaved,goPetDiy,goPetDiyFromDown,showReviveModal,reviveLeader,freeReroll,submitRant,submitRantReport,saveOfftime});
 </script>
 <script src="scripts/xqx-config.js"></script>
 <script src="scripts/xqx-auth.js"></script>
