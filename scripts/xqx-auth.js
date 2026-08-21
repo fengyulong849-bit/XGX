@@ -14,6 +14,8 @@
     try { return JSON.parse(atob(token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).exp || 0; } catch { return 0; }
   }
   function message(reason) {
+    if (reason === "appearance_locked") return "当前领导状态正常，重新捏领导需在其倒地后进行";
+    if (reason === "invalid_request") return "请求参数无效，请重试";
     return ({ invalid_input: "请检查填写内容", account_unavailable: "该账号不可用或已存在", invalid_credentials: "账号或密码不正确", invalid_recovery: "恢复码无效、已使用或已过期", rate_limited: "尝试过于频繁，请稍后再试", pet_down: "领导已经倒下，请先复活或重新捏一位", pet_locked: "领导正在缓冲中，请稍等几秒", pet_not_down: "领导目前没有倒下", insufficient_points: "积分不足，先去签到或完成其他任务赚积分", invalid_action: "无效的互动动作", invalid_content: "吐槽内容需为 1–50 个字符", sensitive_content: "内容可能含有联系方式或身份信息，请修改后再发布", limit_exceeded: "今天的次数已用完", rant_unavailable: "这条吐槽已不可共鸣", self_resonance: "不能给自己的吐槽共鸣", nothing_to_claim: "暂时没有可领取的共鸣", service_unavailable: "请求未完成，请稍后重试" })[reason] || "请求未完成，请稍后重试";
   }
   async function call(name, body) {
@@ -78,6 +80,7 @@
       const data = await callAuthenticated("profile-me", {});
       return data.profile || null;
     },
-    async saveAppearance(appearance) { return callAuthenticated("profile-save-appearance", { appearance }); },
+    async pet() { return callAuthenticated("pet-get", {}); },
+    async saveAppearance(appearance, requestId) { return callAuthenticated("profile-save-appearance", { appearance, request_id: requestId || uuid() }); },
   };
 })();

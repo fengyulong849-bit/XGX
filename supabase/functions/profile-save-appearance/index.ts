@@ -1,4 +1,4 @@
-import { serviceClient } from "../_shared/auth.ts";
+import { isUuid, serviceClient } from "../_shared/auth.ts";
 import { json, options, readJson } from "../_shared/http.ts";
 
 const keys = ["face", "hair", "glasses", "beard", "expr", "suit", "belly", "skin"] as const;
@@ -15,13 +15,17 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return json(request, 405, { ok: false, reason: "method_not_allowed" });
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim();
   const body = await readJson(request);
-  if (!token || !validAppearance(body?.appearance)) return json(request, 400, { ok: false, reason: "invalid_appearance" });
+  if (!token) return json(request, 401, { ok: false, reason: "invalid_session" });
+  if (!validAppearance(body?.appearance)) return json(request, 400, { ok: false, reason: "invalid_appearance" });
+  if (!isUuid(body?.request_id)) return json(request, 400, { ok: false, reason: "invalid_request" });
   try {
     const admin = serviceClient();
     const { data: identity, error: identityError } = await admin.auth.getUser(token);
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
-    const { data: saved, error } = await admin.rpc("m1_save_appearance", { p_user_id: identity.user.id, p_appearance: body.appearance });
-    if (error || saved !== true) return json(request, 503, { ok: false, reason: "appearance_save_failed" });
-    return json(request, 200, { ok: true, appearance: body.appearance });
+    const { data, error } = await admin.rpc("m3_save_appearance", {
+      p_user_id: identity.user.id, p_appearance: body.appearance, p_request_id: body.request_id,
+    });
+    if (error || !data?.ok) return json(request, 409, { ok: false, reason: data?.reason || "appearance_save_failed" });
+    return json(request, 200, data);
   } catch { return json(request, 503, { ok: false, reason: "service_unavailable" }); }
 });

@@ -816,16 +816,18 @@ document.getElementById('defBtn').addEventListener('click',()=>{
   popModel(.82,1.1);
   toast('已恢复默认','amber');
 });
+let cloudPetState=null;
 document.getElementById('saveBtn').addEventListener('click',async function(){
   if(!window.XQXAuth?.configured()){toast('请先配置 Supabase 公共连接信息','rose');return}
   if(!window.XQXAuth.session()){toast('请先登录后再保存领导形象','rose');window.location.href='P1_首页.html';return}
   const button=this;
   button.disabled=true;
   try{
-    await XQXAuth.saveAppearance(cfg);
+    const result=await XQXAuth.saveAppearance(cfg,crypto.randomUUID());
     localStorage.setItem('xqx_avatar',encodeCfg(cfg));
     button.textContent='已保存 ✓';button.classList.add('saved');
-    toast('领导形象已同步到账号 ☁️','calm');
+    toast(result.used_free_diy?'已使用免费 DIY，领导形象已同步':(cloudPetState?.will_revive_on_save?'新领导已就位，满血状态已同步':'领导形象已同步到账号'),'calm');
+    cloudPetState={...cloudPetState,...result,will_revive_on_save:false};
   }catch(error){toast(XQXAuth.message(error.message),'rose')}
   finally{button.disabled=false;setTimeout(()=>{button.textContent='保存领导';button.classList.remove('saved')},1500)}
 });
@@ -838,10 +840,11 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
   }catch(e){}
 })();
 (async function loadCloudAppearance(){
-  const profile=await window.XQXAuth?.profile();
-  if(!profile){window.location.href='P1_首页.html';return}
+  const [profile,petState]=await Promise.all([window.XQXAuth?.profile(),window.XQXAuth?.pet()]);
+  if(!profile||!petState){window.location.href='P1_首页.html';return}
+  cloudPetState=petState;
   document.getElementById('p2-points').textContent=Number(profile.points_balance||0).toLocaleString('zh-CN');
-  if(profile.appearance) applyCfg(profile.appearance);
+  if(petState.appearance) applyCfg(petState.appearance);
 })();
 document.getElementById('shareBtn').addEventListener('click',function(){
   const code=encodeCfg(cfg);
