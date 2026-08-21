@@ -863,6 +863,7 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
     button.textContent='已保存 ✓';button.classList.add('saved');
     toast(result.used_free_diy?'已使用免费 DIY，领导形象已同步':(cloudPetState?.will_revive_on_save?'新领导已就位，满血状态已同步':'领导形象已同步到账号'),'calm');
     cloudPetState={...cloudPetState,...result,will_revive_on_save:false};
+    setTimeout(()=>window.location.replace('P1_首页.html#pet'),700);
   }catch(error){toast(XQXAuth.message(error.message),'rose')}
   finally{button.disabled=false;setTimeout(()=>{button.textContent='保存领导';button.classList.remove('saved')},1500)}
 });
@@ -876,8 +877,14 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
 })();
 (async function loadCloudAppearance(){
   const [profile,petState]=await Promise.all([window.XQXAuth?.profile(),window.XQXAuth?.pet()]);
-  if(!profile||!petState){window.location.href='P1_首页.html';return}
+  if(!profile||!petState){window.location.replace('P1_首页.html');return}
   cloudPetState=petState;
+  const hasAppearance=Boolean(petState.appearance||profile.appearance);
+  const isDown=Boolean(petState.down??profile.pet_status?.down);
+  if(hasAppearance&&!isDown){
+    window.location.replace('P1_首页.html#pet');
+    return;
+  }
   document.getElementById('p2-points').textContent=Number(profile.points_balance||0).toLocaleString('zh-CN');
   if(petState.appearance) applyCfg(petState.appearance);
 })();

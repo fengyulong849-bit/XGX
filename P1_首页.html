@@ -60,6 +60,7 @@ body::before{
 .nav-links a:hover{color:var(--ink);background:var(--surface)}
 .nav-spacer{flex:1}
 .countdown{display:flex;align-items:center;gap:9px;background:var(--surface);border:1px solid var(--rule);border-radius:999px;padding:7px 15px;font-family:var(--mono);font-size:13px}
+.countdown[hidden]{display:none}
 .countdown .dot{width:7px;height:7px;border-radius:50%;background:var(--calm);box-shadow:0 0 8px var(--calm);animation:pulse 2.4s infinite}
 .countdown b{color:var(--amber)}
 .countdown.off .dot{background:var(--amber-2);box-shadow:0 0 8px var(--amber-2)}
@@ -571,7 +572,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <!-- ============ 1. 浮动胶囊导航 ============ -->
   <nav class="nav">
     <div class="logo"><span class="logo-mark">闲</span>小确闲</div>
-    <div class="nav-links"><a href="#pet">桌宠</a><a href="P2_捏脸DIY.html">捏脸</a><a href="#wall">吐槽墙</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
+    <div class="nav-links"><a href="#pet">桌宠</a><a href="#pet">我的领导</a><a href="#wall">吐槽墙</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
     <div class="nav-spacer"></div>
     <div class="countdown" id="countdown" hidden aria-hidden="true"><span class="dot"></span><span id="cd-text">下班还有 <b>02:14:30</b></span></div>
     <button class="schedule-settings" id="schedule-settings" type="button" title="设置下班时间、喝水和久坐提醒">调整节奏</button>
@@ -844,7 +845,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <p>打工人的五分钟治愈站。捏捏领导，释怀一下，今天就没那么难熬。</p>
       </div>
       <div class="f-cols">
-        <div class="f-col"><h5>产品</h5><a href="#pet">领导桌宠</a><a href="P2_捏脸DIY.html">捏脸DIY</a><a href="#wall">匿名发声</a><a href="P4_个人中心.html">我的发声</a></div>
+        <div class="f-col"><h5>产品</h5><a href="#pet">领导桌宠</a><a href="#pet">我的领导</a><a href="#wall">匿名发声</a><a href="P4_个人中心.html">我的发声</a></div>
         <div class="f-col"><h5>规则</h5><a href="P6_规则与隐私.html#content">内容规则</a><a href="P6_规则与隐私.html#anon">隐私说明</a><a href="P6_规则与隐私.html#retention">15天淡出</a><a href="P6_规则与隐私.html#account">账号注销</a></div>
         <div class="f-col"><h5>账户</h5><a href="#">登录注册</a><a href="P5_找回密码.html">找回密码</a><a href="P4_个人中心.html">积分明细</a></div>
       </div>
@@ -1714,7 +1715,6 @@ setInterval(updateCountdown,1000);updateCountdown();
   const openWorkSettings=()=>{
     hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);openModal('modal-offtime');
   };
-  $('#countdown')?.addEventListener('click',openWorkSettings);
   $('#schedule-settings').addEventListener('click',openWorkSettings);
   document.querySelectorAll('.offtime-quick button').forEach(b=>b.addEventListener('click',()=>{
     hSel.value=b.dataset.h;mSel.value=b.dataset.m;
