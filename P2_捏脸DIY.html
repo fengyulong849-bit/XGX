@@ -255,6 +255,38 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 
 <script src="scripts/xqx-config.js"></script>
 <script src="scripts/xqx-auth.js"></script>
+<script>
+// 2D 配置面板不依赖 3D CDN；Three.js 仅用于增强预览，加载失败也不能影响捏脸和保存。
+(()=>{
+  const dims=[
+    {key:'face',icon:'脸',name:'脸型',opts:['圆脸','方脸','长脸']},
+    {key:'hair',icon:'发',name:'发型',opts:['背头','中分','寸头','地中海']},
+    {key:'glasses',icon:'镜',name:'眼镜',opts:['无','圆框','方框']},
+    {key:'beard',icon:'胡',name:'胡子',opts:['无','八字胡','络腮']},
+    {key:'expr',icon:'表',name:'表情',opts:['微笑','皱眉','惊讶','生气']},
+    {key:'suit',icon:'装',name:'西装',opts:['深蓝','黑','灰','棕'],swatch:['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F']},
+    {key:'belly',icon:'腹',name:'基础肚子',opts:['标准','微胖','发福']},
+    {key:'skin',icon:'肤',name:'肤色',opts:['白','黄','棕','黑'],swatch:['#F0C8A0','#E8B98A','#D4A574','#9C7B5A']}
+  ];
+  const defaults={face:0,hair:0,glasses:1,beard:0,expr:0,suit:0,belly:0,skin:0};
+  const skins=['#F0C8A0','#E8B98A','#D4A574','#9C7B5A'],suits=['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F'];
+  let cfg={...defaults,...(window.xqxAppearance||{})},active='face';
+  const paint=()=>{
+    const f=document.getElementById('humanFigure');if(!f)return;
+    f.dataset.glasses=String(cfg.glasses);f.dataset.beard=String(cfg.beard);f.dataset.expr=String(cfg.expr);f.dataset.belly=String(cfg.belly);
+    f.style.setProperty('--human-skin',skins[cfg.skin]);f.style.setProperty('--human-suit',suits[cfg.suit]);f.style.setProperty('--human-suit-dark',suits[cfg.suit]);
+    f.style.setProperty('--human-hair',cfg.hair===2?'#201B19':cfg.hair===3?'#3A2922':'#30251F');f.style.setProperty('--human-tie',cfg.suit===1?'#D97A6C':'#E8A33D');
+  };
+  const render=()=>{
+    const list=document.getElementById('dimList');if(!list)return;
+    list.dataset.renderer='fallback';
+    list.innerHTML=dims.map(d=>`<div class="dim ${d.key===active?'active':''}" data-key="${d.key}"><div class="dim-head"><div class="di">${d.icon}</div><div class="dn">${d.name}</div><div class="dv">${d.opts[cfg[d.key]]}</div><div class="chev">›</div></div><div class="dim-body"><div class="opts">${d.opts.map((o,i)=>`<button type="button" class="opt ${i===cfg[d.key]?'sel':''}" data-idx="${i}">${d.swatch?`<span class="sw" style="background:${d.swatch[i]}"></span>`:''}${o}</button>`).join('')}</div></div></div>`).join('');
+    list.querySelectorAll('.dim-head').forEach(head=>head.addEventListener('click',()=>{active=head.parentElement.dataset.key;render();}));
+    list.querySelectorAll('.opt').forEach(opt=>opt.addEventListener('click',()=>{const card=opt.closest('.dim');cfg[card.dataset.key]=Number(opt.dataset.idx);window.xqxAppearance={...cfg};paint();render();}));
+  };
+  window.xqxAppearance={...cfg};window.xqxPaintAppearance=paint;window.xqxAppearanceDims=dims;paint();render();
+})();
+</script>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -273,7 +305,7 @@ const DIMS=[
 const SKINS=[0xF0C8A0,0xE8B98A,0xD4A574,0x9C7B5A];
 const SUITS=[0x2E3A4A,0x1A1A1A,0x4A4A4A,0x3D2E1F];
 const DEFAULT_CFG={face:0,hair:0,glasses:1,beard:0,expr:0,suit:0,belly:0,skin:0};
-let cfg={...DEFAULT_CFG};
+let cfg={...DEFAULT_CFG,...(window.xqxAppearance||{})};
 let activeDim='face';
 
 function syncHumanFigure(){
@@ -286,6 +318,7 @@ function syncHumanFigure(){
   figure.style.setProperty('--human-suit-dark',suits[cfg.suit]);
   figure.style.setProperty('--human-hair',cfg.hair===2?'#201B19':cfg.hair===3?'#3A2922':'#30251F');
   figure.style.setProperty('--human-tie',suits[cfg.suit]==='#1A1A1A'?'#D97A6C':'#E8A33D');
+  window.xqxAppearance={...cfg};
 }
 
 // ===== 分享链接编解码（只编码外观，不包含状态/积分/账号/吐槽）=====
@@ -301,7 +334,7 @@ function decodeCfg(code){
   }
   return out;
 }
-function applyCfg(c){cfg={...c};syncSel();syncDV();buildChar();syncHumanFigure();popModel(.82,1.1)}
+function applyCfg(c){cfg={...c};window.xqxAppearance={...cfg};syncSel();syncDV();buildChar();syncHumanFigure();popModel(.82,1.1)}
 function applyShared(){
   const shared=decodeCfg(sharedCode);
   if(shared){applyCfg(shared);toast('已用分享的领导替换你的领导','calm')}
@@ -761,6 +794,8 @@ resize();buildChar();popModel(.5,1);animate();
 
 // ===== 配置面板 =====
 const list=document.getElementById('dimList');
+list.innerHTML='';
+list.dataset.renderer='three';
 DIMS.forEach(dim=>{
   const card=document.createElement('div');
   card.className='dim'+(dim.key===activeDim?' active':'');

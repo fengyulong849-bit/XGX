@@ -1600,7 +1600,7 @@ window.pet3D={
 };
 
 // ============ 状态管理 ============
-const state={mode:'try',points:300,streak:5,signedToday:false};
+const state={mode:'try',points:300,streak:5,signedToday:false,hasAppearance:false};
 const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
 
 function setState(st){
@@ -1616,6 +1616,7 @@ window.xqxApplyCloudProfile=(profile)=>{
   state.points=Number(profile.points_balance||0);
   state.signedToday=Boolean(profile.signed_today);
   state.streak=Number(profile.streak||state.streak);
+  state.hasAppearance=Boolean(profile.appearance);
   const cloud=profile.pet_status;
   if(cloud&&typeof cloud==='object'){
     pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
@@ -1671,6 +1672,17 @@ const CIRC=2*Math.PI*58;
 function workBounds(now=new Date()){const off=new Date(now);off.setHours(OFF_HOUR(),OFF_MIN(),0,0);const start=new Date(off.getTime()-9*3600000);return {start,off}}
 function dayKey(now=new Date()){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
 function persistWellbeing(){try{localStorage.setItem('xqx_wellbeing',JSON.stringify(wellbeing))}catch(e){}}
+function promptInitialWorkSetup(){
+  if(localStorage.getItem('xqx_offtime_setup_v1'))return;
+  setTimeout(()=>{
+    // 不与当前其他流程（例如登录提示）叠加显示。
+    if(document.querySelector('.modal-mask.show'))return;
+    const h=document.getElementById('off-hour'),m=document.getElementById('off-min');
+    const water=document.getElementById('water-interval'),sit=document.getElementById('sit-interval');
+    if(h){h.value=offtime.h;m.value=offtime.m;water.value=String(wellbeing.water);sit.value=String(wellbeing.sit);}
+    openModal('modal-offtime');
+  },250);
+}
 function formatClock(ms){const h=String(Math.floor(Math.max(0,ms)/3600000)).padStart(2,'0'),m=String(Math.floor(Math.max(0,ms)%3600000/60000)).padStart(2,'0'),s=String(Math.floor(Math.max(0,ms)%60000/1000)).padStart(2,'0');return `${h}:${m}:${s}`}
 function updateCountdown(){
   const now=new Date();
@@ -1742,6 +1754,7 @@ function saveOfftime(){
   wellbeing.water=parseInt(document.getElementById('water-interval').value,10)||60;
   wellbeing.sit=parseInt(document.getElementById('sit-interval').value,10)||45;
   try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime))}catch(e){}
+  try{localStorage.setItem('xqx_offtime_setup_v1','1')}catch(e){}
   persistWellbeing();
   updateCountdown();
   toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已更新`,'calm');
@@ -1970,12 +1983,15 @@ $('#nav-cta').addEventListener('click',()=>openModal('modal-auth'));
 $('#nav-avatar').addEventListener('click',()=>{window.location.href='P4_个人中心.html'});
 $('#hero-cta-1').addEventListener('click',()=>{
   if(state.mode!=='auth'){openModal('modal-auth');return}
+  if(state.hasAppearance){document.querySelector('#pet')?.scrollIntoView({behavior:'smooth'});return}
   window.location.href='P2_捏脸DIY.html';
 });
 $('#hero-cta-2').addEventListener('click',()=>{document.querySelector('#wall').scrollIntoView({behavior:'smooth'})});
 
 // ============ UI 同步 ============
 function updateUI(){
+  const heroButton=$('#hero-cta-1');
+  if(heroButton)heroButton.textContent=state.mode==='auth'&&state.hasAppearance?'看看我的领导':'开始捏领导';
   const balance=$('#cb-balance');
   if(balance)balance.textContent=state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--';
   if(state.mode==='auth'){
@@ -2048,12 +2064,23 @@ async function doLogin(){
   const pwd = document.getElementById('login-password').value;
   if(!acc||!pwd){setAuthError('auth-login-error','请填写账号和密码');return}
   if(!window.XQXAuth?.configured()){setAuthError('auth-login-error','系统尚未配置云端连接，请稍后再试');return}
-  try{const result=await XQXAuth.login(acc,pwd);state.points=result.profile.points_balance;state.signedToday=Boolean(result.profile.signed_today);state.streak=Number(result.profile.streak||state.streak);toast('登录成功','calm')}catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
+  let profile;
+  try{
+    const result=await XQXAuth.login(acc,pwd);
+    state.points=result.profile.points_balance;
+    profile=await XQXAuth.profile();
+    state.signedToday=Boolean(profile?.signed_today);
+    state.streak=Number(profile?.streak||state.streak);
+    state.hasAppearance=Boolean(profile?.appearance);
+    toast('登录成功','calm');
+  }catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
   closeModal('modal-auth');
   // 切换到真实登录态；不再保留开发用的试用/登录切换器。
   setState('auth');
+  if(profile&&window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
   // 登录接口已返回今日签到状态；立即重绘签到卡/下班航线，避免仍显示旧的签到入口。
   updateCountdown();
+  promptInitialWorkSetup();
 }
 
 async function doRegister(){
