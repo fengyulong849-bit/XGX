@@ -362,6 +362,11 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
       <span class="warn-icon">⚠️</span>
       <div class="modal-title" style="text-align:center">确认注销账号？</div>
       <div class="modal-sub" style="text-align:center">注销后个人数据按规则删除，公开吐槽立即销毁，<b style="color:var(--rose)">且无法恢复</b>。请谨慎操作。</div>
+      <div class="modal-pwd-field">
+        <label for="delete-password">输入当前密码以确认</label>
+        <input id="delete-password" type="password" autocomplete="current-password" placeholder="当前密码" maxlength="32">
+      </div>
+      <div class="form-error" id="delete-error" role="alert"></div>
       <div class="modal-actions">
         <button class="btn-ghost" onclick="closeModal('modal-delete')">再想想</button>
         <button class="btn-primary" style="background:var(--rose);box-shadow:0 6px 18px rgba(217,122,108,.3)" onclick="confirmDelete()">确认注销</button>
@@ -584,9 +589,21 @@ function downloadRecovery(){
 }
 
 /* ============ 注销确认 ============ */
-function confirmDelete(){
-  closeModal('modal-delete');
-  toast('注销功能需服务端对接，暂为演示','amber');
+async function confirmDelete(){
+  const error=document.getElementById('delete-error');
+  const password=document.getElementById('delete-password');
+  const button=document.querySelector('#modal-delete .btn-primary');
+  error.textContent='';error.classList.remove('show');
+  if(!password.value){error.textContent='请输入当前密码以确认注销';error.classList.add('show');return}
+  if(!window.XQXAuth?.configured()){error.textContent='系统尚未配置云端连接，请稍后再试';error.classList.add('show');return}
+  button.disabled=true;
+  try{
+    await XQXAuth.deleteAccount(password.value);
+    XQXAuth.clear();
+    window.location.replace('P1_首页.html?deleted=1');
+  }catch(requestError){
+    error.textContent=XQXAuth.message(requestError.message);error.classList.add('show');
+  }finally{button.disabled=false;}
 }
 
 /* ============ Toast ============ */
