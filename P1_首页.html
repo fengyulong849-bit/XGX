@@ -573,7 +573,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="logo"><span class="logo-mark">闲</span>小确闲</div>
     <div class="nav-links"><a href="#pet">桌宠</a><a href="P2_捏脸DIY.html">捏脸</a><a href="#wall">吐槽墙</a><a href="#care">关怀</a><a href="P4_个人中心.html">我的</a><a href="P6_规则与隐私.html">规则</a></div>
     <div class="nav-spacer"></div>
-    <div class="countdown" id="countdown"><span class="dot"></span><span id="cd-text">下班还有 <b>02:14:30</b></span></div>
+    <div class="countdown" id="countdown" hidden aria-hidden="true"><span class="dot"></span><span id="cd-text">下班还有 <b>02:14:30</b></span></div>
     <button class="schedule-settings" id="schedule-settings" type="button" title="设置下班时间、喝水和久坐提醒">调整节奏</button>
     <button class="nav-cta" id="nav-cta">免费试玩</button>
     <div class="avatar" id="nav-avatar" title="个人中心">闲</div>
@@ -1648,16 +1648,12 @@ const CIRC=2*Math.PI*58;
 function workBounds(now=new Date()){const off=new Date(now);off.setHours(OFF_HOUR(),OFF_MIN(),0,0);const start=new Date(off.getTime()-9*3600000);return {start,off}}
 function dayKey(now=new Date()){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
 function persistWellbeing(){try{localStorage.setItem('xqx_wellbeing',JSON.stringify(wellbeing))}catch(e){}}
-function promptInitialWorkSetup(){
-  if(localStorage.getItem('xqx_offtime_setup_v1'))return;
-  setTimeout(()=>{
-    // 不与当前其他流程（例如登录提示）叠加显示。
-    if(document.querySelector('.modal-mask.show'))return;
-    const h=document.getElementById('off-hour'),m=document.getElementById('off-min');
-    const water=document.getElementById('water-interval'),sit=document.getElementById('sit-interval');
-    if(h){h.value=offtime.h;m.value=offtime.m;water.value=String(wellbeing.water);sit.value=String(wellbeing.sit);}
-    openModal('modal-offtime');
-  },250);
+function restartWellbeingCountdown(){
+  const startedAt=new Date().toISOString();
+  wellbeing.lastWater=startedAt;
+  wellbeing.lastSit=startedAt;
+  persistWellbeing();
+  updateCountdown();
 }
 function formatClock(ms){const h=String(Math.floor(Math.max(0,ms)/3600000)).padStart(2,'0'),m=String(Math.floor(Math.max(0,ms)%3600000/60000)).padStart(2,'0'),s=String(Math.floor(Math.max(0,ms)%60000/1000)).padStart(2,'0');return `${h}:${m}:${s}`}
 function updateCountdown(){
@@ -1715,12 +1711,10 @@ setInterval(updateCountdown,1000);updateCountdown();
   for(let m=0;m<60;m+=5){const o=document.createElement('option');o.value=m;o.textContent=String(m).padStart(2,'0');mSel.appendChild(o)}
   hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);
   // 胶囊点击打开设置
-  $('#countdown').style.cursor='pointer';
-  $('#countdown').title='点击调整工作节奏';
   const openWorkSettings=()=>{
     hSel.value=offtime.h;mSel.value=offtime.m;waterSel.value=String(wellbeing.water);sitSel.value=String(wellbeing.sit);openModal('modal-offtime');
   };
-  $('#countdown').addEventListener('click',openWorkSettings);
+  $('#countdown')?.addEventListener('click',openWorkSettings);
   $('#schedule-settings').addEventListener('click',openWorkSettings);
   document.querySelectorAll('.offtime-quick button').forEach(b=>b.addEventListener('click',()=>{
     hSel.value=b.dataset.h;mSel.value=b.dataset.m;
@@ -1741,7 +1735,6 @@ async function saveOfftime(){
   wellbeing.water=next.water_interval;
   wellbeing.sit=next.sit_interval;
   try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime))}catch(e){}
-  try{localStorage.setItem('xqx_offtime_setup_v1','1')}catch(e){}
   persistWellbeing();
   updateCountdown();
   toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已同步`,'calm');
@@ -2060,8 +2053,7 @@ async function doLogin(){
   setState('auth');
   if(profile&&window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
   // 登录接口已返回今日签到状态；立即重绘签到卡/下班航线，避免仍显示旧的签到入口。
-  updateCountdown();
-  promptInitialWorkSetup();
+  restartWellbeingCountdown();
 }
 
 async function doRegister(){
@@ -2100,6 +2092,7 @@ function recoverySaved(){
   document.querySelectorAll('#modal-auth .modal-body').forEach(b=>b.classList.add('hidden'));
   document.getElementById('auth-welcome').classList.remove('hidden');
   setState('auth');
+  restartWellbeingCountdown();
   toast('欢迎加入！300 积分已到账','calm');
 }
 
