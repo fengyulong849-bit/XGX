@@ -223,7 +223,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
     <div class="write-card">
       <div class="title">把最烦的那件事<i>写下来</i></div>
       <div class="subtitle">1–50 字 · 写下最想销毁的那件事…</div>
-      <div id="rant-picker" style="margin:0 0 12px;color:var(--muted);font-size:12px">正在读取你已发布的吐槽…</div>
+      <div id="rant-picker" style="margin:0 0 12px;color:var(--muted);font-size:12px">可直接写下并释怀，或选择一条已发布的吐槽。</div>
       <div class="write-area">
         <textarea id="write-input" maxlength="50" placeholder="写下最想销毁的那件事…" autofocus></textarea>
         <div class="counter"><span id="char-count">0</span>/50</div>
@@ -312,19 +312,23 @@ const state = {
   releaseResult: null
 };
 
-function showError(message){const el=document.getElementById('rant-picker');if(el){el.textContent=message;el.style.color='var(--rose)';}}
+function showError(message){
+  const el=document.getElementById('rant-picker');
+  if(el){el.textContent=message;el.style.color='var(--rose)';}
+}
 async function loadMyRants(){
   const picker=document.getElementById('rant-picker');
-  if(!window.XQXAuth?.configured()){showError('请先登录并配置云端连接，才能进行释怀。');return}
+  if(!window.XQXAuth?.configured()){showError('请先登录后进行释怀。');return}
   try{
     const result=await XQXAuth.myRants();
     // 开发测试阶段先展示最近 3 条本人吐槽；是否满足奖励时长仍由服务端最终判断。
     const items=(result.rants||[]).filter(r=>r.status==='published').slice(0,3);
-    if(!items.length){showError('目前还没有可释怀的吐槽，先去吐槽墙写下一件烦心事吧。');return}
-    const select=document.createElement('select');select.id='rant-select';select.style.cssText='width:100%;padding:10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit';
+    if(!items.length){picker.textContent='直接写下这件烦心事，它不会发布到吐槽墙。';picker.style.color='var(--muted)';return}
+    const select=document.createElement('select');
+    select.id='rant-select';select.style.cssText='width:100%;padding:10px;border-radius:10px;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit';
     select.innerHTML='<option value="">选择一件烦心事（测试显示最近 3 条）</option>'+items.map(r=>`<option value="${r.id}">${String(r.content).replace(/[&<>\"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;'}[c]))}</option>`).join('');
-    picker.replaceChildren(select);select.addEventListener('change',()=>{state.rantId=select.value;const item=items.find(r=>r.id===state.rantId);state.text=item?.content||'';input.value=state.text;countEl.textContent=String(state.text.length);btnToStep2.disabled=!state.rantId;});
-  }catch(error){showError(XQXAuth.message(error.message));}
+    picker.replaceChildren(select);select.addEventListener('change',()=>{state.rantId=select.value;const item=items.find(r=>r.id===state.rantId);state.text=item?.content||'';input.value=state.text;countEl.textContent=String(state.text.length);btnToStep2.disabled=!state.text;});
+  }catch(error){showError(XQXAuth.message(error.message))}
 }
 
 /* ============ 步骤切换 ============ */
@@ -353,16 +357,22 @@ const btnToStep2 = document.getElementById('to-step2');
 input.addEventListener('input', ()=>{
   const len = input.value.length;
   countEl.textContent = len;
-  const counter = countEl.parentElement.querySelector('.counter');
+  const counter = countEl.parentElement;
   counter.classList.toggle('near', len>=40 && len<50);
   counter.classList.toggle('max', len>=50);
   state.text = input.value.trim();
+  // 编辑已选公开吐槽即转为一条私密释怀草稿，避免误销毁原内容。
+  if(state.rantId){
+    state.rantId='';
+    const selectedRant=document.getElementById('rant-select');
+    if(selectedRant)selectedRant.value='';
+  }
   btnToStep2.disabled = state.text.length < 1;
   btnToStep2.textContent = len >= 50 ? '已满 50 字，继续 →' : '下一步 · 选一种方式了断 →';
 });
 
 btnToStep2.addEventListener('click', ()=>{
-  if(!state.text||!state.rantId) return;
+  if(!state.text) return;
   document.getElementById('preview-text').textContent = state.text;
   goToStep(2);
 });
@@ -389,7 +399,12 @@ btnToStep3.addEventListener('click', async ()=>{
   if(!selectedMethod) return;
   state.method = selectedMethod;
   btnToStep3.disabled=true;
-  try{state.releaseResult=await XQXAuth.completeRelease(state.rantId,crypto.randomUUID());state.rewarded=Boolean(state.releaseResult.eligible);}
+  try{
+    state.releaseResult=state.rantId
+      ?await XQXAuth.completeRelease(state.rantId,crypto.randomUUID())
+      :await XQXAuth.releaseDraft(state.text,crypto.randomUUID());
+    state.rewarded=Boolean(state.releaseResult.eligible);
+  }
   catch(error){showError(XQXAuth.message(error.message));btnToStep3.disabled=false;return}
   goToStep(3);
   playDestroyAnimation(selectedMethod);
@@ -424,7 +439,7 @@ function settleRelease(){
   const sub = document.getElementById('release-sub');
   const plus = document.getElementById('point-plus');
   if(!state.rewarded){
-    sub.textContent = state.releaseResult ? '销毁完成。发布未满24小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
+    sub.textContent = state.releaseResult?.is_draft ? '已私密销毁，没有发布到吐槽墙。' : state.releaseResult ? '销毁完成。发布未满24小时，本次不加积分。' : '已跳过动画，仍完成删除，本次不加积分。';
     plus.style.visibility = 'hidden';
     return;
   }
@@ -577,7 +592,7 @@ document.getElementById('try-again').addEventListener('click', ()=>{
   // 重置所有状态
   state.text = '';
   state.method = null;
-  state.rewarded = true;
+  state.rewarded = false;
   state.rantId = '';
   state.releaseResult = null;
   selectedMethod = null;
