@@ -307,6 +307,7 @@ body::before{
 .rant-card[data-age="14"]{opacity:.5}
 .rant-card[data-age="14"]::before{opacity:.2}
 .rant-card .fading-tag{position:absolute;top:14px;right:14px;font-family:var(--mono);font-size:10px;color:var(--tertiary);background:rgba(0,0,0,.25);padding:3px 8px;border-radius:999px}
+.rant-tools{display:flex;align-items:center;gap:8px}.btn-report{border:0;background:transparent;color:var(--tertiary);font:inherit;font-size:11px;cursor:pointer;padding:5px 3px}.btn-report:hover{color:var(--rose)}.btn-report:disabled{opacity:.45;cursor:not-allowed}
 .rant-card[data-age="0"] .fading-tag,
 .rant-card[data-age="3"] .fading-tag{display:none}
 .wall-empty{text-align:center;padding:40px;color:var(--muted);font-size:14px}
@@ -1025,6 +1026,19 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <button class="btn-ghost" onclick="closeModal('modal-rant')">取消</button>
         <button class="btn-primary" id="rant-submit" onclick="submitRant()">扔上墙</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-mask" id="modal-report" role="dialog" aria-modal="true" aria-label="举报内容" onclick="closeModalOnMask(event,'modal-report')">
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal('modal-report')">×</button>
+    <div class="modal-body">
+      <div class="modal-title">举报<i>内容</i></div>
+      <div class="modal-sub">举报将匿名提交。达到多人举报阈值后，该内容会暂时从公开墙隐藏，等待核查。</div>
+      <label class="field-label" for="report-reason">举报原因</label>
+      <select class="auth-input" id="report-reason"><option value="privacy">包含隐私或联系方式</option><option value="abuse">攻击、辱骂或令人不适</option><option value="other">其他不适内容</option></select>
+      <div class="modal-actions"><button class="btn-ghost" onclick="closeModal('modal-report')">取消</button><button class="btn-primary" id="report-submit">提交举报</button></div>
     </div>
   </div>
 </div>
@@ -1922,11 +1936,17 @@ async function renderWall(){
   try{
     const result=await XQXAuth.randomRants(9),pool=Array.isArray(result.rants)?result.rants:[];
     if(!pool.length){grid.innerHTML='<div class="empty-state">墙上暂时还没有吐槽，成为第一个写下它的人吧。</div>';return}
-    grid.innerHTML=pool.map(r=>{const age=rantAge(r.created_at);return `<article class="rant-card" data-age="${Math.min(age,14)}">${age>=7?'<span class="fading-tag">淡忘中</span>':''}<p class="rant-content">${escapeHtml(r.content)}</p><div class="rant-foot"><span class="rant-time">${rantTime(r.created_at)} · 发布 ${age} 天</span><button class="btn-res" data-id="${r.id}" data-v="${r.votes}" ${state.mode==='try'?'disabled':''}>🫶 ${r.votes}</button></div></article>`}).join('');
+    grid.innerHTML=pool.map(r=>{const age=rantAge(r.created_at);return `<article class="rant-card" data-age="${Math.min(age,14)}">${age>=7?'<span class="fading-tag">淡忘中</span>':''}<p class="rant-content">${escapeHtml(r.content)}</p><div class="rant-foot"><span class="rant-time">${rantTime(r.created_at)} · 发布 ${age} 天</span><div class="rant-tools"><button class="btn-report" data-report-id="${r.id}" ${state.mode==='try'?'disabled':''}>举报</button><button class="btn-res" data-id="${r.id}" data-v="${r.votes}" ${state.mode==='try'?'disabled':''}>🫶 ${r.votes}</button></div></div></article>`}).join('');
     $$('.btn-res').forEach(b=>b.addEventListener('click',async()=>{
       if(state.mode!=='auth'){openModal('modal-auth');return} if(b.disabled)return;b.disabled=true;
       try{const result=await XQXAuth.resonance(b.dataset.id,crypto.randomUUID());state.points=Number(result.points_balance??state.points);b.classList.add('active');b.textContent=`🫶 ${result.votes??Number(b.dataset.v)+1}`;updateUI();toast(result.points_delta?`共鸣 +${result.points_delta}`:'共鸣已送达','calm');}
       catch(error){toast(XQXAuth.message(error.message),'rose');b.disabled=false;}
+    }));
+    $$('.btn-report').forEach(b=>b.addEventListener('click',()=>{
+      if(state.mode!=='auth'){openModal('modal-auth');return}
+      reportRantId=b.dataset.reportId;
+      document.getElementById('report-reason').value='privacy';
+      openModal('modal-report');
     }));
   }catch(error){grid.innerHTML='<div class="empty-state">吐槽墙暂时无法加载，请稍后刷新重试。</div>'}
 }
@@ -2159,6 +2179,7 @@ const rantInput = document.getElementById('rant-input');
 const rantCount = document.getElementById('rant-count');
 const rantRemain = document.getElementById('rant-remain');
 const rantSubmit = document.getElementById('rant-submit');
+let reportRantId = null;
 
 if(rantInput){
   rantInput.addEventListener('input',()=>{
@@ -2195,6 +2216,20 @@ async function submitRant(){
   catch(error){toast(XQXAuth.message(error.message),'rose');}
   finally{rantSubmit.disabled=false;}
 }
+
+document.getElementById('report-submit').addEventListener('click',async function(){
+  if(state.mode!=='auth'||!reportRantId)return;
+  const button=this;
+  button.disabled=true;
+  try{
+    const result=await XQXAuth.reportRant(reportRantId,document.getElementById('report-reason').value,crypto.randomUUID());
+    toast(result.replayed?'这条内容已经举报过了':(result.hidden?'举报已提交，内容已暂时隐藏':'举报已匿名提交，感谢维护友善空间'),'calm');
+    closeModal('modal-report');
+    reportRantId=null;
+    if(result.hidden)renderWall();
+  }catch(error){toast(XQXAuth.message(error.message),'rose');}
+  finally{button.disabled=false;}
+});
 
 // === 弹窗5: 销毁预览（试用态）===
 // 已在 HTML 中定义，通过 release-card 触发
