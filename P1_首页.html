@@ -439,12 +439,14 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .modal-mask{position:fixed;inset:0;background:rgba(0,0,0,.55);backdrop-filter:blur(20px);z-index:300;display:none;align-items:center;justify-content:center;padding:24px;animation:maskIn .3s ease-out}
 .modal-mask.show{display:flex}
 @keyframes maskIn{from{opacity:0}to{opacity:1}}
-.modal-card{position:relative;background:var(--surface);border:1px solid var(--rule-2);border-radius:22px;width:100%;max-width:440px;box-shadow:var(--shadow-lg);animation:modalPop .3s cubic-bezier(.2,1.2,.4,1);overflow:hidden}
+.modal-card{position:relative;background:var(--surface);border:1px solid var(--rule-2);border-radius:22px;width:100%;max-width:440px;max-height:min(760px,calc(100dvh - 48px));box-shadow:var(--shadow-lg);animation:modalPop .3s cubic-bezier(.2,1.2,.4,1);overflow:auto;overscroll-behavior:contain}
 @keyframes modalPop{from{opacity:0;transform:scale(.92) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
 .modal-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--grad)}
 .modal-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--tertiary);font-size:20px;cursor:pointer;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:all .2s;z-index:5}
 .modal-close:hover{color:var(--ink);background:var(--surface-2)}
 .modal-body{padding:32px 28px 24px}
+.modal-card:focus-visible{outline:2px solid var(--amber);outline-offset:3px}
+.modal-mask.show .modal-card{animation:modalPop .3s cubic-bezier(.2,1.2,.4,1)}
 .modal-title{font-family:var(--serif);font-size:24px;font-weight:600;margin-bottom:6px}
 .modal-title i{font-style:italic;color:var(--amber)}
 .modal-sub{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.6}
@@ -537,7 +539,7 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 
 /* === 弹窗响应式 === */
 @media(max-width:640px){
-  .modal-card{max-width:calc(100vw - 32px)}
+  .modal-card{max-width:calc(100vw - 32px);max-height:calc(100dvh - 28px);border-radius:18px}
   .modal-body{padding:24px 20px 20px}
   .welcome-rewards{padding:14px}
   .revive-cost{padding:12px 14px}
@@ -586,7 +588,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <header class="hero">
     <div class="eyebrow">打工人的五分钟治愈站</div>
     <h1>捏捏领导，<span class="accent">释怀一下</span></h1>
-    <p class="lede">不是又一个让你更高效的工具。而是一个让你慢下来、发泄一下、然后轻一点的地方。</p>
+    <p class="lede" id="hero-lede">不是又一个让你更高效的工具。而是一个让你慢下来、发泄一下、然后轻一点的地方。</p>
     <div class="hero-cta">
       <button class="btn-primary" id="hero-cta-1">开始捏领导</button>
       <button class="btn-ghost" id="hero-cta-2">看看吐槽墙</button>
@@ -1997,7 +1999,17 @@ $('#hero-cta-2').addEventListener('click',()=>{document.querySelector('#wall').s
 // ============ UI 同步 ============
 function updateUI(){
   const heroButton=$('#hero-cta-1');
+  const heroLede=$('#hero-lede');
   if(heroButton)heroButton.textContent=state.mode==='auth'&&state.hasAppearance?'开始暴揍领导':'开始捏领导';
+  if(heroLede){
+    heroLede.textContent=state.mode!=='auth'
+      ? '先戳一下试试，登录后可以签到、保存自己的领导，把今天的烦躁轻轻放下。'
+      : !state.signedToday
+        ? '今天还没签到，先领一份打工人的小惊喜，再开始你的五分钟发泄。'
+        : state.hasAppearance
+          ? '今天已经签到。下班前，来戳一戳、拍一拍，把不开心留在这里。'
+          : '今天已经签到。先捏一位属于你的领导，再开始这段发泄时间。';
+  }
   const balance=$('#cb-balance');
   if(balance)balance.textContent=state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--';
   if(state.mode==='auth'){
@@ -2023,18 +2035,30 @@ updateUI();
 updateStreak();
 
 // ============ 弹窗 管理 ============
+let lastModalTrigger=null;
 function openModal(id){
   const m = document.getElementById(id);
   if(!m) return;
+  lastModalTrigger=document.activeElement instanceof HTMLElement?document.activeElement:null;
   m.classList.add('show');
+  m.setAttribute('aria-hidden','false');
   document.body.style.overflow = 'hidden';
+  requestAnimationFrame(()=>{
+    const first=m.querySelector('button:not([disabled]),input,select,textarea,[tabindex]:not([tabindex="-1"])');
+    const card=m.querySelector('.modal-card');
+    if(card&&!card.hasAttribute('tabindex'))card.setAttribute('tabindex','-1');
+    (first||card)?.focus?.();
+  });
 }
 function closeModal(id){
   const m = document.getElementById(id);
   if(!m) return;
   m.classList.remove('show');
+  m.setAttribute('aria-hidden','true');
   if(!document.querySelector('.modal-mask.show')){
     document.body.style.overflow = '';
+    if(lastModalTrigger&&document.contains(lastModalTrigger))lastModalTrigger.focus();
+    lastModalTrigger=null;
   }
 }
 function closeModalOnMask(e,id){
@@ -2044,8 +2068,8 @@ function closeModalOnMask(e,id){
 // Esc 关闭弹窗
 document.addEventListener('keydown',(e)=>{
   if(e.key==='Escape'){
-    document.querySelectorAll('.modal-mask.show').forEach(m=>m.classList.remove('show'));
-    document.body.style.overflow = '';
+    const open=[...document.querySelectorAll('.modal-mask.show')].pop();
+    if(open)closeModal(open.id);
   }
 });
 
