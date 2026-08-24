@@ -1837,24 +1837,31 @@ function playHumanAction(action,eventName){
   figure.classList.add(`action-${action}`);
   setTimeout(()=>figure.classList.remove(`action-${action}`),700);
 }
+let petActionSequence=0;
+let lastAppliedPetActionSequence=0;
 $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if($('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
   if(state.mode==='auth'){
+    const actionSequence=++petActionSequence;
     try{
       const result=await XQXAuth.petAction(b.dataset.act,crypto.randomUUID());
       const cloud=result.pet_status||{};
-      pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
-      pet.fat=Number(cloud.fat??pet.fat);pet.dirty=Number(cloud.dirty??pet.dirty);
-      state.points=Number(result.points_balance??state.points);
-      updateBars();updateUI();
+      const isLatest=actionSequence>=lastAppliedPetActionSequence;
+      if(isLatest){
+        lastAppliedPetActionSequence=actionSequence;
+        pet.endure=Number(cloud.endure??pet.endure);pet.irritate=Number(cloud.irritate??pet.irritate);
+        pet.fat=Number(cloud.fat??pet.fat);pet.dirty=Number(cloud.dirty??pet.dirty);
+        state.points=Number(result.points_balance??state.points);
+        updateBars();updateUI();
+      }
       showBubble(ac.bubble);
       playHumanAction(b.dataset.act,result.event);
       if(window.pet3D&&ac.shake)window.pet3D.shake(ac.shake);
       if(ac.fx==='squash'&&window.pet3D)window.pet3D.squash(5000);
       if(result.event==='burst'){window.pet3D?.burst();showBubble('嗝——爆了！');toast('胖度爆表，领导卡通爆炸了！','amber')}
       if(result.event==='faint'){window.pet3D?.faint();showBubble('呕……我臭晕了');toast('太臭了，领导臭晕后爬了起来','rose')}
-      if(cloud.down)knockDown();
+      if(isLatest&&cloud.down)knockDown();
       toast(result.replayed?'动作已同步':`${ac.label} +${result.points_delta||ac.pts}`,'calm');
     }catch(error){
       toast(XQXAuth.message(error.message),'rose');
