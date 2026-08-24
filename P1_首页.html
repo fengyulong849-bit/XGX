@@ -2029,17 +2029,39 @@ $('#btn-post').addEventListener('click',()=>{
 });
 
 // ============ 关怀提醒 ============
-async function completeCareTask(b){
-  if(state.mode!=='auth'){toast('登录后可领关怀积分','amber');return}
-  if(b.dataset.busy==='1')return;
-  b.dataset.busy='1';
-  b.disabled=true;
-  try{const result=await XQXAuth.completeCare(b.dataset.care,crypto.randomUUID());state.points=Number(result.points_balance??state.points);wellbeing[b.dataset.care==='water'?'lastWater':'lastSit']=new Date().toISOString();persistWellbeing();b.classList.add('done');b.textContent='已记录';updateUI();updateCountdown();toast(`${b.dataset.care==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');}
-  catch(error){toast(XQXAuth.message(error.message),'rose');b.disabled=false;}
-  finally{delete b.dataset.busy;}
+const careBusy={water:false,sit:false};
+async function completeCare(type,homeButton=null){
+  if(state.mode!=='auth'){toast('登录后可领关怀积分','amber');return false}
+  if(careBusy[type])return false;
+  careBusy[type]=true;
+  const modalButton=$('#reminder-done');
+  if(homeButton){homeButton.disabled=true;homeButton.dataset.busy='1'}
+  if(modalButton){modalButton.disabled=true;modalButton.textContent='正在记录…'}
+  try{
+    // 弹窗和首页按钮共用同一条前端提交链路，避免依赖隐藏的首页按钮状态。
+    const result=await XQXAuth.completeCare(type,crypto.randomUUID());
+    state.points=Number(result.points_balance??state.points);
+    wellbeing[type==='water'?'lastWater':'lastSit']=new Date().toISOString();
+    persistWellbeing();
+    const button=homeButton||document.querySelector(`.btn-care[data-care="${type}"]`);
+    if(button){button.classList.add('done');button.textContent='已记录';button.disabled=true;}
+    updateUI();
+    updateCountdown();
+    if($('#modal-reminder').classList.contains('show'))closeModal('modal-reminder');
+    toast(`${type==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');
+    return true;
+  }catch(error){
+    toast(XQXAuth.message(error.message),'rose');
+    return false;
+  }finally{
+    careBusy[type]=false;
+    if(homeButton)delete homeButton.dataset.busy;
+    if(modalButton){modalButton.disabled=false;modalButton.textContent='我完成了'}
+  }
 }
+async function completeCareTask(b){return completeCare(b.dataset.care,b)}
 $$('.btn-care').forEach(b=>b.addEventListener('click',()=>completeCareTask(b)));
-function completeCareFromReminder(type){const button=document.querySelector(`.btn-care[data-care="${type}"]`);closeModal('modal-reminder');if(button)completeCareTask(button);}
+function completeCareFromReminder(type){return completeCare(type);}
 
 // ============ 导航/CTA ============
 $('#nav-cta').addEventListener('click',()=>openModal('modal-auth'));
