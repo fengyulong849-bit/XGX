@@ -171,6 +171,15 @@ body::before{
 .nameplate{text-align:center;padding-top:14px;border-top:1px solid var(--rule);margin-top:6px;position:relative;z-index:4}
 .nameplate .nm{font-family:var(--serif);font-weight:600;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .nameplate .sub{font-size:12px;color:var(--muted);font-style:italic;font-family:var(--serif)}
+.pet-mood{display:flex;justify-content:center;align-items:center;gap:7px;margin:8px auto 2px;color:var(--ink);font-size:11px}
+.pet-mood .mood-dot{width:7px;height:7px;border-radius:50%;background:#6FB3A8;box-shadow:0 0 0 4px rgba(111,179,168,.13);animation:moodPulse 2.4s ease-in-out infinite}
+.pet-mood[data-tone="amber"] .mood-dot{background:var(--amber);box-shadow:0 0 0 4px rgba(232,163,61,.13)}
+.pet-mood[data-tone="rose"] .mood-dot{background:#D97A6C;box-shadow:0 0 0 4px rgba(217,122,108,.13)}
+.pet-mood b{font-weight:700;color:var(--ink)}.pet-mood span:last-child{color:var(--muted)}
+@keyframes moodPulse{0%,100%{transform:scale(.9);opacity:.72}50%{transform:scale(1.15);opacity:1}}
+.pet-combo{display:flex;align-items:center;justify-content:space-between;min-height:22px;margin:0 0 10px;color:var(--muted);font-size:11px}
+.pet-combo b{color:var(--amber);font-family:var(--mono);font-size:12px;opacity:0;transform:translateY(4px);transition:all .2s ease}
+.pet-combo.hot b{opacity:1;transform:translateY(0)}
 
 .pet-bottom{padding:0 20px 20px;position:relative;z-index:4}
 .stats{display:grid;grid-template-columns:1fr 1fr;gap:12px 18px;margin-bottom:18px}
@@ -660,10 +669,12 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         </div>
         <div class="nameplate">
           <div class="nm" id="petName">暴躁打工人 · 领导</div>
+          <div class="pet-mood" id="petMood" data-tone="calm"><span class="mood-dot"></span><b>今日状态</b><span id="petMoodText">还能扛住</span></div>
           <div class="sub" id="petSub">"再改一版，今晚就给"</div>
         </div>
       </div>
       <div class="pet-bottom">
+        <div class="pet-combo" id="petCombo"><span>把烦躁留在这里，慢慢出一口气</span><b id="petComboValue">连击 x0</b></div>
         <div class="stats">
           <div class="stat-row"><span class="lbl">承受</span><div class="stat-bar"><i id="bar-endure" style="width:62%;background:#6FB3A8"></i></div><span class="val" id="val-endure">62</span></div>
           <div class="stat-row"><span class="lbl">烦躁</span><div class="stat-bar"><i id="bar-irritate" style="width:45%;background:#E8A33D"></i></div><span class="val" id="val-irritate">45</span></div>
@@ -1793,13 +1804,23 @@ const bubble=$('#bubble');
 
 const pet={endure:62,irritate:45,fat:30,dirty:18,locked:false};
 const ACTS={
-  poke:{label:'戳一下',bubble:'嗯？',dEndure:-4,dIrritate:8,pts:10,shake:0.08,fx:'poke'},
-  slap:{label:'拍一拍',bubble:'别拍了！',dEndure:-20,lock:5000,pts:10,shake:0.2,fx:'squash'},
-  feed:{label:'喂食',bubble:'嗝～',dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
-  throw:{label:'扔东西',bubble:'好臭…',dEndure:-20,dDirty:20,pts:10,shake:0.1,fx:'faint'}
+  poke:{label:'戳一下',bubbles:['嗯？你叫我？','别戳了，工位在晃。','你今天是不是受委屈了？继续，我扛得住。'],dEndure:-4,dIrritate:8,pts:10,shake:0.08,fx:'poke'},
+  slap:{label:'拍一拍',bubbles:['这一巴掌，我替你记下了。','拍得好，烦恼少。','行，今天的锅先拍掉一半。'],dEndure:-20,lock:5000,pts:10,shake:0.2,fx:'squash'},
+  feed:{label:'喂食',bubbles:['先吃口苹果，别气坏自己。','收到，今天也要照顾好自己。','这口甜的，算给辛苦费。'],dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
+  throw:{label:'扔东西',bubbles:['好臭……这是什么会议纪要？','扔准一点，别扔到自己身上。','很好，今天的废话清理完毕。'],dEndure:-20,dDirty:20,pts:10,shake:0.1,fx:'faint'}
 };
 let actCount=0;
-function showBubble(txt){bubble.textContent=txt;bubble.classList.add('show');setTimeout(()=>bubble.classList.remove('show'),1400)}
+let comboCount=0,comboTimer=null,moodTimer=null;
+function showBubble(txt){bubble.textContent=txt;bubble.classList.remove('show');void bubble.offsetWidth;bubble.classList.add('show');clearTimeout(moodTimer);moodTimer=setTimeout(()=>bubble.classList.remove('show'),1900)}
+function setPetMood(action,combo=0){
+  const mood=$('#petMood'),text=$('#petMoodText'),comboEl=$('#petCombo'),comboValue=$('#petComboValue');
+  if(!mood||!text)return;
+  const moods={poke:['amber',combo>2?'被你戳出火花了':'有点烦，但还能扛'],slap:['rose',combo>2?'今天的锅先拍碎':'脸有点疼，心情好多了'],feed:['calm','吃饱了，继续陪你'],throw:['rose','这股闷气终于有出口了']};
+  const next=moods[action]||['calm','正在陪你缓一缓'];mood.dataset.tone=next[0];text.textContent=next[1];
+  if(comboEl&&comboValue){comboValue.textContent=`连击 x${combo}`;comboEl.classList.toggle('hot',combo>1);}
+  clearTimeout(comboTimer);comboTimer=setTimeout(()=>{comboCount=0;comboEl?.classList.remove('hot');if(comboValue)comboValue.textContent='连击 x0'},2600);
+}
+function nextActionBubble(ac){return ac.bubbles[Math.min(ac.bubbles.length-1,Math.max(0,comboCount-1))]}
 function updateBars(){
   $('#bar-endure').style.width=pet.endure+'%';$('#val-endure').textContent=pet.endure;
   $('#bar-irritate').style.width=pet.irritate+'%';$('#val-irritate').textContent=pet.irritate;
@@ -1846,6 +1867,8 @@ let lastAppliedPetActionSequence=0;
 $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if($('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
+  comboCount=Math.min(9,comboCount+1);
+  setPetMood(b.dataset.act,comboCount);
   if(state.mode==='auth'){
     const actionSequence=++petActionSequence;
     try{
@@ -1859,7 +1882,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
         state.points=Number(result.points_balance??state.points);
         updateBars();updateUI();
       }
-      showBubble(ac.bubble);
+      showBubble(nextActionBubble(ac));
       playHumanAction(b.dataset.act,result.event);
       if(window.pet3D&&ac.shake)window.pet3D.shake(ac.shake);
       if(ac.fx==='squash'&&window.pet3D)window.pet3D.squash(5000);
@@ -1872,10 +1895,10 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
     }
     return;
   }
-  showBubble(ac.bubble);
+  showBubble(nextActionBubble(ac));
   playHumanAction(b.dataset.act);
   b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
-  if(pet.endure<=0){toast('补刀：'+ac.bubble,'rose');return}
+  if(pet.endure<=0){toast('补刀：'+nextActionBubble(ac),'rose');return}
   pet.endure=Math.max(0,Math.min(100,pet.endure+ac.dEndure));
   if(ac.dIrritate!=null)pet.irritate=Math.max(0,Math.min(100,pet.irritate+ac.dIrritate));
   if(ac.dFat!=null)pet.fat=Math.max(0,Math.min(100,pet.fat+ac.dFat));
