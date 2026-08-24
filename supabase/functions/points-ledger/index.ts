@@ -6,7 +6,9 @@ Deno.serve(async (request) => {
   if (request.method !== "POST") return json(request, 405, { ok: false, reason: "method_not_allowed" });
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "").trim(); const body = await readJson(request);
   if (!token) return json(request, 401, { ok: false, reason: "invalid_session" });
-  const limit = typeof body?.limit === "number" ? Math.min(100, Math.max(1, Math.floor(body.limit))) : 50;
+  const limit = typeof body?.limit === "number" && Number.isFinite(body.limit)
+    ? Math.min(100, Math.max(1, Math.floor(body.limit)))
+    : 50;
   try {
     const admin = serviceClient(); const { data: identity, error: identityError } = await admin.auth.getUser(token);
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
