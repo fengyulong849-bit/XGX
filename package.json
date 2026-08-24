@@ -8,6 +8,7 @@
     "check:static": "node scripts/check-static.mjs",
     "check:backend": "node scripts/check-backend.mjs",
     "check": "npm run check:static && npm run check:backend",
+    "deploy:m8": "node scripts/deploy-m8.mjs",
     "supabase": "npx --yes supabase@latest"
   },
   "engines": {
