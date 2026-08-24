@@ -1823,10 +1823,31 @@ function surpriseExpr(){
 }
 function knockDown(){
   $('#petCard').classList.add('down');
+  setPetActionButtonsDisabled(true);
   showBubble('我倒下了…');
   if(window.pet3D)window.pet3D.knockDown();
   spawnFx(['💫','⭐','🌟','💫','✨'],8); // 倒地卡通星星特效
   setTimeout(promptReviveOnce, 900);
+}
+let petActionCooldownTimer=null;
+function setPetActionButtonsDisabled(disabled){
+  $$('.act').forEach(button=>{button.disabled=Boolean(disabled)});
+}
+function applyPetActionCooldown(status){
+  if(petActionCooldownTimer){clearTimeout(petActionCooldownTimer);petActionCooldownTimer=null;}
+  const until=status&&typeof status.locked_until==='string'?Date.parse(status.locked_until):NaN;
+  const remaining=Number.isFinite(until)?until-Date.now():0;
+  if(remaining>0){
+    pet.locked=true;
+    setPetActionButtonsDisabled(true);
+    petActionCooldownTimer=setTimeout(()=>{
+      pet.locked=false;
+      if(!$('#petCard').classList.contains('down'))setPetActionButtonsDisabled(false);
+    },remaining+50);
+  }else{
+    pet.locked=false;
+    if(!$('#petCard').classList.contains('down'))setPetActionButtonsDisabled(false);
+  }
 }
 function playHumanAction(action,eventName){
   const figure=document.querySelector('.human-figure');
@@ -1841,7 +1862,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if(pet.locked||$('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
   if(state.mode==='auth'){
-    b.disabled=true;
+    setPetActionButtonsDisabled(true);
     try{
       const result=await XQXAuth.petAction(b.dataset.act,crypto.randomUUID());
       const cloud=result.pet_status||{};
@@ -1856,9 +1877,13 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
       if(result.event==='burst'){window.pet3D?.burst();showBubble('嗝——爆了！');toast('胖度爆表，领导卡通爆炸了！','amber')}
       if(result.event==='faint'){window.pet3D?.faint();showBubble('呕……我臭晕了');toast('太臭了，领导臭晕后爬了起来','rose')}
       if(cloud.down)knockDown();
+      applyPetActionCooldown(cloud);
       toast(result.replayed?'动作已同步':`${ac.label} +${result.points_delta||ac.pts}`,'calm');
-    }catch(error){toast(XQXAuth.message(error.message),'rose')}
-    finally{b.disabled=false}
+    }catch(error){
+      applyPetActionCooldown(error.data?.pet_status||error.data||{});
+      toast(XQXAuth.message(error.message),'rose');
+    }
+    finally{if(!pet.locked&&!$('#petCard').classList.contains('down'))setPetActionButtonsDisabled(false)}
     return;
   }
   showBubble(ac.bubble);
@@ -2160,6 +2185,7 @@ async function reviveLeader(){
     state.points=Number(result.points_balance??state.points);
     pet.endure=Number(cloud.endure??100);pet.irritate=Number(cloud.irritate??20);pet.fat=Number(cloud.fat??10);pet.dirty=Number(cloud.dirty??5);
     updateBars();updateUI();$('#petCard').classList.remove('down');
+    applyPetActionCooldown(cloud);
     sessionStorage.removeItem('xqx_pet_down_prompted');
     if(window.pet3D)window.pet3D.revive();
     toast(`领导复活！${result.points_delta||-500} 积分`,'calm');
