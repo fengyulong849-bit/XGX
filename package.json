@@ -7,7 +7,8 @@
     "dev": "node scripts/dev-server.mjs",
     "check:static": "node scripts/check-static.mjs",
     "check:backend": "node scripts/check-backend.mjs",
-    "check": "npm run check:static && npm run check:backend",
+    "check:core": "node scripts/check-core-release.mjs",
+    "check": "npm run check:static && npm run check:backend && node scripts/check-core-release.mjs",
     "deploy:core": "node scripts/deploy-core.mjs",
     "deploy:m8": "node scripts/deploy-m8.mjs",
     "supabase": "npx --yes supabase@latest"
