@@ -179,10 +179,10 @@ body::before{
 @keyframes cardImpact{0%,100%{transform:translateY(0)}35%{transform:translateY(-2px) rotate(-.35deg)}70%{transform:translateY(1px) rotate(.35deg)}}
 .action-prop{position:absolute;z-index:8;pointer-events:none;opacity:0;line-height:1;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4))}.action-prop svg{width:64px;height:64px;display:block;overflow:visible}.action-prop svg path,.action-prop svg circle,.action-prop svg rect{vector-effect:non-scaling-stroke}
 .action-prop.show{opacity:1}
-.action-prop[data-action="poke"]{left:calc(50% - 142px);top:118px}.action-prop[data-action="poke"].show{animation:propPoke .5s cubic-bezier(.2,1.4,.4,1) forwards}
-.action-prop[data-action="slap"]{left:calc(50% + 50px);top:8px}.action-prop[data-action="slap"].show{animation:propSlap .54s cubic-bezier(.2,1.5,.4,1) forwards}
-.action-prop[data-action="feed"]{left:calc(50% + 72px);top:145px}.action-prop[data-action="feed"].show{animation:propFeed .7s cubic-bezier(.2,1.2,.4,1) forwards}
-.action-prop[data-action="throw"]{left:calc(50% - 150px);top:174px}.action-prop[data-action="throw"].show{animation:propThrow .62s cubic-bezier(.2,1.2,.4,1) forwards}
+.action-prop[data-action="poke"]{left:calc(50% - 142px);top:118px}.action-prop[data-action="poke"].show{animation:propPoke .86s cubic-bezier(.2,1.4,.4,1) forwards}
+.action-prop[data-action="slap"]{left:calc(50% + 50px);top:8px}.action-prop[data-action="slap"].show{animation:propSlap .94s cubic-bezier(.2,1.5,.4,1) forwards}
+.action-prop[data-action="feed"]{left:calc(50% + 72px);top:145px}.action-prop[data-action="feed"].show{animation:propFeed 1.04s cubic-bezier(.2,1.2,.4,1) forwards}
+.action-prop[data-action="throw"]{left:calc(50% - 150px);top:174px}.action-prop[data-action="throw"].show{animation:propThrow .96s cubic-bezier(.2,1.2,.4,1) forwards}
 @keyframes propPoke{0%{opacity:0;transform:translateX(-34px) rotate(-24deg) scale(.8)}18%{opacity:1}62%{opacity:1;transform:translateX(74px) rotate(8deg) scale(1.05)}100%{opacity:0;transform:translateX(90px) rotate(18deg) scale(.92)}}
 @keyframes propSlap{0%{opacity:0;transform:translateY(-50px) rotate(18deg) scale(.8)}18%{opacity:1}58%{opacity:1;transform:translateY(50px) rotate(-10deg) scale(1.08)}100%{opacity:0;transform:translateY(70px) rotate(-20deg) scale(.9)}}
 @keyframes propFeed{0%{opacity:0;transform:translateX(70px) scale(.7) rotate(20deg)}18%{opacity:1}65%{opacity:1;transform:translateX(-22px) scale(1.04) rotate(-10deg)}100%{opacity:0;transform:translateX(-34px) scale(.9) rotate(-18deg)}}
@@ -1868,7 +1868,7 @@ function showPhysicalAction(action){
     throw:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M17 18h30l-4 35H21l-4-35Z" fill="#9AA8BC" stroke="#293449" stroke-width="3" stroke-linejoin="round"/><path d="M13 15h38M24 10h16" stroke="#293449" stroke-width="3" stroke-linecap="round"/><path d="m25 25 14 19m0-19L25 44" stroke="#F0A398" stroke-width="3" stroke-linecap="round"/><path d="M7 8h-5m9 0-3-4M57 15l5-3" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>'
   };
   prop.dataset.action=action;prop.innerHTML=art[action]||'';prop.classList.remove('show');void prop.offsetWidth;prop.classList.add('show');
-  clearTimeout(propTimer);propTimer=setTimeout(()=>prop.classList.remove('show'),760);
+  clearTimeout(propTimer);propTimer=setTimeout(()=>prop.classList.remove('show'),1120);
 }
 function setPetMood(action,combo=0){
   const mood=$('#petMood'),text=$('#petMoodText'),comboEl=$('#petCombo'),comboValue=$('#petComboValue');
