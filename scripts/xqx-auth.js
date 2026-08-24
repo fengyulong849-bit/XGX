@@ -74,6 +74,7 @@
     async reportRant(rantId, reason, requestId) { return callAuthenticated("rant-report", { rant_id: rantId, reason, request_id: requestId }); },
     async moderationQueue(limit = 30) { return callAuthenticated("moderation-queue", { limit }); },
     async moderationHistory(limit = 20) { return callAuthenticated("moderation-history", { limit }); },
+    async manageModerator(targetId, action, requestId) { return callAuthenticated("moderation-role", { target_id: targetId, action, request_id: requestId || crypto.randomUUID() }); },
     async reviewRant(rantId, decision, note, requestId) { return callAuthenticated("moderation-review", { rant_id: rantId, decision, note: note || "", request_id: requestId || uuid() }); },
     async randomRants(limit = 9) { return callPublicGet("rants-random", { limit }); },
     async myRants() { return callAuthenticated("rants-mine", {}); },

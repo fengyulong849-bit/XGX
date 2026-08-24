@@ -22,7 +22,7 @@ const requiredFunctions = [
   'care-complete', 'checkin-sign', 'pet-action', 'pet-get', 'pet-revive', 'points-ledger',
   'profile-me', 'profile-save-appearance', 'rant-report', 'rants-create', 'rants-expire',
   'rants-mine', 'rants-random', 'release-complete', 'resonance-claim', 'resonance-create',
-  'moderation-history', 'moderation-queue', 'moderation-review',
+  'moderation-history', 'moderation-queue', 'moderation-review', 'moderation-role',
   'work-preferences-save'
 ];
 for (const name of requiredFunctions) {
@@ -35,6 +35,11 @@ for (const name of ['moderation-queue', 'moderation-review', 'moderation-history
   const source = readFileSync(resolve(functionDir, name, 'index.ts'), 'utf8');
   if (!source.includes('consumeRateLimit')) fail(`审核 Function 未接入服务端限流：${name}`);
 }
+const roleMigration = text('supabase/migrations/202608210027_m8_role_management.sql').toLowerCase();
+for (const requiredMarker of ['create table if not exists public.moderation_role_actions', 'm8_manage_moderator', 'cannot_revoke_self', 'revoke all on function public.m8_manage_moderator', 'grant execute on function public.m8_manage_moderator']) {
+  if (!roleMigration.includes(requiredMarker)) fail(`审核角色管理迁移缺少安全标记：${requiredMarker}`);
+}
+if (!readFileSync(resolve(functionDir, 'moderation-role', 'index.ts'), 'utf8').includes('consumeRateLimit')) fail('moderation-role 未接入服务端限流');
 
 const authClient = text('scripts/xqx-auth.js');
 const personalPage = text('P4_个人中心.html');
