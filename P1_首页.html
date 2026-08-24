@@ -2299,7 +2299,12 @@ window.addEventListener('DOMContentLoaded',async()=>{
       figure.dataset.beard=String(profile.appearance.beard||0);
     }
   }
-  if(window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
+  if(window.xqxApplyCloudProfile){
+    window.xqxApplyCloudProfile(profile);
+    // 自动恢复已有会话时，按用户当前设置重新开始本次浏览器会话的提醒计时。
+    // 不弹设置窗，只重置喝水/久坐提醒的计时起点。
+    restartWellbeingCountdown();
+  }
   else if(window.xqxSetAuth)window.xqxSetAuth();
   else document.documentElement.setAttribute('data-state','auth');
   document.getElementById('nav-cta')?.style.setProperty('display','none');
