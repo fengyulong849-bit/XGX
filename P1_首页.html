@@ -177,12 +177,12 @@ body::before{
 @keyframes impactPop{0%{opacity:0;transform:translate(-50%,20px) scale(.45) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.18) rotate(3deg)}55%{opacity:1;transform:translate(-50%,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-38px) scale(.92) rotate(2deg)}}
 .pet-card.impacting{animation:cardImpact .34s ease-out}
 @keyframes cardImpact{0%,100%{transform:translateY(0)}35%{transform:translateY(-2px) rotate(-.35deg)}70%{transform:translateY(1px) rotate(.35deg)}}
-.action-prop{position:absolute;z-index:8;pointer-events:none;opacity:0;font-size:44px;line-height:1;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4))}
+.action-prop{position:absolute;z-index:8;pointer-events:none;opacity:0;line-height:1;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4))}.action-prop svg{width:64px;height:64px;display:block;overflow:visible}.action-prop svg path,.action-prop svg circle,.action-prop svg rect{vector-effect:non-scaling-stroke}
 .action-prop.show{opacity:1}
 .action-prop[data-action="poke"]{left:calc(50% - 142px);top:118px}.action-prop[data-action="poke"].show{animation:propPoke .5s cubic-bezier(.2,1.4,.4,1) forwards}
 .action-prop[data-action="slap"]{left:calc(50% + 50px);top:8px}.action-prop[data-action="slap"].show{animation:propSlap .54s cubic-bezier(.2,1.5,.4,1) forwards}
-.action-prop[data-action="feed"]{left:calc(50% + 72px);top:145px;font-size:34px}.action-prop[data-action="feed"].show{animation:propFeed .7s cubic-bezier(.2,1.2,.4,1) forwards}
-.action-prop[data-action="throw"]{left:calc(50% - 150px);top:174px;font-size:34px}.action-prop[data-action="throw"].show{animation:propThrow .62s cubic-bezier(.2,1.2,.4,1) forwards}
+.action-prop[data-action="feed"]{left:calc(50% + 72px);top:145px}.action-prop[data-action="feed"].show{animation:propFeed .7s cubic-bezier(.2,1.2,.4,1) forwards}
+.action-prop[data-action="throw"]{left:calc(50% - 150px);top:174px}.action-prop[data-action="throw"].show{animation:propThrow .62s cubic-bezier(.2,1.2,.4,1) forwards}
 @keyframes propPoke{0%{opacity:0;transform:translateX(-34px) rotate(-24deg) scale(.8)}18%{opacity:1}62%{opacity:1;transform:translateX(74px) rotate(8deg) scale(1.05)}100%{opacity:0;transform:translateX(90px) rotate(18deg) scale(.92)}}
 @keyframes propSlap{0%{opacity:0;transform:translateY(-50px) rotate(18deg) scale(.8)}18%{opacity:1}58%{opacity:1;transform:translateY(50px) rotate(-10deg) scale(1.08)}100%{opacity:0;transform:translateY(70px) rotate(-20deg) scale(.9)}}
 @keyframes propFeed{0%{opacity:0;transform:translateX(70px) scale(.7) rotate(20deg)}18%{opacity:1}65%{opacity:1;transform:translateX(-22px) scale(1.04) rotate(-10deg)}100%{opacity:0;transform:translateX(-34px) scale(.9) rotate(-18deg)}}
@@ -213,7 +213,7 @@ body::before{
 
 .actions{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 .act{position:relative;background:rgba(255,255,255,.04);border:1px solid var(--rule);border-radius:14px;padding:13px 6px;cursor:pointer;text-align:center;transition:all .2s var(--ease);font:inherit;font-weight:600;font-size:13px;color:var(--ink)}
-.act .ico{font-size:20px;display:block;margin-bottom:3px}
+.act .ico{font-size:20px;display:block;margin-bottom:3px}.action-icon{width:28px;height:28px;display:block;margin:0 auto 4px;overflow:visible}.action-icon path,.action-icon circle,.action-icon rect,.action-icon line{vector-effect:non-scaling-stroke}
 .act:hover{transform:translateY(-3px);border-color:var(--amber);color:var(--amber);box-shadow:var(--glow-amber)}
 .act:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none;border-color:var(--rule)}
 
@@ -413,6 +413,7 @@ body::before{
 .btn-care{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);color:var(--ink);font:inherit;font-size:13px;font-weight:600;padding:9px 18px;border-radius:999px;cursor:pointer;transition:all .2s var(--ease)}
 .btn-care:hover{border-color:var(--amber);color:var(--amber);background:rgba(232,163,61,.08)}
 .btn-care.done{background:rgba(111,179,168,.18);border-color:rgba(111,179,168,.35);color:var(--calm);cursor:default}
+.btn-care.syncing{border-color:var(--amber);color:var(--amber);background:rgba(232,163,61,.1);cursor:wait}
 .care-sympathy{font-family:var(--serif);font-style:italic;font-size:14px;color:var(--ink);line-height:1.6}
 .care-sympathy .em{color:var(--amber)}
 [data-state="try"] .care-card{opacity:.55}
@@ -706,10 +707,10 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="stat-row"><span class="lbl">脏度</span><div class="stat-bar"><i id="bar-dirty" style="width:18%;background:#9AA8BC"></i></div><span class="val" id="val-dirty">18</span></div>
         </div>
         <div class="actions">
-          <button class="act" data-act="poke" aria-label="戳一下"><span class="ico">👆</span>戳一下</button>
-          <button class="act" data-act="slap" aria-label="拍一拍"><span class="ico">👋</span>拍一拍</button>
-          <button class="act" data-act="feed" aria-label="喂食"><span class="ico">🍎</span>喂食</button>
-          <button class="act" data-act="throw" aria-label="扔东西"><span class="ico">🗑️</span>扔东西</button>
+          <button class="act" data-act="poke" aria-label="戳一下"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 22c-2-3-1-6 1-7l6-3V6c0-2 3-2 3 0v6l2-1V4c0-2 3-2 3 0v8l2-1V7c0-2 3-2 3 0v8c0 5-3 9-8 11-4 2-8 0-12-4Z" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round"/><path d="M18 12V9" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>戳一下</button>
+          <button class="act" data-act="slap" aria-label="拍一拍"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 25c-2-3-2-7 0-10l3-5V5c0-2 3-2 3 0v6l1-8c0-2 3-2 3 0v8l1-7c0-2 3-2 3 0v8l1-5c1-2 3-1 3 1v8c0 7-4 10-9 10-3 0-5-1-6-3Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M5 5l3 3M27 5l-3 3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>拍一拍</button>
+          <button class="act" data-act="feed" aria-label="喂食"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="18" r="9" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M16 9c2-4 6-4 8-3-1 3-4 5-8 4M16 9c-1-2-3-3-5-3" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="M11 20c2 2 7 3 10 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" opacity=".7"/></svg>喂食</button>
+          <button class="act" data-act="throw" aria-label="扔东西"><svg class="action-icon" viewBox="0 0 32 32" aria-hidden="true"><path d="M8 10h16l-2 17H10L8 10Z" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linejoin="round"/><path d="M6 8h20M12 5h8" stroke="currentColor" stroke-width="2.1" stroke-linecap="round"/><path d="m13 14 6 8m0-8-6 8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" opacity=".7"/></svg>扔东西</button>
         </div>
       </div>
     </div>
@@ -1860,8 +1861,13 @@ function showImpact(action,points=10,replayed=false){
 let propTimer=null;
 function showPhysicalAction(action){
   const prop=$('#actionProp');if(!prop)return;
-  const icons={poke:'☝️',slap:'✋',feed:'🍎',throw:'🗑️'};
-  prop.dataset.action=action;prop.textContent=icons[action]||'✨';prop.classList.remove('show');void prop.offsetWidth;prop.classList.add('show');
+  const art={
+    poke:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 47c-6-7-5-15 2-19l12-6V8c0-5 8-5 8 0v14l5-3V7c0-5 8-5 8 0v15l5-4c4-3 8 2 5 6l-7 10c-4 7-10 12-18 13-6 1-11-1-20-10Z" fill="#F2B184" stroke="#4B2930" stroke-width="3" stroke-linejoin="round"/><path d="M32 22V12" stroke="#FFF1D8" stroke-width="3" stroke-linecap="round"/><circle cx="52" cy="36" r="3" fill="#F5B14C"/></svg>',
+    slap:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 54c-7-9-7-17-2-25l7-10V7c0-5 8-5 8 0v13l3-17c1-5 8-4 8 1v17l4-15c1-5 8-3 7 2l-3 17 5-10c2-5 9-2 7 3l-6 18c-3 10-11 16-21 16-8 0-13-2-17-8Z" fill="#F2B184" stroke="#4B2930" stroke-width="3" stroke-linejoin="round"/><path d="M8 13 2 7M53 9l7-6M8 29H1" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>',
+    feed:'<svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="31" cy="37" r="18" fill="#D97A6C" stroke="#4B2930" stroke-width="3"/><path d="M30 18c4-9 12-10 18-7-2 8-8 11-17 10M30 19c-3-5-7-7-12-6" fill="#6FB3A8" stroke="#4B2930" stroke-width="3" stroke-linejoin="round"/><path d="M23 35c4 4 12 5 17 0" fill="none" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>',
+    throw:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M17 18h30l-4 35H21l-4-35Z" fill="#9AA8BC" stroke="#293449" stroke-width="3" stroke-linejoin="round"/><path d="M13 15h38M24 10h16" stroke="#293449" stroke-width="3" stroke-linecap="round"/><path d="m25 25 14 19m0-19L25 44" stroke="#F0A398" stroke-width="3" stroke-linecap="round"/><path d="M7 8h-5m9 0-3-4M57 15l5-3" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>'
+  };
+  prop.dataset.action=action;prop.innerHTML=art[action]||'';prop.classList.remove('show');void prop.offsetWidth;prop.classList.add('show');
   clearTimeout(propTimer);propTimer=setTimeout(()=>prop.classList.remove('show'),760);
 }
 function setPetMood(action,combo=0){
@@ -2072,15 +2078,17 @@ async function completeCare(type,homeButton=null){
   const timeoutId=setTimeout(()=>controller.abort(),12000);
   const requestId=careRequestIds[type]||(careRequestIds[type]=crypto.randomUUID());
   const modalButton=$('#reminder-done');
-  if(homeButton){homeButton.disabled=true;homeButton.dataset.busy='1'}
-  if(modalButton){modalButton.disabled=true;modalButton.textContent='正在记录…'}
+  const button=homeButton||document.querySelector(`.btn-care[data-care="${type}"]`);
+  if(button){button.disabled=true;button.dataset.busy='1';button.classList.add('syncing');button.textContent='同步中…'}
+  if(modalButton){modalButton.disabled=true;modalButton.textContent='正在同步…'}
+  if($('#modal-reminder').classList.contains('show'))closeModal('modal-reminder');
+  toast('已提交，同步中','calm');
   try{
     // 弹窗和首页按钮共用同一条前端提交链路，避免依赖隐藏的首页按钮状态。
     const result=await XQXAuth.completeCare(type,requestId,{signal:controller.signal});
     state.points=Number(result.points_balance??state.points);
     wellbeing[type==='water'?'lastWater':'lastSit']=new Date().toISOString();
     persistWellbeing();
-    const button=homeButton||document.querySelector(`.btn-care[data-care="${type}"]`);
     if(button){button.classList.add('done');button.textContent='已记录';button.disabled=true;}
     updateUI();
     updateCountdown();
@@ -2095,7 +2103,11 @@ async function completeCare(type,homeButton=null){
   }finally{
     careBusy[type]=false;
     clearTimeout(timeoutId);
-    if(homeButton)delete homeButton.dataset.busy;
+    if(button)delete button.dataset.busy;
+    if(!button?.classList.contains('done')){
+      button?.classList.remove('syncing');
+      if(button){button.disabled=false;button.textContent=type==='water'?'喝好啦':'活动好啦'}
+    }
     if(modalButton){modalButton.disabled=false;modalButton.textContent='我完成了'}
   }
 }
