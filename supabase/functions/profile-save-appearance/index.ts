@@ -1,4 +1,4 @@
-import { isUuid, serviceClient } from "../_shared/auth.ts";
+import { consumeRateLimit, isUuid, serviceClient } from "../_shared/auth.ts";
 import { json, options, readJson } from "../_shared/http.ts";
 
 const keys = ["face", "hair", "glasses", "beard", "expr", "suit", "belly", "skin"] as const;
@@ -22,6 +22,8 @@ Deno.serve(async (request) => {
     const admin = serviceClient();
     const { data: identity, error: identityError } = await admin.auth.getUser(token);
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
+    const rate = await consumeRateLimit(admin, "profile_save_appearance", identity.user.id, request, 10, 600);
+    if (!rate.allowed) return json(request, 429, { ok: false, reason: "rate_limited", retry_after_seconds: rate.retryAfterSeconds });
     const { data, error } = await admin.rpc("m3_save_appearance", {
       p_user_id: identity.user.id, p_appearance: body.appearance, p_request_id: body.request_id,
     });
