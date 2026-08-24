@@ -1,4 +1,4 @@
-import { serviceClient, isUuid } from "../_shared/auth.ts";
+import { consumeRateLimit, serviceClient, isUuid } from "../_shared/auth.ts";
 import { json, options, readJson } from "../_shared/http.ts";
 
 const reasons = new Set(["privacy", "abuse", "other"]);
@@ -17,6 +17,8 @@ Deno.serve(async (request) => {
     const admin = serviceClient();
     const { data: identity, error: identityError } = await admin.auth.getUser(token);
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
+    const rate = await consumeRateLimit(admin, "rant_report", identity.user.id, request, 30, 600);
+    if (!rate.allowed) return json(request, 429, { ok: false, reason: "rate_limited", retry_after_seconds: rate.retryAfterSeconds });
     const { data, error } = await admin.rpc("m4_report_rant", { p_user_id: identity.user.id, p_rant_id: body.rant_id, p_reason: body.reason, p_request_id: body.request_id });
     if (error || !data?.ok) return json(request, 409, { ok: false, reason: data?.reason || "report_failed" });
     return json(request, 200, data);

@@ -24,7 +24,13 @@ for (const name of coreFunctions) {
 for (const name of deferredFunctions) {
   if (deploySource.includes(`'${name}'`)) fail(`M8 Function 不得进入核心部署：${name}`);
 }
-for (const name of ['auth-change-password', 'checkin-sign', 'work-preferences-save']) {
+const rateLimitedCoreFunctions = [
+  'auth-change-password', 'checkin-sign', 'work-preferences-save',
+  'pet-action', 'pet-revive', 'rants-create', 'resonance-create',
+  'resonance-claim', 'rant-report', 'release-complete', 'release-draft',
+  'care-complete',
+];
+for (const name of rateLimitedCoreFunctions) {
   const source = readFileSync(resolve(root, 'supabase/functions', name, 'index.ts'), 'utf8');
   if (!source.includes('consumeRateLimit')) fail(`核心安全接口未接入服务端限流：${name}`);
 }
