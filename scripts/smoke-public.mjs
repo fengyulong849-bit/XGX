@@ -10,14 +10,20 @@ if (!url || !anonKey) {
   console.error('请在 Codespaces 配置 scripts/xqx-config.js，或临时设置 XQX_SUPABASE_URL 与 XQX_SUPABASE_ANON_KEY。');
   process.exitCode = 2;
 } else {
-  const endpoint = `${url.replace(/\/$/, '')}/functions/v1/rants-random?limit=1`;
-  const response = await fetch(endpoint, { headers: { apikey: anonKey } });
-  const data = await response.json().catch(() => null);
-  if (!response.ok || !data?.ok || !Array.isArray(data.rants)) {
-    throw new Error(`rants-random 返回异常：HTTP ${response.status}`);
+  const baseEndpoint = `${url.replace(/\/$/, '')}/functions/v1/rants-random`;
+  const requests = await Promise.all([
+    fetch(`${baseEndpoint}?limit=1`, { headers: { apikey: anonKey } }),
+    fetch(`${baseEndpoint}?limit=abc`, { headers: { apikey: anonKey } }),
+  ]);
+  const payloads = await Promise.all(requests.map((response) => response.json().catch(() => null)));
+  for (const [response, data] of requests.map((response, index) => [response, payloads[index]])) {
+    if (!response.ok || !data?.ok || !Array.isArray(data.rants)) {
+      throw new Error(`rants-random 返回异常：HTTP ${response.status}`);
+    }
   }
+  const [response, data] = [requests[0], payloads[0]];
   const forbiddenFields = ['owner_id', 'reporter_id', 'review_status', 'destroyed_at', 'release_rewarded_at'];
   const leaked = data.rants.flatMap((rant) => forbiddenFields.filter((field) => Object.hasOwn(rant, field)));
   if (leaked.length) throw new Error(`公开随机墙返回了禁止字段：${[...new Set(leaked)].join(', ')}`);
-  console.log(`核心云端冒烟检查通过：rants-random HTTP ${response.status}，返回 ${data.rants.length} 条安全公开内容。`);
+  console.log(`核心云端冒烟检查通过：rants-random 正常/非法 limit 均返回 HTTP ${response.status}，返回 ${data.rants.length} 条安全公开内容。`);
 }
