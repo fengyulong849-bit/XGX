@@ -452,6 +452,8 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .toast.amber{border-color:var(--amber);color:var(--amber)}
 .toast.calm{border-color:var(--calm);color:var(--calm)}
 .toast.rose{border-color:var(--rose);color:var(--rose)}
+@keyframes toastPulse{50%{transform:scale(1.03);filter:brightness(1.16)}}
+.toast.toast-pulse{animation:toastPulse .24s ease-out}
 @keyframes toastIn{from{opacity:0;transform:translateY(-12px)}to{opacity:1;transform:translateY(0)}}
 
 /* ============ 弹窗 通用 ============ */
@@ -1648,12 +1650,22 @@ window.xqxApplyCloudProfile=(profile)=>{
   if(!cloud?.down)sessionStorage.removeItem('xqx_pet_down_prompted');
 };
 
+const toastCache=new Map();
 function toast(msg,type='amber'){
+  const cacheKey=`${type}:${msg}`,now=Date.now(),cached=toastCache.get(cacheKey);
+  if(cached&&now-cached.at<1400){
+    cached.at=now;
+    cached.el.classList.remove('toast-pulse');
+    void cached.el.offsetWidth;
+    cached.el.classList.add('toast-pulse');
+    return;
+  }
   const el=document.createElement('div');
   el.className='toast '+type;
   el.textContent=msg;
   $('#toastWrap').appendChild(el);
-  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-8px)';setTimeout(()=>el.remove(),300)},3000);
+  toastCache.set(cacheKey,{el,at:now});
+  setTimeout(()=>{el.style.opacity='0';el.style.transform='translateY(-8px)';setTimeout(()=>{el.remove();if(toastCache.get(cacheKey)?.el===el)toastCache.delete(cacheKey)},300)},3000);
 }
 
 function setAuthError(id,message){
@@ -1877,6 +1889,7 @@ function surpriseExpr(){
   exprTimer=setTimeout(()=>{exprTimer=null;updateExpr()},1500);
 }
 function knockDown(){
+  if($('#petCard').classList.contains('down'))return;
   $('#petCard').classList.add('down');
   showBubble('我倒下了…');
   if(window.pet3D)window.pet3D.knockDown();
@@ -1922,6 +1935,8 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
       if(isLatest&&cloud.down)knockDown();
       toast(result.replayed?'动作已同步':`${ac.label} +${result.points_delta||ac.pts}`,'calm');
     }catch(error){
+      // 倒地后，之前并发动作返回的 pet_down 不再重复打扰用户。
+      if($('#petCard').classList.contains('down'))return;
       toast(XQXAuth.message(error.message),'rose');
     }
     return;
