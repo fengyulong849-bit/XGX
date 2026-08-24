@@ -1842,7 +1842,15 @@ function setPetMood(action,combo=0){
   if(comboEl&&comboValue){comboValue.textContent=`连击 x${combo}`;comboEl.classList.toggle('hot',combo>1);}
   clearTimeout(comboTimer);comboTimer=setTimeout(()=>{comboCount=0;comboEl?.classList.remove('hot');if(comboValue)comboValue.textContent='连击 x0'},2600);
 }
-function nextActionBubble(ac){return ac.bubbles[Math.min(ac.bubbles.length-1,Math.max(0,comboCount-1))]}
+const lastActionLine={};
+function nextActionBubble(ac,actionKey='default'){
+  const lines=Array.isArray(ac.bubbles)&&ac.bubbles.length?ac.bubbles:['先缓一缓。'];
+  if(lines.length===1){lastActionLine[actionKey]=0;return lines[0]}
+  let index=Math.floor(Math.random()*lines.length),guard=0;
+  while(index===lastActionLine[actionKey]&&guard<8){index=Math.floor(Math.random()*lines.length);guard++}
+  lastActionLine[actionKey]=index;
+  return lines[index];
+}
 function updateBars(){
   $('#bar-endure').style.width=pet.endure+'%';$('#val-endure').textContent=pet.endure;
   $('#bar-irritate').style.width=pet.irritate+'%';$('#val-irritate').textContent=pet.irritate;
@@ -1904,7 +1912,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
         state.points=Number(result.points_balance??state.points);
         updateBars();updateUI();
       }
-      showBubble(nextActionBubble(ac));
+      showBubble(nextActionBubble(ac,b.dataset.act));
       showImpact(b.dataset.act,result.points_delta??ac.pts,result.replayed);
       playHumanAction(b.dataset.act,result.event);
       if(window.pet3D&&ac.shake)window.pet3D.shake(ac.shake);
@@ -1918,11 +1926,11 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
     }
     return;
   }
-  showBubble(nextActionBubble(ac));
+  showBubble(nextActionBubble(ac,b.dataset.act));
   showImpact(b.dataset.act,ac.pts);
   playHumanAction(b.dataset.act);
   b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
-  if(pet.endure<=0){toast('补刀：'+nextActionBubble(ac),'rose');return}
+  if(pet.endure<=0){toast('补刀：'+nextActionBubble(ac,b.dataset.act),'rose');return}
   pet.endure=Math.max(0,Math.min(100,pet.endure+ac.dEndure));
   if(ac.dIrritate!=null)pet.irritate=Math.max(0,Math.min(100,pet.irritate+ac.dIrritate));
   if(ac.dFat!=null)pet.fat=Math.max(0,Math.min(100,pet.fat+ac.dFat));
