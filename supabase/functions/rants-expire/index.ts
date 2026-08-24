@@ -9,6 +9,7 @@ Deno.serve(async (request) => {
   try {
     const { data, error } = await serviceClient().rpc("m7_expire_rants");
     if (error || !data?.ok) return json(request, 503, { ok: false, reason: "expiration_unavailable" });
+    if (data.skipped === true) return json(request, 200, { ok: true, skipped: true, reason: "job_already_running", expired_count: 0 });
     return json(request, 200, data);
   } catch { return json(request, 503, { ok: false, reason: "expiration_unavailable" }); }
 });

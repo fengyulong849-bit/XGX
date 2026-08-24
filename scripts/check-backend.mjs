@@ -48,6 +48,11 @@ if (!expirationMigration.includes('delete from public.rants') || !expirationMigr
   fail('到期吐槽迁移未执行物理清理');
 }
 
+const expirationLockMigration = text('supabase/migrations/202608210026_m7_expire_job_lock.sql').toLowerCase();
+for (const requiredMarker of ['pg_try_advisory_xact_lock', 'job_already_running', 'delete from public.rants']) {
+  if (!expirationLockMigration.includes(requiredMarker)) fail(`到期清理并发保护缺少安全标记：${requiredMarker}`);
+}
+
 const moderationMigration = text('supabase/migrations/202608210024_m8_moderation_workflow.sql').toLowerCase();
 for (const requiredMarker of ['create table if not exists public.user_roles', 'create table if not exists public.rant_moderation_actions', 'revoke all on table public.user_roles', 'm8_moderation_queue', 'm8_review_rant']) {
   if (!moderationMigration.includes(requiredMarker)) fail(`审核迁移缺少安全标记：${requiredMarker}`);
