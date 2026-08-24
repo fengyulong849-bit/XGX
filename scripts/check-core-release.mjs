@@ -26,7 +26,8 @@ for (const name of deferredFunctions) {
 }
 const rateLimitedCoreFunctions = [
   'auth-change-password', 'checkin-sign', 'work-preferences-save',
-  'profile-save-appearance', 'pet-action', 'pet-revive', 'rants-create', 'resonance-create',
+  'profile-save-appearance', 'pet-get', 'pet-action', 'pet-revive', 'rants-random', 'rants-create',
+  'rants-mine', 'points-ledger', 'resonance-create',
   'resonance-claim', 'rant-report', 'release-complete', 'release-draft',
   'care-complete',
 ];
