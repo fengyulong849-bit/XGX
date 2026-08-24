@@ -1135,6 +1135,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   </div></div>
 </div>
 
+<script src="scripts/xqx-pet-lines.js"></script>
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -1814,11 +1815,12 @@ fillMq('mq1',sig1);fillMq('mq2',sig2);
 const bubble=$('#bubble');
 
 const pet={endure:62,irritate:45,fat:30,dirty:18,locked:false};
+const PET_LINES=window.XQX_PET_LINES||{};
 const ACTS={
-  poke:{label:'戳一下',bubbles:['嗯？你叫我？','别戳了，工位在晃。','你今天是不是受委屈了？继续，我扛得住。'],dEndure:-4,dIrritate:8,pts:10,shake:0.08,fx:'poke'},
-  slap:{label:'拍一拍',bubbles:['这一巴掌，我替你记下了。','拍得好，烦恼少。','行，今天的锅先拍掉一半。'],dEndure:-20,lock:5000,pts:10,shake:0.2,fx:'squash'},
-  feed:{label:'喂食',bubbles:['先吃口苹果，别气坏自己。','收到，今天也要照顾好自己。','这口甜的，算给辛苦费。'],dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
-  throw:{label:'扔东西',bubbles:['好臭……这是什么会议纪要？','扔准一点，别扔到自己身上。','很好，今天的废话清理完毕。'],dEndure:-20,dDirty:20,pts:10,shake:0.1,fx:'faint'}
+  poke:{label:'戳一下',bubbles:PET_LINES.poke||['嗯？你叫我？'],dEndure:-4,dIrritate:8,pts:10,shake:0.08,fx:'poke'},
+  slap:{label:'拍一拍',bubbles:PET_LINES.slap||['这一巴掌，我替你记下了。'],dEndure:-20,lock:5000,pts:10,shake:0.2,fx:'squash'},
+  feed:{label:'喂食',bubbles:PET_LINES.feed||['先吃口苹果，别气坏自己。'],dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
+  throw:{label:'扔东西',bubbles:PET_LINES.throw||['好臭……这是什么会议纪要？'],dEndure:-20,dDirty:20,pts:10,shake:0.1,fx:'faint'}
 };
 let actCount=0;
 let comboCount=0,comboTimer=null,moodTimer=null;
