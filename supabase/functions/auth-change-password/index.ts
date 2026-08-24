@@ -1,5 +1,6 @@
 import {
   anonClient,
+  consumeRateLimit,
   generateRecoveryCode,
   hashRecoveryCode,
   isValidPassword,
@@ -24,6 +25,8 @@ Deno.serve(async (request) => {
     const admin = serviceClient();
     const { data: identity, error: identityError } = await admin.auth.getUser(token);
     if (identityError || !identity.user) return json(request, 401, { ok: false, reason: "invalid_session" });
+    const rate = await consumeRateLimit(admin, "password_change", identity.user.id, request, 5, 600);
+    if (!rate.allowed) return json(request, 429, { ok: false, reason: "rate_limited", retry_after_seconds: rate.retryAfterSeconds });
 
     const { data: credential, error: credentialError } = await admin
       .from("account_credentials")

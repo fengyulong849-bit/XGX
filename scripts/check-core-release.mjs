@@ -24,6 +24,10 @@ for (const name of coreFunctions) {
 for (const name of deferredFunctions) {
   if (deploySource.includes(`'${name}'`)) fail(`M8 Function 不得进入核心部署：${name}`);
 }
+for (const name of ['auth-change-password', 'checkin-sign', 'work-preferences-save']) {
+  const source = readFileSync(resolve(root, 'supabase/functions', name, 'index.ts'), 'utf8');
+  if (!source.includes('consumeRateLimit')) fail(`核心安全接口未接入服务端限流：${name}`);
+}
 
 const coreMigrations = ['202608170001_m0_extensions_types_and_security.sql', '202608170002_m1_auth_and_profile_schema.sql'];
 for (const name of coreMigrations) {
