@@ -177,6 +177,16 @@ body::before{
 @keyframes impactPop{0%{opacity:0;transform:translate(-50%,20px) scale(.45) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.18) rotate(3deg)}55%{opacity:1;transform:translate(-50%,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-38px) scale(.92) rotate(2deg)}}
 .pet-card.impacting{animation:cardImpact .34s ease-out}
 @keyframes cardImpact{0%,100%{transform:translateY(0)}35%{transform:translateY(-2px) rotate(-.35deg)}70%{transform:translateY(1px) rotate(.35deg)}}
+.action-prop{position:absolute;z-index:8;pointer-events:none;opacity:0;font-size:44px;line-height:1;filter:drop-shadow(0 4px 5px rgba(0,0,0,.4))}
+.action-prop.show{opacity:1}
+.action-prop[data-action="poke"]{left:calc(50% - 142px);top:118px}.action-prop[data-action="poke"].show{animation:propPoke .5s cubic-bezier(.2,1.4,.4,1) forwards}
+.action-prop[data-action="slap"]{left:calc(50% + 50px);top:8px}.action-prop[data-action="slap"].show{animation:propSlap .54s cubic-bezier(.2,1.5,.4,1) forwards}
+.action-prop[data-action="feed"]{left:calc(50% + 72px);top:145px;font-size:34px}.action-prop[data-action="feed"].show{animation:propFeed .7s cubic-bezier(.2,1.2,.4,1) forwards}
+.action-prop[data-action="throw"]{left:calc(50% - 150px);top:174px;font-size:34px}.action-prop[data-action="throw"].show{animation:propThrow .62s cubic-bezier(.2,1.2,.4,1) forwards}
+@keyframes propPoke{0%{opacity:0;transform:translateX(-34px) rotate(-24deg) scale(.8)}18%{opacity:1}62%{opacity:1;transform:translateX(74px) rotate(8deg) scale(1.05)}100%{opacity:0;transform:translateX(90px) rotate(18deg) scale(.92)}}
+@keyframes propSlap{0%{opacity:0;transform:translateY(-50px) rotate(18deg) scale(.8)}18%{opacity:1}58%{opacity:1;transform:translateY(50px) rotate(-10deg) scale(1.08)}100%{opacity:0;transform:translateY(70px) rotate(-20deg) scale(.9)}}
+@keyframes propFeed{0%{opacity:0;transform:translateX(70px) scale(.7) rotate(20deg)}18%{opacity:1}65%{opacity:1;transform:translateX(-22px) scale(1.04) rotate(-10deg)}100%{opacity:0;transform:translateX(-34px) scale(.9) rotate(-18deg)}}
+@keyframes propThrow{0%{opacity:0;transform:translateX(-10px) rotate(0) scale(.7)}15%{opacity:1}68%{opacity:1;transform:translateX(145px) rotate(420deg) scale(1.04)}100%{opacity:0;transform:translateX(172px) rotate(520deg) scale(.85)}}
 
 .nameplate{text-align:center;padding-top:14px;border-top:1px solid var(--rule);margin-top:6px;position:relative;z-index:4}
 .nameplate .nm{font-family:var(--serif);font-weight:600;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -632,6 +642,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="bubble" id="bubble"></div>
           <canvas id="pet-canvas" aria-hidden="true"></canvas>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
+          <div class="action-prop" id="actionProp" aria-hidden="true"></div>
           <div class="human-figure" aria-label="卡通领导人物">
             <svg viewBox="0 0 220 278" role="img" aria-labelledby="human-title">
               <title id="human-title">卡通领导人物</title>
@@ -1846,6 +1857,13 @@ function showImpact(action,points=10,replayed=false){
   impact.classList.remove('show');card?.classList.remove('impacting');void impact.offsetWidth;void card?.offsetWidth;impact.classList.add('show');card?.classList.add('impacting');
   clearTimeout(impactTimer);impactTimer=setTimeout(()=>card?.classList.remove('impacting'),420);
 }
+let propTimer=null;
+function showPhysicalAction(action){
+  const prop=$('#actionProp');if(!prop)return;
+  const icons={poke:'☝️',slap:'✋',feed:'🍎',throw:'🗑️'};
+  prop.dataset.action=action;prop.textContent=icons[action]||'✨';prop.classList.remove('show');void prop.offsetWidth;prop.classList.add('show');
+  clearTimeout(propTimer);propTimer=setTimeout(()=>prop.classList.remove('show'),760);
+}
 function setPetMood(action,combo=0){
   const mood=$('#petMood'),text=$('#petMoodText'),comboEl=$('#petCombo'),comboValue=$('#petComboValue');
   if(!mood||!text)return;
@@ -1912,6 +1930,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   const ac=ACTS[b.dataset.act];
   comboCount=Math.min(9,comboCount+1);
   setPetMood(b.dataset.act,comboCount);
+  showPhysicalAction(b.dataset.act);
   if(state.mode==='auth'){
     const actionSequence=++petActionSequence;
     try{
@@ -2044,17 +2063,20 @@ $('#btn-post').addEventListener('click',()=>{
 });
 
 // ============ 关怀提醒 ============
-const careBusy={water:false,sit:false};
+const careBusy={water:false,sit:false},careRequestIds={water:'',sit:''};
 async function completeCare(type,homeButton=null){
   if(state.mode!=='auth'){toast('登录后可领关怀积分','amber');return false}
   if(careBusy[type])return false;
   careBusy[type]=true;
+  const controller=new AbortController();
+  const timeoutId=setTimeout(()=>controller.abort(),12000);
+  const requestId=careRequestIds[type]||(careRequestIds[type]=crypto.randomUUID());
   const modalButton=$('#reminder-done');
   if(homeButton){homeButton.disabled=true;homeButton.dataset.busy='1'}
   if(modalButton){modalButton.disabled=true;modalButton.textContent='正在记录…'}
   try{
     // 弹窗和首页按钮共用同一条前端提交链路，避免依赖隐藏的首页按钮状态。
-    const result=await XQXAuth.completeCare(type,crypto.randomUUID());
+    const result=await XQXAuth.completeCare(type,requestId,{signal:controller.signal});
     state.points=Number(result.points_balance??state.points);
     wellbeing[type==='water'?'lastWater':'lastSit']=new Date().toISOString();
     persistWellbeing();
@@ -2062,14 +2084,17 @@ async function completeCare(type,homeButton=null){
     if(button){button.classList.add('done');button.textContent='已记录';button.disabled=true;}
     updateUI();
     updateCountdown();
+    careRequestIds[type]='';
     if($('#modal-reminder').classList.contains('show'))closeModal('modal-reminder');
     toast(`${type==='water'?'喝水':'久坐'} +${result.points_delta||0}`,'calm');
     return true;
   }catch(error){
-    toast(XQXAuth.message(error.message),'rose');
+    const reason=error?.name==='AbortError'?'request_timeout':error.message;
+    toast(XQXAuth.message(reason),'rose');
     return false;
   }finally{
     careBusy[type]=false;
+    clearTimeout(timeoutId);
     if(homeButton)delete homeButton.dataset.busy;
     if(modalButton){modalButton.disabled=false;modalButton.textContent='我完成了'}
   }
