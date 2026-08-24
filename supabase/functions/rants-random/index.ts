@@ -7,7 +7,10 @@ Deno.serve(async (request) => {
   if (request.method !== "GET") return json(request, 405, { ok: false, reason: "method_not_allowed" });
   try {
     const url = new URL(request.url);
-    const limit = Math.min(20, Math.max(1, Number(url.searchParams.get("limit") || 10)));
+    const requestedLimit = Number(url.searchParams.get("limit") || 10);
+    const limit = Number.isFinite(requestedLimit)
+      ? Math.min(20, Math.max(1, Math.floor(requestedLimit)))
+      : 10;
     const admin = serviceClient();
     const rate = await consumeRateLimit(admin, "rants_random", "public", request, 60, 60);
     if (!rate.allowed) return json(request, 429, { ok: false, reason: "rate_limited", retry_after_seconds: rate.retryAfterSeconds });
