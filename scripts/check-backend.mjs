@@ -31,6 +31,11 @@ for (const name of requiredFunctions) {
   if (!readFileSync(entry, 'utf8').includes('Deno.serve')) fail(`Function 未注册服务：${name}`);
 }
 
+for (const name of ['moderation-queue', 'moderation-review', 'moderation-history']) {
+  const source = readFileSync(resolve(functionDir, name, 'index.ts'), 'utf8');
+  if (!source.includes('consumeRateLimit')) fail(`审核 Function 未接入服务端限流：${name}`);
+}
+
 const authClient = text('scripts/xqx-auth.js');
 const personalPage = text('P4_个人中心.html');
 if (!authClient.includes('callAuthenticated("account-delete"')) fail('浏览器适配层未调用 account-delete');
