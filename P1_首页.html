@@ -1752,6 +1752,8 @@ async function saveOfftime(){
   wellbeing.sit=next.sit_interval;
   try{localStorage.setItem('xqx_offtime',JSON.stringify(offtime))}catch(e){}
   persistWellbeing();
+  // 修改工作节奏后，从新的设置生效时刻重新计算提醒周期，避免旧计时污染新间隔。
+  restartWellbeingCountdown();
   updateCountdown();
   toast(`下班 ${String(offtime.h).padStart(2,'0')}:${String(offtime.m).padStart(2,'0')} · 提醒已同步`,'calm');
   closeModal('modal-offtime');
