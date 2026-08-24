@@ -16,6 +16,7 @@
   function message(reason) {
     if (reason === "appearance_locked") return "当前领导状态正常，重新捏领导需在其倒地后进行";
     if (reason === "invalid_request") return "请求参数无效，请重试";
+    if (reason === "request_timeout") return "网络响应超时，请检查网络后重试";
     return ({ invalid_input: "请检查填写内容", account_unavailable: "该账号不可用或已存在", invalid_credentials: "账号或密码不正确", invalid_current_password: "当前密码不正确", invalid_recovery: "恢复码无效、已使用或已过期", rate_limited: "尝试过于频繁，请稍后再试", account_delete_failed: "注销暂未完成，请稍后重试", pet_down: "领导已经倒下，请先复活或重新捏一位", pet_locked: "领导正在缓冲中，请稍等几秒", pet_not_down: "领导目前没有倒下", insufficient_points: "积分不足，先去签到或完成其他任务赚积分", invalid_action: "无效的互动动作", invalid_work_preferences: "下班时间或提醒间隔不符合规则", preferences_unavailable: "设置暂未同步，请稍后重试", invalid_content: "吐槽内容需为 1–50 个字符", sensitive_content: "内容可能含有联系方式或身份信息，请修改后再发布", limit_exceeded: "今天的次数已用完", rant_unavailable: "这条吐槽已不可操作", self_resonance: "不能给自己的吐槽共鸣", self_report: "不能举报自己的吐槽", forbidden: "当前账号没有审核权限", nothing_to_claim: "暂时没有可领取的共鸣", service_unavailable: "请求未完成，请稍后重试" })[reason] || "请求未完成，请稍后重试";
   }
   async function call(name, body) {
@@ -27,11 +28,11 @@
     if (!response.ok || !data.ok) { const error = new Error(data.reason || "request_failed"); error.status = response.status; error.data = data; throw error; }
     return data;
   }
-  async function callAuthenticated(name, body) {
+  async function callAuthenticated(name, body, options = {}) {
     const token = await accessToken();
     if (!token) { const error = new Error("invalid_session"); error.status = 401; throw error; }
     if (!ready()) throw new Error("missing_config");
-    const response = await fetch(`${config().supabaseUrl.replace(/\/$/, "")}/functions/v1/${name}`, { method: "POST", headers: { "Content-Type": "application/json", apikey: config().supabaseAnonKey, Authorization: `Bearer ${token}` }, body: JSON.stringify(body) });
+    const response = await fetch(`${config().supabaseUrl.replace(/\/$/, "")}/functions/v1/${name}`, { method: "POST", headers: { "Content-Type": "application/json", apikey: config().supabaseAnonKey, Authorization: `Bearer ${token}` }, body: JSON.stringify(body), signal: options.signal });
     const data = await response.json().catch(() => ({}));
     if (!response.ok || !data.ok) { const error = new Error(data.reason || "request_failed"); error.status = response.status; error.data = data; throw error; }
     return data;
@@ -80,7 +81,7 @@
     async myRants() { return callAuthenticated("rants-mine", {}); },
     async pointsLedger(limit = 50) { return callAuthenticated("points-ledger", { limit }); },
     async claimResonance(rantId, requestId) { return callAuthenticated("resonance-claim", { rant_id: rantId, request_id: requestId }); },
-    async completeCare(careType, requestId) { return callAuthenticated("care-complete", { care_type: careType, request_id: requestId }); },
+    async completeCare(careType, requestId, options = {}) { return callAuthenticated("care-complete", { care_type: careType, request_id: requestId }, options); },
     async completeRelease(rantId, requestId) { return callAuthenticated("release-complete", { rant_id: rantId, request_id: requestId }); },
     async releaseDraft(content, requestId) { return callAuthenticated("release-draft", { content, request_id: requestId }); },
     async profile() {
