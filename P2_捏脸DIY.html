@@ -226,7 +226,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="cfg-head">
       <h3>八维捏脸</h3>
       <p>实时预览人物 · 当前维度高亮</p>
-      <div class="name-editor"><label for="leaderNameInput">给你的领导起个名字</label><div class="name-editor-row"><input id="leaderNameInput" maxlength="12" placeholder="例如：周一综合症" autocomplete="off"><small id="leaderNameCount">0/12</small></div></div>
+      <div class="name-editor"><label for="leaderNameInput">给你的领导起个名字</label><div class="name-editor-row"><input id="leaderNameInput" maxlength="12" placeholder="不输入就叫坏领导" autocomplete="off"><small id="leaderNameCount">0/12</small></div></div>
     </div>
     <div class="dim-list" id="dimList"></div>
   </div>
@@ -838,13 +838,14 @@ const leaderNameInput=document.getElementById('leaderNameInput');
 const leaderNameCount=document.getElementById('leaderNameCount');
 const leaderNamePreview=document.getElementById('leaderNamePreview');
 function updateLeaderName(value){
-  const name=String(value||'').replace(/[<>]/g,'').trim().slice(0,12)||'暴躁打工人';
-  if(leaderNameInput&&leaderNameInput.value!==name)leaderNameInput.value=name;
-  if(leaderNameCount)leaderNameCount.textContent=`${name.length}/12`;
+  const raw=String(value||'').replace(/[<>]/g,'').slice(0,12);
+  const name=raw.trim()||'坏领导';
+  if(leaderNameInput&&leaderNameInput.value!==raw)leaderNameInput.value=raw;
+  if(leaderNameCount)leaderNameCount.textContent=`${raw.length}/12`;
   if(leaderNamePreview)leaderNamePreview.textContent=name;
-  localStorage.setItem('xqx_leader_name',name);
+  localStorage.setItem('xqx_leader_name',raw.trim());
 }
-updateLeaderName(localStorage.getItem('xqx_leader_name')||'暴躁打工人');
+updateLeaderName(localStorage.getItem('xqx_leader_name')||'');
 leaderNameInput?.addEventListener('input',()=>updateLeaderName(leaderNameInput.value));
 
 // 操作栏
