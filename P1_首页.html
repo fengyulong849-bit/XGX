@@ -272,6 +272,29 @@ body::before{
 .rhythm-host>.care-section .care-ico{width:36px;height:36px;font-size:16px}
 .rhythm-host>.care-section .cc-head b{font-size:16px}
 .rhythm-host>.care-section .cc-head span{font-size:12px}
+.rhythm-host>.care-section .shift-summary{padding-bottom:10px}
+
+/* 首页排版第一稿：参考 Recent Design 的“窄内容轨道 + 明确卡片层级”。
+   只改变视觉排版，不改变任何业务节点、数据或接口。 */
+.hero{max-width:1100px;text-align:left;padding:78px 32px 42px}
+.hero .lede{margin-left:0;margin-right:0;max-width:620px}
+.hero-cta{justify-content:flex-start}
+.pet-row{max-width:1100px;grid-template-columns:minmax(0,1.18fr) minmax(360px,.82fr);gap:20px;align-items:start}
+.holo-card{min-height:620px}
+.rhythm-host{height:max-content;min-height:0}
+.rhythm-host>.care-section{height:auto;min-height:0;padding:22px}
+.rhythm-host>.care-section .countdown-panel{padding:14px 0 0}
+.rhythm-host>.care-section .cd-ring-wrap{display:block}
+.rhythm-host>.care-section .cd-ring{width:clamp(190px,18vw,228px);height:clamp(190px,18vw,228px);margin:16px auto 0}
+.rhythm-host>.care-section .cc-head{padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
+.rhythm-host>.care-section .care-card:first-child{padding:0}
+.signal{max-width:1100px;margin:0 auto;padding:22px 32px 12px}
+.signal-head{text-align:left;margin-bottom:16px}
+.signal-head h2{font-size:24px}
+.section{max-width:1100px;padding-top:58px;padding-bottom:58px}
+.wall-head{align-items:flex-end;padding-bottom:4px;border-bottom:1px solid var(--rule);margin-bottom:22px}
+.rant-grid{gap:14px}
+.care-section{max-width:1100px;margin:0 auto}
 .shift-summary{position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;padding:2px 0 14px;border-bottom:1px solid rgba(255,255,255,.08)}
 .shift-summary .shift-top{margin:0}.shift-summary .shift-time{font-size:28px}.shift-summary .shift-caption{font-size:12px}
 .shift-summary .shift-route{height:24px}.shift-summary .shift-foot{font-size:11px}
@@ -612,17 +635,22 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 /* ============ 响应式 ============ */
 @media(max-width:880px){
   .nav-links{display:none}
-  .pet-row{grid-template-columns:1fr}
+  .pet-row{grid-template-columns:1fr;align-items:stretch}
   .principles{grid-template-columns:1fr}
   .rant-grid{grid-template-columns:1fr}
   .release-grid{grid-template-columns:1fr}
   .care-grid{grid-template-columns:1fr}
   .stats{grid-template-columns:1fr}
   .actions{grid-template-columns:repeat(2,1fr)}
-  .hero{padding:56px 24px 40px}
+  .hero{padding:56px 24px 40px;text-align:center}
+  .hero .lede{margin-left:auto;margin-right:auto}
+  .hero-cta{justify-content:center}
   .section{padding:48px 24px}
   .care-section{margin:0 24px;padding:36px 24px;border-radius:24px}
   .cd-ring-wrap{flex-direction:column;align-items:center}
+  .rhythm-host>.care-section .cd-ring{width:210px;height:210px}
+  .signal{padding-left:24px;padding-right:24px}
+  .signal-head{text-align:center}
 }
 
 /* ============ 无障碍 / 降级 ============ */
