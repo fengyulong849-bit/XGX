@@ -263,22 +263,28 @@ body::before{
 .reminder-options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.reminder-options label{display:flex;flex-direction:column;gap:6px;font-size:12px;color:var(--muted)}.reminder-options select{width:100%;background:var(--surface-3);border:1px solid var(--rule-2);color:var(--ink);font:inherit;padding:9px 10px;border-radius:10px;outline:none}
 .reminder-modal-icon{font-size:38px;margin-bottom:10px}.reminder-modal-actions{display:flex;gap:10px}.reminder-modal-actions button{flex:1}
 
-/* ============ 下班倒计时 SVG 圆环 ============ */
+/* ============ 下班节奏：Apple Watch 风格三重环 ============ */
 .countdown-panel{padding:24px}
+/* 三环是主视觉，桌面端给它独立整行，避免说明栏被挤成竖排。 */
+.care-grid>.care-card:first-child{grid-column:1/-1}
+.care-grid>.care-card:first-child .cd-ring-wrap{justify-content:center;gap:clamp(34px,8vw,120px)}
+.care-grid>.care-card:first-child .cd-ring{width:230px;height:230px}
 .cd-ring-wrap{display:flex;align-items:center;gap:28px}
-.cd-ring{position:relative;width:140px;height:140px;flex-shrink:0}
-.cd-ring svg{width:100%;height:100%;transform:rotate(-90deg)}
-.cd-ring .track{fill:none;stroke:rgba(255,255,255,.08);stroke-width:8}
-.cd-ring .liquid{fill:none;stroke:rgba(107,159,212,.15);stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:365;stroke-dashoffset:0;transition:stroke-dashoffset 1s ease}
-.cd-ring .progress{fill:none;stroke:url(#cdGrad);stroke-width:8;stroke-linecap:round;
-  stroke-dasharray:365;stroke-dashoffset:365;filter:drop-shadow(0 0 6px rgba(232,163,61,.4));
-  transition:stroke-dashoffset 1s ease}
+.cd-ring{position:relative;width:190px;height:190px;flex-shrink:0}
+.cd-ring svg{width:100%;height:100%;transform:rotate(-90deg);overflow:visible}
+.cd-ring .track{fill:none;stroke:rgba(255,255,255,.09);stroke-width:9}
+.cd-ring .progress{fill:none;stroke-linecap:round;transition:stroke-dashoffset 1s ease}
+.cd-ring .work-ring{stroke:#F5B14C;filter:drop-shadow(0 0 7px rgba(245,177,76,.5));stroke-width:10}
+.cd-ring .water-ring{stroke:#6FB3A8;filter:drop-shadow(0 0 6px rgba(111,179,168,.45));stroke-width:8}
+.cd-ring .sit-ring{stroke:#D97A6C;filter:drop-shadow(0 0 6px rgba(217,122,108,.42));stroke-width:8}
+.cd-ring .progress.due{animation:ringDue 1.2s ease-in-out infinite}
+@keyframes ringDue{0%,100%{filter:drop-shadow(0 0 5px currentColor);opacity:.8}50%{filter:drop-shadow(0 0 15px currentColor);opacity:1}}
 .cd-ring-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
-.cd-ring-text .time{font-family:var(--mono);font-size:22px;font-weight:500;color:var(--ink);letter-spacing:.04em}
-.cd-ring-text .label{font-size:11px;color:var(--muted);margin-top:2px}
+.cd-ring-text .time{font-family:var(--mono);font-size:24px;font-weight:500;color:var(--ink);letter-spacing:.02em}
+.cd-ring-text .label{font-size:11px;color:var(--muted);margin-top:4px}
+.cd-ring-legend{display:grid;gap:10px;margin-top:16px}.cd-ring-legend-item{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}.cd-ring-legend-item i{width:8px;height:8px;border-radius:50%;flex:0 0 auto}.cd-ring-legend-item b{color:var(--ink);font-weight:600}.cd-ring-legend-item.work i{background:#F5B14C;box-shadow:0 0 8px rgba(245,177,76,.55)}.cd-ring-legend-item.water i{background:#6FB3A8;box-shadow:0 0 8px rgba(111,179,168,.5)}.cd-ring-legend-item.sit i{background:#D97A6C;box-shadow:0 0 8px rgba(217,122,108,.5)}
 
-.cd-info{flex:1;min-width:0}
+.cd-info{flex:0 1 280px;min-width:240px}
 .cd-info .title{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:4px}
 .cd-info .sub{font-size:13px;color:var(--muted);margin-bottom:14px}
 .cd-ticks{display:flex;gap:6px;margin-bottom:14px}
@@ -789,26 +795,28 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
             <div class="countdown-panel">
               <div class="cd-ring-wrap">
                 <div class="cd-ring">
-                  <svg viewBox="0 0 140 140">
-                    <defs>
-                      <linearGradient id="cdGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                        <stop offset="0%" stop-color="#E8A33D"></stop>
-                        <stop offset="100%" stop-color="#D97A6C"></stop>
-                      </linearGradient>
-                    </defs>
-                    <circle class="track" cx="70" cy="70" r="58"></circle>
-                    <circle class="liquid" id="cdLiquid" cx="70" cy="70" r="58"></circle>
-                    <circle class="progress" id="cdProgress" cx="70" cy="70" r="58"></circle>
+                  <svg viewBox="0 0 190 190" aria-label="下班、喝水和久坐节奏">
+                    <circle class="track" cx="95" cy="95" r="78"></circle>
+                    <circle class="progress work-ring" id="cdProgress" cx="95" cy="95" r="78" pathLength="100" stroke-dasharray="100" stroke-dashoffset="100"></circle>
+                    <circle class="track" cx="95" cy="95" r="60"></circle>
+                    <circle class="progress water-ring" id="cdWaterProgress" cx="95" cy="95" r="60" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"></circle>
+                    <circle class="track" cx="95" cy="95" r="42"></circle>
+                    <circle class="progress sit-ring" id="cdSitProgress" cx="95" cy="95" r="42" pathLength="100" stroke-dasharray="100" stroke-dashoffset="0"></circle>
                   </svg>
                   <div class="cd-ring-text">
                     <div class="time" id="cdRingTime">02:14:30</div>
                     <div class="label">下班倒计时</div>
                   </div>
                 </div>
-                <div class="cd-info">
-                  <div class="title" id="cdInfoTitle">还差一点</div>
-                  <div class="sub" id="cdInfoSub">一天进度 62%</div>
-                  <div class="cd-ticks" id="cdTicks">
+                 <div class="cd-info">
+                   <div class="title" id="cdInfoTitle">还差一点</div>
+                   <div class="sub" id="cdInfoSub">一天进度 62%</div>
+                   <div class="cd-ring-legend">
+                     <div class="cd-ring-legend-item work"><i></i><span>下班 <b id="cdWorkLegend">17:30</b></span></div>
+                     <div class="cd-ring-legend-item water"><i></i><span>喝水 <b id="cdWaterLegend">按设置提醒</b></span></div>
+                     <div class="cd-ring-legend-item sit"><i></i><span>久坐 <b id="cdSitLegend">按设置提醒</b></span></div>
+                   </div>
+                   <div class="cd-ticks" id="cdTicks">
                     <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
                   </div>
                   <div class="sympathy" id="cdSympathy" style="display:none">
@@ -1715,7 +1723,6 @@ let wellbeing={water:60,sit:45,lastWater:'',lastSit:''};
 try{const saved=JSON.parse(localStorage.getItem('xqx_offtime')||'null');if(saved&&saved.h!=null&&saved.m!=null)offtime=saved;}catch(e){}
 try{const saved=JSON.parse(localStorage.getItem('xqx_wellbeing')||'null');if(saved)wellbeing={...wellbeing,...saved};}catch(e){}
 const OFF_HOUR=()=>offtime.h,OFF_MIN=()=>offtime.m;
-const CIRC=2*Math.PI*58;
 function workBounds(now=new Date()){const off=new Date(now);off.setHours(OFF_HOUR(),OFF_MIN(),0,0);const start=new Date(off.getTime()-9*3600000);return {start,off}}
 function dayKey(now=new Date()){return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`}
 function persistWellbeing(){try{localStorage.setItem('xqx_wellbeing',JSON.stringify(wellbeing))}catch(e){}}
@@ -1732,7 +1739,7 @@ function updateCountdown(){
   const {start,off}=workBounds(now);
   const cd=$('#countdown'),txt=$('#cd-text');
   const titleEl=$('#care-cd-title'),subEl=$('#care-cd-sub');
-  const ringTime=$('#cdRingTime'),progEl=$('#cdProgress'),liqEl=$('#cdLiquid');
+  const ringTime=$('#cdRingTime'),progEl=$('#cdProgress');
   const cdTitle=$('#cdInfoTitle'),cdSub=$('#cdInfoSub'),cdTicks=$('#cdTicks');
   const symEl=$('#cdSympathy');
   if(now<off){
@@ -1746,8 +1753,8 @@ function updateCountdown(){
     titleEl.textContent=`下班还有 ${str}`;
     subEl.textContent=`一天进度 ${pct}%`;
     ringTime.textContent=str;
-    progEl.style.strokeDashoffset=CIRC*(1-pct/100);
-    liqEl.style.strokeDashoffset=CIRC*(1-pct/100)*0.6;
+    progEl.style.strokeDashoffset=100-pct;
+    $('#cdWorkLegend').textContent=`${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}`;
     cdTitle.textContent=pct<50?'还差一点':pct<80?'快了快了':'冲鸭！就快到了';
     cdSub.textContent=`一天进度 ${pct}%`;
     const onTicks=Math.round(pct/100*7);
@@ -1760,7 +1767,7 @@ function updateCountdown(){
     subEl.textContent='一天进度 100%';
     ringTime.textContent='00:00:00';
     progEl.style.strokeDashoffset=0;
-    liqEl.style.strokeDashoffset=0;
+    $('#cdWorkLegend').textContent='今天收工';
     cdTitle.textContent='下班啦！';
     cdSub.textContent='一天进度 100%';
     [...cdTicks.children].forEach(t=>t.className='on');
@@ -1826,7 +1833,11 @@ function updateCareReminders(now,start,off){
   const active=state.mode==='auth'&&state.signedToday&&now>=start&&now<off;
   [['water','lastWater','care-water-status','care-water-bar','💧','该喝水啦','起身接杯水，给自己一分钟喘口气。'],['sit','lastSit','care-sit-status','care-sit-bar','🪑','起来动一动','站起来活动一下，让肩颈和眼睛休息片刻。']].forEach(([type,lastKey,statusId,barId,icon,title,copy])=>{
     const interval=Number(wellbeing[type])*60000,savedLast=wellbeing[lastKey]?new Date(wellbeing[lastKey]):null,last=savedLast&&dayKey(savedLast)===dayKey(now)?savedLast:start,elapsed=Math.max(0,now-last),remaining=Math.max(0,interval-elapsed),due=active&&elapsed>=interval;
-    const status=$('#'+statusId),bar=$('#'+barId);if(status)status.textContent=active?(due?'现在该完成啦':`${Math.ceil(remaining/60000)} 分钟后提醒`):'签到后按工作节奏提醒';if(bar)bar.style.width=`${Math.min(100,elapsed/interval*100)}%`;
+    const progressPct=state.mode==='auth'&&state.signedToday?(now>=off?100:(active?Math.min(100,elapsed/interval*100):0)):0;
+    const ring=document.getElementById(type==='water'?'cdWaterProgress':'cdSitProgress'),legend=document.getElementById(type==='water'?'cdWaterLegend':'cdSitLegend');
+    if(ring){ring.style.strokeDashoffset=100-progressPct;ring.classList.toggle('due',due)}
+    if(legend)legend.textContent=state.mode!=='auth'||!state.signedToday?'签到后开始':now>=off?'今天收工':due?'现在':`${Math.ceil(remaining/60000)} 分钟后`;
+    const status=$('#'+statusId),bar=$('#'+barId);if(status)status.textContent=active?(due?'现在该完成啦':`${Math.ceil(remaining/60000)} 分钟后提醒`):now>=off?'今天收工':'签到后按工作节奏提醒';if(bar)bar.style.width=`${progressPct}%`;
     const button=document.querySelector(`.btn-care[data-care="${type}"]`);if(button&&due){button.classList.remove('done');button.disabled=false;button.textContent=type==='water'?'喝好啦':'活动好啦';}
     const slot=Math.floor(elapsed/interval),shownKey=`xqx_reminder_${type}_${dayKey(now)}_${slot}`;
     if(due&&!sessionStorage.getItem(shownKey)&&!$('#modal-reminder').classList.contains('show')){sessionStorage.setItem(shownKey,'1');showWellbeingReminder(type,icon,title,copy);}
@@ -1848,7 +1859,7 @@ const PET_LINES=window.XQX_PET_LINES||{};
 const ACTS={
   poke:{label:'戳一下',bubbles:PET_LINES.poke||['嗯？你叫我？'],dEndure:-4,dIrritate:8,pts:10,shake:0.08,fx:'poke'},
   slap:{label:'拍一拍',bubbles:PET_LINES.slap||['这一巴掌，我替你记下了。'],dEndure:-20,lock:5000,pts:10,shake:0.2,fx:'squash'},
-  feed:{label:'喂屎',bubbles:PET_LINES.feed||['这口屎，给你补补。'],dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
+   feed:{label:'喂屎',bubbles:PET_LINES.feed||['这口屎，给你补补。'],dEndure:-20,dFat:20,pts:10,shake:0.05,fx:'burst'},
   throw:{label:'扔东西',bubbles:PET_LINES.throw||['好臭……这是什么会议纪要？'],dEndure:-20,dDirty:20,pts:10,shake:0.1,fx:'faint'}
 };
 let actCount=0;
@@ -1858,7 +1869,12 @@ let impactTimer=null;
 function showImpact(action,points=10,replayed=false,pending=false){
   const impact=$('#actionImpact'),word=$('#impactWord'),pointsEl=$('#impactPoints'),copy=$('#impactCopy'),card=$('#petCard');
   if(!impact||!word||!pointsEl||!copy)return;
-  const data={poke:['戳！','这一戳，先把烦躁推出去'],slap:['啪！','这一掌，替你拍掉一点烦心事'],feed:['喂屎！','这口恶心，专治今天的不爽'],throw:['走你！','这句废话，今天就到此为止']}[action]||['释放！','把情绪留在这里'];
+  const data={
+    poke:['戳！','这一戳，先把烦躁推出去'],
+    slap:['啪！','这一掌，替你拍掉一点烦心事'],
+     feed:['喂屎！','这口恶心，专治今天的不爽'],
+    throw:['走你！','这句废话，今天就到此为止']
+  }[action]||['释放！','把情绪留在这里'];
   impact.dataset.action=action;word.textContent=data[0];pointsEl.textContent=pending?'积分同步中…':(replayed?'动作已同步':`+${Math.max(0,Number(points)||0)} 情绪释放`);copy.textContent=data[1];
   if(card)card.dataset.action=action;
   impact.classList.remove('show');card?.classList.remove('impacting');void impact.offsetWidth;void card?.offsetWidth;impact.classList.add('show');card?.classList.add('impacting');
@@ -1875,7 +1891,7 @@ function showPhysicalAction(action){
   const art={
     poke:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 47c-6-7-5-15 2-19l12-6V8c0-5 8-5 8 0v14l5-3V7c0-5 8-5 8 0v15l5-4c4-3 8 2 5 6l-7 10c-4 7-10 12-18 13-6 1-11-1-20-10Z" fill="#F2B184" stroke="#4B2930" stroke-width="3" stroke-linejoin="round"/><path d="M32 22V12" stroke="#FFF1D8" stroke-width="3" stroke-linecap="round"/><circle cx="52" cy="36" r="3" fill="#F5B14C"/></svg>',
     slap:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M18 54c-7-9-7-17-2-25l7-10V7c0-5 8-5 8 0v13l3-17c1-5 8-4 8 1v17l4-15c1-5 8-3 7 2l-3 17 5-10c2-5 9-2 7 3l-6 18c-3 10-11 16-21 16-8 0-13-2-17-8Z" fill="#F2B184" stroke="#4B2930" stroke-width="3" stroke-linejoin="round"/><path d="M8 13 2 7M53 9l7-6M8 29H1" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>',
-    feed:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 52c-7-2-8-11-1-15-4-9 2-17 10-17-1-8 5-14 12-12 8 2 10 10 7 16 8 0 13 5 12 12-1 8-8 12-17 12H25c-3 0-6-1-9-2Z" fill="#7C5B36" stroke="#30251F" stroke-width="3" stroke-linejoin="round"/><path d="M23 23c2-4 6-6 10-5M42 17c2 1 3 3 3 5" fill="none" stroke="#B98A5A" stroke-width="3" stroke-linecap="round"/><path d="M12 12c3-3 6 0 4 3M51 7c3-2 5 1 3 4M56 27c3-1 4 2 2 4" fill="none" stroke="#91A66F" stroke-width="3" stroke-linecap="round"/></svg>',
+     feed:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M16 52c-7-2-8-11-1-15-4-9 2-17 10-17-1-8 5-14 12-12 8 2 10 10 7 16 8 0 13 5 12 12-1 8-8 12-17 12H25c-3 0-6-1-9-2Z" fill="#7C5B36" stroke="#30251F" stroke-width="3" stroke-linejoin="round"/><path d="M23 23c2-4 6-6 10-5M42 17c2 1 3 3 3 5" fill="none" stroke="#B98A5A" stroke-width="3" stroke-linecap="round"/><path d="M12 12c3-3 6 0 4 3M51 7c3-2 5 1 3 4M56 27c3-1 4 2 2 4" fill="none" stroke="#91A66F" stroke-width="3" stroke-linecap="round"/></svg>',
     throw:'<svg viewBox="0 0 64 64" aria-hidden="true"><path d="M17 18h30l-4 35H21l-4-35Z" fill="#9AA8BC" stroke="#293449" stroke-width="3" stroke-linejoin="round"/><path d="M13 15h38M24 10h16" stroke="#293449" stroke-width="3" stroke-linecap="round"/><path d="m25 25 14 19m0-19L25 44" stroke="#F0A398" stroke-width="3" stroke-linecap="round"/><path d="M7 8h-5m9 0-3-4M57 15l5-3" stroke="#F5B14C" stroke-width="3" stroke-linecap="round"/></svg>'
   };
   prop.dataset.action=action;prop.innerHTML=art[action]||'';prop.classList.remove('show');void prop.offsetWidth;prop.classList.add('show');
@@ -2232,7 +2248,7 @@ async function doLogin(){
   const pwd = document.getElementById('login-password').value;
   if(!acc||!pwd){setAuthError('auth-login-error','请填写账号和密码');return}
   if(!window.XQXAuth?.configured()){setAuthError('auth-login-error','系统尚未配置云端连接，请稍后再试');return}
-  let profile,hasModerationAccess=false;
+  let profile;
   try{
     const result=await XQXAuth.login(acc,pwd);
     state.points=result.profile.points_balance;
@@ -2240,15 +2256,9 @@ async function doLogin(){
     state.signedToday=Boolean(profile?.signed_today);
     state.streak=Number(profile?.streak||state.streak);
     state.hasAppearance=Boolean(profile?.appearance);
-    // 仅以后端角色校验结果决定是否进入受限审核后台，前端不保存审核账号名单。
-    try{await XQXAuth.moderationQueue(1);hasModerationAccess=true;}catch(accessError){if(accessError.message!=='forbidden')console.warn('审核权限探测暂不可用，已按普通账号进入首页');}
     toast('登录成功','calm');
   }catch(error){setAuthError('auth-login-error',XQXAuth.message(error.message));return}
   closeModal('modal-auth');
-  if(hasModerationAccess){
-    window.location.replace('P7_审核后台.html');
-    return;
-  }
   // 切换到真实登录态；不再保留开发用的试用/登录切换器。
   setState('auth');
   if(profile&&window.xqxApplyCloudProfile)window.xqxApplyCloudProfile(profile);
