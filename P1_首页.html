@@ -132,12 +132,12 @@ body::before{
 .rarity .stars{color:var(--amber);font-size:14px;letter-spacing:1px;font-weight:600}
 .rarity .id{font-family:var(--mono);font-size:12px;color:var(--tertiary)}
 
-.figure-stage{position:relative;height:290px;z-index:4;overflow:hidden}
+.figure-stage{position:relative;height:330px;z-index:4;overflow:hidden}
 .figure-glow{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,61,.18),transparent 70%);filter:blur(10px);pointer-events:none}
 .figure-shadow{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:150px;height:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent 70%);pointer-events:none}
 #pet-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;opacity:0;pointer-events:none}
 #pet-canvas:active{cursor:default}
-.human-figure{position:absolute;z-index:1;left:50%;bottom:8px;width:220px;height:278px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
+.human-figure{position:absolute;z-index:1;left:50%;bottom:0;width:260px;height:328px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
 .human-figure svg{width:100%;height:100%;overflow:visible}
 .human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}.human-figure .face-shape{transform-box:fill-box;transform-origin:50% 50%;transition:transform .25s ease}.human-figure[data-face="1"] .face-shape{transform:scaleX(1.08) scaleY(1.02)}.human-figure[data-face="2"] .face-shape{transform:scaleX(.9) scaleY(1.14)}.human-figure .hair-variant{display:none}.human-figure[data-hair="0"] .hair-0,.human-figure[data-hair="1"] .hair-1,.human-figure[data-hair="2"] .hair-2,.human-figure[data-hair="3"] .hair-3{display:block}
 .human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
@@ -639,11 +639,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="holo-card pet-card" id="petCard">
       <div class="holo-inner" id="holoInner">
         <div class="glare"></div>
-        <div class="rarity">
-          <span class="stars" id="petStars">★★★ 试玩版 / 领导系列 #001</span>
-          <span class="id" id="petId"></span>
-        </div>
-        <div class="figure-stage" id="figureStage">
+         <div class="figure-stage" id="figureStage">
           <div class="figure-glow"></div>
           <div class="figure-shadow"></div>
           <div class="bubble" id="bubble"></div>
@@ -702,7 +698,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           </div>
         </div>
         <div class="nameplate">
-      <div class="nm" id="petName">坏领导 · 领导</div>
+      <div class="nm" id="petName">坏领导</div>
           <div class="pet-mood" id="petMood" data-tone="calm"><span class="mood-dot"></span><b>今日状态</b><span id="petMoodText">还能扛住</span></div>
           <div class="sub" id="petSub">"再改一版，今晚就给"</div>
         </div>
@@ -2161,16 +2157,12 @@ function updateUI(){
   if(state.mode==='auth'){
     $('#nav-cta').style.display='none';
     $('#nav-avatar').style.display='flex';
-    $('#petStars').textContent='★★★ 我的领导';
-    $('#petId').textContent='领导系列 #001';
     const preview=$('.cb-pts-preview');if(preview)preview.style.display='none';
     if(!state.signedToday)renderCheckinPanel();
     renderWall();
   }else{
     $('#nav-cta').style.display='block';
     $('#nav-avatar').style.display='none';
-    $('#petStars').textContent='★★★ 试玩版 / 领导系列 #001';
-    $('#petId').textContent='';
     const preview=$('.cb-pts-preview');if(preview)preview.style.display='block';
     renderCheckinPanel();
     renderWall();
@@ -2475,7 +2467,7 @@ window.addEventListener('DOMContentLoaded',async()=>{
   }
   const leaderName=localStorage.getItem('xqx_leader_name');
   const name=String(leaderName||'').replace(/[<>]/g,'').trim().slice(0,12)||'坏领导';
-  document.getElementById('petName').textContent=`${name} · 领导`;
+  document.getElementById('petName').textContent=name;
   if(window.xqxApplyCloudProfile){
     window.xqxApplyCloudProfile(profile);
     // 自动恢复已有会话时，按用户当前设置重新开始本次浏览器会话的提醒计时。
