@@ -256,6 +256,25 @@ body::before{
 
 /* 已签到后的下班节奏面板：把领取位置转化为当日工作进度。 */
 .shift-panel{display:flex;flex-direction:column;gap:14px}
+.rhythm-host{grid-column:2;align-self:stretch;padding:0;overflow:hidden}
+.rhythm-host>.care-section{height:100%;border:0;border-radius:20px;padding:24px;background:linear-gradient(160deg,#172335 0%,#202A3C 55%,#263247 100%)}
+.rhythm-host>.care-section::before,.rhythm-host>.care-section::after{opacity:.28}
+.rhythm-host>.care-section>.care-grid{display:block}
+.rhythm-host>.care-section .care-head{display:none}
+.rhythm-host>.care-section .care-card:first-child{display:block;border:0;background:transparent;box-shadow:none;padding:0;transform:none}
+.rhythm-host>.care-section .care-card:first-child::before{display:none}
+.rhythm-host>.care-section .care-card:not(:first-child){display:none}
+.rhythm-host>.care-section .countdown-panel{padding:16px 0 0}
+.rhythm-host>.care-section .cd-ring-wrap{gap:18px;align-items:center;justify-content:center}
+.rhythm-host>.care-section .cd-ring{width:190px;height:190px}
+.rhythm-host>.care-section .cd-info{display:none}
+.rhythm-host>.care-section .cc-head{margin-bottom:2px}
+.rhythm-host>.care-section .care-ico{width:36px;height:36px;font-size:16px}
+.rhythm-host>.care-section .cc-head b{font-size:16px}
+.rhythm-host>.care-section .cc-head span{font-size:12px}
+.shift-summary{position:relative;z-index:2;display:flex;flex-direction:column;gap:12px;padding:2px 0 14px;border-bottom:1px solid rgba(255,255,255,.08)}
+.shift-summary .shift-top{margin:0}.shift-summary .shift-time{font-size:28px}.shift-summary .shift-caption{font-size:12px}
+.shift-summary .shift-route{height:24px}.shift-summary .shift-foot{font-size:11px}
 .shift-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.shift-top b{font-family:var(--serif);font-size:17px}.shift-done{background:rgba(111,179,168,.14);border:1px solid rgba(111,179,168,.35);color:var(--calm);font-size:12px;padding:5px 10px;border-radius:999px;white-space:nowrap}
 .shift-time{font-family:var(--mono);font-size:28px;font-weight:700;color:var(--amber);line-height:1}.shift-caption{font-size:12px;color:var(--muted);margin-top:4px}
 .shift-route{position:relative;height:32px;display:flex;align-items:center;justify-content:space-between;padding:0 3px}.shift-route::before{content:'';position:absolute;left:4px;right:4px;height:5px;border-radius:999px;background:rgba(255,255,255,.1)}.shift-route i{position:relative;z-index:1;width:11px;height:11px;border-radius:50%;background:var(--surface-3);border:2px solid var(--muted)}.shift-route i.on{background:var(--amber);border-color:var(--amber);box-shadow:0 0 12px rgba(232,163,61,.55)}.shift-marker{position:absolute;z-index:2;top:5px;width:22px;height:22px;border-radius:50%;background:var(--grad);box-shadow:0 0 18px rgba(232,163,61,.55);transform:translateX(-50%);transition:left .6s var(--ease)}
@@ -1781,6 +1800,16 @@ function updateCountdown(){
 function fmtDur(ms){const h=Math.floor(ms/3600000),m=Math.floor(ms%3600000/60000);return (h>0?h+'时':'')+m+'分'}
 setInterval(updateCountdown,1000);updateCountdown();
 
+// 将完整的下班节奏卡移动到原签到卡位置，避免首页重复出现两套进度模块。
+(function relocateRhythmPanel(){
+  const host=$('#checkinBar'), source=$('#care .care-section');
+  if(!host||!source)return;
+  host.innerHTML='';host.classList.add('rhythm-host');
+  const summary=document.createElement('div');summary.id='shiftSummary';summary.className='shift-summary';
+  summary.innerHTML='<div class="shift-top"><b>今日下班节奏</b><span class="shift-done">先签到</span></div><div class="shift-caption">签到后显示真实下班进度和提醒节奏</div>';
+  host.append(summary,source);$('#care')?.remove();
+})();
+
 // ============ 下班时间设置弹窗 ============
 (function initOfftime(){
   const hSel=document.getElementById('off-hour'),mSel=document.getElementById('off-min'),waterSel=document.getElementById('water-interval'),sitSel=document.getElementById('sit-interval');
@@ -1821,12 +1850,16 @@ async function saveOfftime(){
 }
 
 function renderShiftPanel(now,start,off){
-  const panel=$('#checkinBar');if(!panel||!state.signedToday||state.mode!=='auth')return;
+  const panel=$('#checkinBar'),summary=$('#shiftSummary');if(!panel||!summary)return;
+  if(!state.signedToday||state.mode!=='auth'){
+    summary.innerHTML='<div class="shift-top"><b>今日下班节奏</b><span class="shift-done">先签到</span></div><div class="shift-caption">登录并签到后显示真实下班进度和提醒节奏</div><button class="cb-btn" id="cb-btn">登录后可签到</button>';
+    return;
+  }
   const diff=off-now,pct=Math.max(0,Math.min(100,Math.round((now-start)/(off-start)*100))),after=diff<=0;
   const signature=`${dayKey(now)}:${pct}:${after}`;
-  if(panel.dataset.shiftSignature===signature)return;panel.dataset.shiftSignature=signature;
+  if(summary.dataset.shiftSignature===signature)return;summary.dataset.shiftSignature=signature;
   const dots=Array.from({length:7},(_,i)=>`<i class="${i<=Math.round(pct/100*6)?'on':''}"></i>`).join('');
-  panel.innerHTML=`<div class="shift-panel"><div class="shift-top"><b>${after?'今日已下班':'今日签到已完成'}</b><span class="shift-done">✓ 已签到</span></div><div><div class="shift-time">${after?'下班啦':formatClock(diff)}</div><div class="shift-caption">${after?'辛苦了，今天可以慢一点。':`距离下班 · 工作进度 ${pct}%`}</div></div><div class="shift-route"><span class="shift-marker" style="left:${pct}%"></span>${dots}</div><div class="shift-foot"><span>上班 ${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}</span><b>${after?'今天收工':'正在驶向下班'}</b><span>下班 ${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}</span></div></div>`;
+  summary.innerHTML=`<div class="shift-top"><b>${after?'今日已下班':'今日签到已完成'}</b><span class="shift-done">✓ 已签到</span></div><div><div class="shift-time">${after?'下班啦':formatClock(diff)}</div><div class="shift-caption">${after?'辛苦了，今天可以慢一点。':`距离下班 · 工作进度 ${pct}%`}</div></div><div class="shift-route"><span class="shift-marker" style="left:${pct}%"></span>${dots}</div><div class="shift-foot"><span>上班 ${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}</span><b>${after?'今天收工':'正在驶向下班'}</b><span>下班 ${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}</span></div></div>`;
 }
 
 function updateCareReminders(now,start,off){
@@ -2033,7 +2066,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
 
 // ============ 签到 ============
 function renderCheckinPanel(){
-  const panel=$('#checkinBar');if(!panel||state.signedToday&&state.mode==='auth')return;
+  const panel=$('#checkinBar');if(!panel||panel.classList.contains('rhythm-host')||state.signedToday&&state.mode==='auth')return;
   panel.dataset.shiftSignature='';
   panel.innerHTML=`<div class="cb-head"><div class="cb-ico">📅</div><div><b>每日签到</b><span id="cb-sub">连续 ${state.streak} 天 · 下个里程碑</span></div></div><div class="cb-streak" id="cb-streak"></div><div class="cb-pts" id="cb-pts">基础 +100 · 签到后解锁下班节奏</div><div class="cb-balance">当前积分 <b id="cb-balance">${state.mode==='auth'?Number(state.points||0).toLocaleString('zh-CN'):'--'}</b></div><button class="cb-btn" id="cb-btn" ${state.mode==='auth'?'':'disabled'}>${state.mode==='auth'?'签到领惊喜':'登录后可签到'}</button><div class="cb-pts-preview" style="display:${state.mode==='auth'?'none':'block'}">登录后可签到领积分</div>`;
   updateStreak();
