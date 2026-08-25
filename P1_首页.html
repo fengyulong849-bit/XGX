@@ -2089,6 +2089,8 @@ $('#checkinBar').addEventListener('click',async(event)=>{
 });
 function updateStreak(){
   const streak=$('#cb-streak');
+  // 签到卡已并入下班节奏卡，已签到状态不再渲染旧的 streak DOM。
+  if(!streak)return;
   streak.innerHTML='';
   const weekPos=((state.streak-1)%7)+1; // 1–7，第7天落在里程碑格
   for(let i=0;i<7;i++){const d=document.createElement('i');d.className=i<weekPos?'on':'';if(i===6&&state.streak>=7)d.classList.add('milestone');streak.appendChild(d)}
@@ -2222,7 +2224,8 @@ updateUI();
 updateStreak();
 
 // ============ 弹窗 管理 ============
-let lastModalTrigger=null;
+// 用 var 避免页面初始化阶段用户快速点击时触发 TDZ。
+var lastModalTrigger=null;
 function openModal(id){
   const m = document.getElementById(id);
   if(!m) return;
@@ -2489,7 +2492,13 @@ Object.assign(window,{openModal,closeModal,closeModalOnMask,switchAuthTab,genAcc
 window.addEventListener('DOMContentLoaded',async()=>{
   const visualConfig=window.XQX_AUTH_VISUAL||{},visual=document.getElementById('auth-visual');
   if(visual&&visualConfig.asset){visual.style.setProperty('--auth-asset',`url("${String(visualConfig.asset).replace(/"/g,'%22')}")`);visual.classList.add('has-asset');visual.setAttribute('aria-label',visualConfig.alt||'登录视觉');}
-  const profile=await window.XQXAuth?.profile();
+  let profile=null;
+  try{profile=await window.XQXAuth?.profile();}
+  catch(error){
+    if(error?.message==='invalid_session')window.XQXAuth?.clear?.();
+    console.warn('profile bootstrap skipped:',error?.message||error);
+    return;
+  }
   if(!profile)return;
   if(profile.appearance){
     const figure=document.querySelector('.human-figure');
