@@ -69,7 +69,8 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 #three-canvas:active{cursor:default}
 .human-figure{position:absolute;z-index:2;left:50%;bottom:32px;width:250px;height:316px;transform:translateX(-50%);filter:drop-shadow(0 16px 14px rgba(0,0,0,.3));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%;pointer-events:none}
 .human-figure svg{width:100%;height:100%;overflow:visible}
-.human-figure .skin{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
+.human-figure .skin{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}.human-figure .face-shape{transform-box:fill-box;transform-origin:50% 50%;transition:transform .25s var(--ease)}.human-figure[data-face="1"] .face-shape{transform:scaleX(1.08) scaleY(1.02)}.human-figure[data-face="2"] .face-shape{transform:scaleX(.9) scaleY(1.14)}
+.human-figure .hair-variant{display:none}.human-figure[data-hair="0"] .hair-0,.human-figure[data-hair="1"] .hair-1,.human-figure[data-hair="2"] .hair-2,.human-figure[data-hair="3"] .hair-3{display:block}
 .human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
 .human-figure[data-expr="2"] .expr-surprise,.human-figure[data-expr="3"] .expr-angry{display:block}.human-figure[data-expr="2"] .expr-default,.human-figure[data-expr="3"] .expr-default{display:none}
 .human-figure .body-group{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .body-group{transform:scaleX(1.08)}.human-figure[data-belly="2"] .body-group{transform:scaleX(1.18)}
@@ -88,6 +89,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--ink);overflow:hidd
 .cfg-head{margin-bottom:16px}
 .cfg-head h3{font-family:var(--serif);font-size:20px;font-weight:600}
 .cfg-head p{font-size:12px;color:var(--muted);margin-top:2px}
+.name-editor{margin-top:14px;padding:12px 13px;background:rgba(232,163,61,.07);border:1px solid rgba(232,163,61,.18);border-radius:12px}.name-editor label{display:block;font-size:12px;color:var(--muted);margin-bottom:7px}.name-editor-row{display:flex;align-items:center;gap:8px}.name-editor input{min-width:0;flex:1;background:var(--bg-2);border:1px solid var(--rule-2);border-radius:8px;color:var(--ink);font:inherit;font-size:13px;padding:8px 10px;outline:none}.name-editor input:focus{border-color:var(--amber);box-shadow:0 0 0 3px rgba(232,163,61,.12)}.name-editor small{font-family:var(--mono);font-size:10px;color:var(--tertiary);white-space:nowrap}
 
 .dim-list{display:flex;flex-direction:column;gap:8px}
 .dim{background:var(--surface);border:1px solid var(--rule);border-left:3px solid transparent;border-radius:12px;overflow:hidden;transition:all .2s var(--ease)}
@@ -188,15 +190,18 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="studio">
     <div class="studio-hint">实时预览你的领导 · 选择下方选项调整</div>
     <canvas id="three-canvas"></canvas>
-    <div class="human-figure" id="humanFigure" data-glasses="1" data-expr="0" data-beard="0" data-belly="0" aria-label="领导人物预览">
+    <div class="human-figure" id="humanFigure" data-face="0" data-hair="0" data-glasses="1" data-expr="0" data-beard="0" data-belly="0" aria-label="领导人物预览">
       <svg viewBox="0 0 220 278" role="img" aria-label="卡通领导人物">
         <g class="body-group"><path class="suit outline" d="M42 270c2-48 12-72 40-83h56c28 11 38 35 40 83z"/>
         <path class="suit-dark outline" d="M82 188l28 27 28-27 13 82H69z"/><path class="shirt outline" d="M88 184l22 25 22-25 9 20-31 30-31-30z"/>
         <path class="tie outline" d="M104 205h12l5 29-11 12-11-12z"/><circle class="tie" cx="110" cy="204" r="7"/>
         <path class="suit-dark outline" d="M42 270l9-59 25 7-5 52zM178 270l-9-59-25 7 5 52z"/>
         <path class="skin outline" d="M88 170v28c0 12 44 12 44 0v-28z"/><ellipse class="skin outline" cx="67" cy="119" rx="13" ry="20"/><ellipse class="skin outline" cx="153" cy="119" rx="13" ry="20"/>
-        <path class="skin outline" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
-        <path class="hair outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/><path class="hair-hi" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+         <path class="skin outline face-shape" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
+         <path class="hair hair-variant hair-0 outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/><path class="hair-hi hair-variant hair-0" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+         <g class="hair-variant hair-1"><path class="hair outline" d="M68 91c-7-34 10-68 42-72 31-3 52 21 44 70l-13-24-13 15-17-18-15 18-13-13z"/><path class="hair-hi" d="M109 25v58"/></g>
+         <path class="hair hair-variant hair-2 outline" d="M72 79c0-27 16-51 38-54 24-3 39 18 39 53l-14-11-13 10-13-9-14 10-10-10z"/>
+         <g class="hair-variant hair-3"><path class="hair outline" d="M68 92c-6-24-2-47 15-60l9 18-9 44zM152 92c6-24 2-47-15-60l-9 18 9 44z"/><path class="hair-hi" d="M77 51c6-8 11-12 17-15M143 51c-6-8-11-12-17-15"/></g>
         <path class="ink" d="M82 106q12-8 24 0l-2 5q-12-5-22 1zM114 106q12-8 24 0l-1 6q-11-6-22-1z"/>
         <g class="expr-default"><ellipse class="white outline" cx="96" cy="122" rx="10" ry="8"/><ellipse class="white outline" cx="124" cy="122" rx="10" ry="8"/><circle class="ink" cx="98" cy="123" r="4"/><circle class="ink" cx="122" cy="123" r="4"/><path fill="none" class="ink outline" d="M98 153q12 8 24 0"/></g>
         <g class="expr-surprise optional"><circle class="white outline" cx="96" cy="122" r="13"/><circle class="white outline" cx="124" cy="122" r="13"/><circle class="ink" cx="96" cy="122" r="5"/><circle class="ink" cx="124" cy="122" r="5"/><circle class="ink" cx="110" cy="153" r="9"/></g>
@@ -221,13 +226,14 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
     <div class="cfg-head">
       <h3>八维捏脸</h3>
       <p>实时预览人物 · 当前维度高亮</p>
+      <div class="name-editor"><label for="leaderNameInput">给你的领导起个名字</label><div class="name-editor-row"><input id="leaderNameInput" maxlength="12" placeholder="例如：周一综合症" autocomplete="off"><small id="leaderNameCount">0/12</small></div></div>
     </div>
     <div class="dim-list" id="dimList"></div>
   </div>
 </div>
 
 <div class="actionbar">
-  <div class="ab-info"><b>暴躁打工人 · 领导</b> · 已自动保存</div>
+   <div class="ab-info"><b id="leaderNamePreview">暴躁打工人</b> · 领导 · 已自动保存</div>
   <button class="btn-ghost2" id="randBtn">🎲 随机</button>
   <button class="btn-ghost2" id="defBtn">默认</button>
   <button class="btn-ghost2" id="shareBtn">分享</button>
@@ -273,7 +279,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   let cfg={...defaults,...(window.xqxAppearance||{})},active='face';
   const paint=()=>{
     const f=document.getElementById('humanFigure');if(!f)return;
-    f.dataset.glasses=String(cfg.glasses);f.dataset.beard=String(cfg.beard);f.dataset.expr=String(cfg.expr);f.dataset.belly=String(cfg.belly);
+     f.dataset.face=String(cfg.face);f.dataset.hair=String(cfg.hair);f.dataset.glasses=String(cfg.glasses);f.dataset.beard=String(cfg.beard);f.dataset.expr=String(cfg.expr);f.dataset.belly=String(cfg.belly);
     f.style.setProperty('--human-skin',skins[cfg.skin]);f.style.setProperty('--human-suit',suits[cfg.suit]);f.style.setProperty('--human-suit-dark',suits[cfg.suit]);
     f.style.setProperty('--human-hair',cfg.hair===2?'#201B19':cfg.hair===3?'#3A2922':'#30251F');f.style.setProperty('--human-tie',cfg.suit===1?'#D97A6C':'#E8A33D');
   };
@@ -313,7 +319,7 @@ function syncHumanFigure(){
   if(!figure)return;
   const skins=['#F0C8A0','#E8B98A','#D4A574','#9C7B5A'];
   const suits=['#2E3A4A','#1A1A1A','#4A4A4A','#3D2E1F'];
-  figure.dataset.glasses=String(cfg.glasses);figure.dataset.beard=String(cfg.beard);figure.dataset.expr=String(cfg.expr);figure.dataset.belly=String(cfg.belly);
+   figure.dataset.face=String(cfg.face);figure.dataset.hair=String(cfg.hair);figure.dataset.glasses=String(cfg.glasses);figure.dataset.beard=String(cfg.beard);figure.dataset.expr=String(cfg.expr);figure.dataset.belly=String(cfg.belly);
   figure.style.setProperty('--human-skin',skins[cfg.skin]);figure.style.setProperty('--human-suit',suits[cfg.suit]);
   figure.style.setProperty('--human-suit-dark',suits[cfg.suit]);
   figure.style.setProperty('--human-hair',cfg.hair===2?'#201B19':cfg.hair===3?'#3A2922':'#30251F');
@@ -826,6 +832,20 @@ DIMS.forEach(dim=>{
 function syncDV(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;const dim=DIMS.find(x=>x.key===k);d.querySelector('.dv').textContent=dim.opts[cfg[k]]})}
 function syncSel(){document.querySelectorAll('.dim').forEach(d=>{const k=d.dataset.key;d.querySelectorAll('.opt').forEach((o,i)=>o.classList.toggle('sel',i===cfg[k]))})}
 syncSel();
+
+// 领导昵称先保存在浏览器，避免改变冻结中的外观保存契约。
+const leaderNameInput=document.getElementById('leaderNameInput');
+const leaderNameCount=document.getElementById('leaderNameCount');
+const leaderNamePreview=document.getElementById('leaderNamePreview');
+function updateLeaderName(value){
+  const name=String(value||'').replace(/[<>]/g,'').trim().slice(0,12)||'暴躁打工人';
+  if(leaderNameInput&&leaderNameInput.value!==name)leaderNameInput.value=name;
+  if(leaderNameCount)leaderNameCount.textContent=`${name.length}/12`;
+  if(leaderNamePreview)leaderNamePreview.textContent=name;
+  localStorage.setItem('xqx_leader_name',name);
+}
+updateLeaderName(localStorage.getItem('xqx_leader_name')||'暴躁打工人');
+leaderNameInput?.addEventListener('input',()=>updateLeaderName(leaderNameInput.value));
 
 // 操作栏
 // 随机洗牌：连续几帧快速切换外观，最后定格，配合弹跳收尾

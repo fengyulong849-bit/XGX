@@ -139,7 +139,7 @@ body::before{
 #pet-canvas:active{cursor:default}
 .human-figure{position:absolute;z-index:1;left:50%;bottom:8px;width:220px;height:278px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
 .human-figure svg{width:100%;height:100%;overflow:visible}
-.human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}
+.human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}.human-figure .face-shape{transform-box:fill-box;transform-origin:50% 50%;transition:transform .25s ease}.human-figure[data-face="1"] .face-shape{transform:scaleX(1.08) scaleY(1.02)}.human-figure[data-face="2"] .face-shape{transform:scaleX(.9) scaleY(1.14)}.human-figure .hair-variant{display:none}.human-figure[data-hair="0"] .hair-0,.human-figure[data-hair="1"] .hair-1,.human-figure[data-hair="2"] .hair-2,.human-figure[data-hair="3"] .hair-3{display:block}
 .human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
 .human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 @keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
@@ -659,10 +659,13 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <ellipse class="skin-light outline" cx="67" cy="119" rx="13" ry="20"/>
               <ellipse class="skin-light outline" cx="153" cy="119" rx="13" ry="20"/>
               <!-- 头部 -->
-              <path class="skin-light outline" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
+              <path class="skin-light outline face-shape" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
               <!-- 头发和刘海 -->
-              <path class="hair outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/>
-              <path class="hair-hi" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+              <path class="hair hair-variant hair-0 outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/>
+              <path class="hair-hi hair-variant hair-0" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+              <g class="hair-variant hair-1"><path class="hair outline" d="M68 91c-7-34 10-68 42-72 31-3 52 21 44 70l-13-24-13 15-17-18-15 18-13-13z"/><path class="hair-hi" d="M109 25v58"/></g>
+              <path class="hair hair-variant hair-2 outline" d="M72 79c0-27 16-51 38-54 24-3 39 18 39 53l-14-11-13 10-13-9-14 10-10-10z"/>
+              <g class="hair-variant hair-3"><path class="hair outline" d="M68 92c-6-24-2-47 15-60l9 18-9 44zM152 92c6-24 2-47-15-60l-9 18 9 44z"/><path class="hair-hi" d="M77 51c6-8 11-12 17-15M143 51c-6-8-11-12-17-15"/></g>
               <!-- 眉毛 -->
               <path class="ink" d="M82 106q12-8 24 0l-2 5q-12-5-22 1zM114 106q12-8 24 0l-1 6q-11-6-22-1z"/>
               <!-- 眼睛 -->
@@ -2449,11 +2452,15 @@ window.addEventListener('DOMContentLoaded',async()=>{
     figure?.style.setProperty('--human-tie',profile.appearance.suit===1?'#D97A6C':'#E8A33D');
     figure?.style.setProperty('--human-hair',profile.appearance.hair===2?'#201B19':'#30251F');
     if(figure){
+      figure.dataset.face=String(profile.appearance.face||0);
+      figure.dataset.hair=String(profile.appearance.hair||0);
       figure.dataset.belly=String(profile.appearance.belly||0);
       figure.dataset.glasses=String(profile.appearance.glasses||0);
       figure.dataset.beard=String(profile.appearance.beard||0);
     }
   }
+  const leaderName=localStorage.getItem('xqx_leader_name');
+  if(leaderName){const name=String(leaderName).replace(/[<>]/g,'').trim().slice(0,12);if(name)document.getElementById('petName').textContent=`${name} · 领导`;}
   if(window.xqxApplyCloudProfile){
     window.xqxApplyCloudProfile(profile);
     // 自动恢复已有会话时，按用户当前设置重新开始本次浏览器会话的提醒计时。
