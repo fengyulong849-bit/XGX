@@ -195,6 +195,11 @@ body::before{
 .action-impact em{display:block;margin-top:4px;color:rgba(255,249,240,.78);font-size:11px;font-style:normal;white-space:nowrap}
 .action-impact[data-action="slap"] strong{color:#F0A398;text-shadow:0 3px 0 rgba(23,24,39,.55),0 0 24px rgba(217,122,108,.65)}
 .action-impact[data-action="feed"] strong{color:#B98A5A;text-shadow:0 3px 0 rgba(23,24,39,.55),0 0 24px rgba(137,96,55,.78)}
+.action-cue{position:absolute;left:50%;bottom:17px;z-index:7;min-width:156px;max-width:220px;padding:7px 11px;border:1px solid rgba(232,163,61,.38);border-radius:12px;background:rgba(17,29,48,.84);box-shadow:0 9px 24px rgba(0,0,0,.24);text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,12px) scale(.9);transition:opacity .16s ease,transform .2s cubic-bezier(.2,1.4,.4,1)}
+.action-cue b{display:block;color:var(--amber);font-family:var(--mono);font-size:11px;letter-spacing:.7px}.action-cue span{display:block;margin-top:2px;color:rgba(255,249,240,.82);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.action-cue.show{opacity:1;transform:translate(-50%,0) scale(1)}.action-cue[data-action="slap"]{border-color:rgba(217,122,108,.5)}.action-cue[data-action="slap"] b{color:#F0A398}.action-cue[data-action="feed"]{border-color:rgba(185,138,90,.52)}.action-cue[data-action="feed"] b{color:#D9B07B}.action-cue[data-action="throw"]{border-color:rgba(154,168,188,.54)}.action-cue[data-action="throw"] b{color:#C6D3E4}
+.figure-stage.combo-heat .figure-glow{animation:comboGlow .72s ease-out}.figure-stage.combo-heat::after{content:'';position:absolute;inset:24px 30px 12px;border:1px solid rgba(232,163,61,.55);border-radius:50%;pointer-events:none;animation:comboRing .7s ease-out forwards}
+@keyframes comboGlow{0%{transform:translateX(-50%) scale(.72);opacity:.2}45%{transform:translateX(-50%) scale(1.35);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:.7}}@keyframes comboRing{0%{opacity:0;transform:scale(.62)}24%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
 @keyframes impactPop{0%{opacity:0;transform:translate(-50%,20px) scale(.45) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.18) rotate(3deg)}55%{opacity:1;transform:translate(-50%,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-38px) scale(.92) rotate(2deg)}}
 .pet-card.impacting{animation:cardImpact .7s cubic-bezier(.2,1.3,.4,1)}
 .pet-card.impacting[data-action="poke"]{animation-name:cardPoke}.pet-card.impacting[data-action="slap"]{animation-name:cardSlap}.pet-card.impacting[data-action="feed"]{animation-name:cardFeed}.pet-card.impacting[data-action="throw"]{animation-name:cardThrow}
@@ -719,6 +724,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="bubble" id="bubble"></div>
           <canvas id="pet-canvas" aria-hidden="true"></canvas>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
+          <div class="action-cue" id="actionCue" aria-live="polite"><b id="actionCueTitle">准备释放</b><span id="actionCueCopy">把烦躁留在这里</span></div>
           <div class="physics-combo" id="physicsCombo" aria-live="polite">连击 x0</div>
           <div class="action-prop" id="actionProp" aria-hidden="true"></div>
           <div class="human-figure" data-face="0" data-hair="0" data-belly="0" data-glasses="0" data-beard="0" data-expr="0" aria-label="卡通领导人物">
@@ -2056,6 +2062,23 @@ function updateImpactResult(action,points,replayed=false){
   if(!impact||!pointsEl||impact.dataset.action!==action)return;
   pointsEl.textContent=replayed?'动作已同步':`+${Math.max(0,Number(points)||0)} 情绪释放`;
 }
+let actionCueTimer=null,comboHeatTimer=null;
+function showActionCue(action,combo){
+  const cue=$('#actionCue'),title=$('#actionCueTitle'),copy=$('#actionCueCopy');if(!cue||!title||!copy)return;
+  const lines={
+    poke:['精准命中','戳进今天的烦躁里'],
+    slap:['掌风落下','这一拍，替你拍掉一点闷气'],
+    feed:['臭气来袭','今天的委屈，原样奉还'],
+    throw:['杂物飞来','把这句废话扔出工作区']
+  };
+  const level=combo>=7?['RAGE MODE','领导已经开始怀疑人生'] : combo>=5?['COMBO x5','连击成型，别让情绪憋回去'] : combo>=3?['连击加速','这股劲已经起来了'] : lines[action]||['释放一下','把烦躁留在这里'];
+  cue.dataset.action=action;title.textContent=level[0];copy.textContent=level[1];cue.classList.remove('show');void cue.offsetWidth;cue.classList.add('show');
+  clearTimeout(actionCueTimer);actionCueTimer=setTimeout(()=>cue.classList.remove('show'),1500);
+  if(combo===3||combo===5||combo===7){
+    const stage=$('.figure-stage');stage?.classList.remove('combo-heat');void stage?.offsetWidth;stage?.classList.add('combo-heat');clearTimeout(comboHeatTimer);comboHeatTimer=setTimeout(()=>stage?.classList.remove('combo-heat'),780);
+    spawnFx(combo>=5?['💥','⚡','💫','✦','✨','💢']:['✦','💫','✨'],combo>=5?8:4);
+  }
+}
 let propTimer=null;
 function showPhysicalAction(action){
   const prop=$('#actionProp');if(!prop)return;
@@ -2071,7 +2094,7 @@ function showPhysicalAction(action){
 function setPetMood(action,combo=0){
   const mood=$('#petMood'),text=$('#petMoodText'),comboEl=$('#petCombo'),comboValue=$('#petComboValue');
   if(!mood||!text)return;
-  const moods={poke:['amber',combo>2?'被你戳出火花了':'有点烦，但还能扛'],slap:['rose',combo>2?'今天的锅先拍碎':'脸有点疼，心情好多了'],feed:['amber','这坨够不够分量？'],throw:['rose','这股闷气终于有出口了']};
+  const moods={poke:['amber',combo>=5?'防线被戳穿了':'有点烦，但还能扛'],slap:['rose',combo>=5?'今天的锅已经拍碎':'脸有点疼，心情好多了'],feed:['amber',combo>=5?'臭气冲到头顶了':'这坨够不够分量？'],throw:['rose',combo>=5?'办公区已经一片狼藉':'这股闷气终于有出口了']};
   const next=moods[action]||['calm','正在陪你缓一缓'];mood.dataset.tone=next[0];text.textContent=next[1];
   if(comboEl&&comboValue){comboValue.textContent=`连击 x${combo}`;comboEl.classList.toggle('hot',combo>1);}
   clearTimeout(comboTimer);comboTimer=setTimeout(()=>{comboCount=0;comboEl?.classList.remove('hot');if(comboValue)comboValue.textContent='连击 x0'},2600);
@@ -2136,6 +2159,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   comboCount=Math.min(9,comboCount+1);
   setPetMood(b.dataset.act,comboCount);
   showPhysicalAction(b.dataset.act);
+  showActionCue(b.dataset.act,comboCount);
    if(state.mode==='auth'){
      const actionSequence=++petActionSequence;
      showBubble(nextActionBubble(ac,b.dataset.act));
