@@ -152,15 +152,15 @@ body::before{
 .human-figure.physics-hit-arm-left .physics-arm-left,.human-figure.physics-hit-arm-right .physics-arm-right{animation:physicsArmHit .44s cubic-bezier(.2,1.45,.4,1)}
 .human-figure.physics-hit-glasses .physics-glasses{animation:physicsGlassesHit .42s cubic-bezier(.2,1.5,.4,1)}
 .human-figure.physics-drag .physics-part,.human-figure.physics-drag .face-shape,.human-figure.physics-drag .human-body{transition:none!important}
-@keyframes physicsHeadHit{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(10px,-4px) rotate(7deg)}100%{transform:translate(0,0) rotate(0)}}
-@keyframes physicsFaceHit{0%{transform:scaleX(1) translateX(0)}35%{transform:scaleX(1.16) translateX(7px)}100%{transform:scaleX(1) translateX(0)}}
-@keyframes physicsBellyHit{0%,100%{transform:scaleX(1)}35%{transform:scaleX(1.16) translateY(3px)}70%{transform:scaleX(.94) translateY(-1px)}}
-@keyframes physicsBodyHit{0%,100%{transform:translateX(0) rotate(0)}35%{transform:translateX(11px) rotate(5deg)}70%{transform:translateX(-5px) rotate(-2deg)}}
-@keyframes physicsNoseHit{0%,100%{transform:scale(1)}35%{transform:scale(1.18,.9)}70%{transform:scale(.96,1.04)}}
-@keyframes physicsHairHit{0%,100%{transform:rotate(0)}30%{transform:translateY(-7px) rotate(-8deg)}65%{transform:translateY(2px) rotate(5deg)}}
-@keyframes physicsTieHit{0%,100%{transform:rotate(0)}30%{transform:translateX(8px) rotate(14deg)}65%{transform:translateX(-5px) rotate(-8deg)}}
-@keyframes physicsArmHit{0%,100%{transform:rotate(0)}30%{transform:translateY(-8px) rotate(var(--arm-swing,10deg))}65%{transform:translateY(2px) rotate(calc(var(--arm-swing,10deg) * -.55))}}
-@keyframes physicsGlassesHit{0%,100%{transform:translateX(0) rotate(0)}30%{transform:translateX(7px) rotate(8deg)}65%{transform:translateX(-4px) rotate(-5deg)}}
+@keyframes physicsHeadHit{0%{transform:translate(0,0) rotate(0)}32%{transform:translate(19px,-8px) rotate(12deg)}62%{transform:translate(-10px,4px) rotate(-7deg)}100%{transform:translate(0,0) rotate(0)}}
+@keyframes physicsFaceHit{0%{transform:scaleX(1) translateX(0)}32%{transform:scaleX(1.28) translateX(13px)}66%{transform:scaleX(.9) translateX(-7px)}100%{transform:scaleX(1) translateX(0)}}
+@keyframes physicsBellyHit{0%,100%{transform:scaleX(1)}30%{transform:scaleX(1.3) translateY(7px)}58%{transform:scaleX(.84) translateY(-4px)}78%{transform:scaleX(1.12) translateY(2px)}}
+@keyframes physicsBodyHit{0%,100%{transform:translateX(0) rotate(0)}30%{transform:translateX(20px) rotate(10deg)}62%{transform:translateX(-12px) rotate(-6deg)}80%{transform:translateX(5px) rotate(3deg)}}
+@keyframes physicsNoseHit{0%,100%{transform:scale(1)}32%{transform:scale(1.42,.7)}66%{transform:scale(.8,1.18)}100%{transform:scale(1)}}
+@keyframes physicsHairHit{0%,100%{transform:rotate(0)}28%{transform:translateY(-15px) rotate(-16deg)}60%{transform:translateY(6px) rotate(11deg)}80%{transform:translateY(-3px) rotate(-5deg)}}
+@keyframes physicsTieHit{0%,100%{transform:rotate(0)}28%{transform:translateX(16px) rotate(25deg)}60%{transform:translateX(-10px) rotate(-15deg)}80%{transform:translateX(4px) rotate(7deg)}}
+@keyframes physicsArmHit{0%,100%{transform:rotate(0)}28%{transform:translateY(-15px) rotate(calc(var(--arm-swing,10deg) * 1.8))}60%{transform:translateY(5px) rotate(calc(var(--arm-swing,10deg) * -1.1))}80%{transform:translateY(-2px) rotate(calc(var(--arm-swing,10deg) * .45))}}
+@keyframes physicsGlassesHit{0%,100%{transform:translateX(0) rotate(0)}28%{transform:translateX(14px) rotate(15deg)}60%{transform:translateX(-9px) rotate(-10deg)}80%{transform:translateX(3px) rotate(4deg)}}
 .physics-combo{position:absolute;right:18px;top:18px;z-index:7;font-family:var(--mono);font-size:12px;color:var(--amber);opacity:0;transform:translateY(-4px);transition:all .2s var(--ease);pointer-events:none}.physics-combo.show{opacity:1;transform:translateY(0)}
 .human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 @keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
@@ -2000,8 +2000,10 @@ function physicsFeedback(zone){
   physicsCombo(true);
   const impact=$('#actionImpact'),word=$('#impactWord'),points=$('#impactPoints'),copy=$('#impactCopy');
   const words={head:['BONK!','头部命中'],face:['POKE!','脸颊弹回来了'],belly:['JIGGLE!','肚子晃起来了'],ear:['YEOW!','耳朵被拉到了'],nose:['TWITCH!','鼻子回弹'],hair:['MESSY!','头发被薅乱了'],tie:['YANK!','领带歪到一边'], 'arm-left':['FLAIL!','左胳膊甩开了'], 'arm-right':['FLAIL!','右胳膊甩开了'],glasses:['SKEW!','眼镜歪了']};
+  const lines={head:'脑袋嗡嗡响！',face:'脸颊都被弹麻了！',belly:'肚子晃到停不下来！',ear:'耳朵快被拉成长条了！',nose:'鼻子都弹歪了！',hair:'发型当场报废！',tie:'领带已经不服管了！','arm-left':'左胳膊开始乱挥！','arm-right':'右胳膊开始乱挥！',glasses:'眼镜差点飞出去！'};
   const hit=words[zone]||['POW!','局部反馈'];
   if(impact&&word&&points&&copy){impact.dataset.action='physics';word.textContent=hit[0];points.textContent='局部反馈';copy.textContent=hit[1];impact.classList.remove('show');void impact.offsetWidth;impact.classList.add('show');clearTimeout(impact._physicsTimer);impact._physicsTimer=setTimeout(()=>impact.classList.remove('show'),760)}
+  showBubble(lines[zone]||'这一下很有分量！');
   if(physicsState.combo===5||physicsState.combo===10||physicsState.combo===15){showBubble(`局部连击 x${physicsState.combo}`);spawnFx(['💥','💫','✨'],physicsState.combo>9?8:4)}
 }
 function physicsCombo(show){const el=$('#physicsCombo');if(!el)return;el.textContent=`局部连击 x${physicsState.combo}`;el.classList.toggle('show',show)}
@@ -2013,8 +2015,8 @@ function physicsDragMove(event){
   const drag=physicsState.drag;if(!drag)return;
   const target=drag.target||physicsTarget(drag.zone);if(!target)return;
   const dx=event.clientX-drag.lastX,dy=event.clientY-drag.lastY;drag.lastX=event.clientX;drag.lastY=event.clientY;
-  const rot=Math.max(-18,Math.min(18,dx*.45));
-  target.style.transform=`translate(${Math.max(-18,Math.min(18,dx*1.5))}px,${Math.max(-12,Math.min(12,dy*1.1))}px) rotate(${rot}deg)`;
+  const rot=Math.max(-30,Math.min(30,dx*.72));
+  target.style.transform=`translate(${Math.max(-34,Math.min(34,dx*2.1))}px,${Math.max(-24,Math.min(24,dy*1.7))}px) rotate(${rot}deg)`;
 }
 function physicsDragEnd(){
   const drag=physicsState.drag;if(!drag)return;const target=drag.target||physicsTarget(drag.zone);if(target){target.animate([{transform:target.style.transform},{transform:''}],{duration:360,easing:'cubic-bezier(.2,1.5,.4,1)'});setTimeout(()=>{target.style.transform=''},380)}drag.figure.classList.remove('physics-drag');drag.figure._ignorePhysicsClick=true;physicsState.drag=null;if(!$('#petCard')?.classList.contains('down'))physicsFeedback(drag.zone);
@@ -2143,6 +2145,8 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
      try{
       const result=await XQXAuth.petAction(b.dataset.act,crypto.randomUUID());
       const cloud=result.pet_status||{};
+      // 真实倒地是终态：即使这个响应因并发晚到，也不能被客户端点击顺序过滤掉。
+      if(cloud.down)knockDown();
       const isLatest=actionSequence>=lastAppliedPetActionSequence;
       if(isLatest){
         lastAppliedPetActionSequence=actionSequence;
@@ -2156,9 +2160,10 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
       if(ac.fx==='squash'&&window.pet3D)window.pet3D.squash(5000);
       if(result.event==='burst'){window.pet3D?.burst();showBubble('噗——爆了！');toast('屎量爆表，领导被臭到爆炸了！','amber')}
       if(result.event==='faint'){window.pet3D?.faint();showBubble('呕……我臭晕了');toast('太臭了，领导臭晕后爬了起来','rose')}
-      if(isLatest&&cloud.down)knockDown();
       toast(result.replayed?'动作已同步':`${ac.label} +${result.points_delta||ac.pts}`,'calm');
     }catch(error){
+      // 服务端可能在并发窗口内直接拒绝后续动作；这同样说明领导已经倒地。
+      if(error?.message==='pet_down'){knockDown();return;}
       // 倒地后，之前并发动作返回的 pet_down 不再重复打扰用户。
       if($('#petCard').classList.contains('down'))return;
       toast(XQXAuth.message(error.message),'rose');
