@@ -673,6 +673,16 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 .modal-actions .btn-ghost:disabled{opacity:.4;cursor:not-allowed}
 
 /* === 弹窗响应式 === */
+/* ============ 首页工作节奏：核心指标 + Activity Ring 辅助信息 ============ */
+.rhythm-host{display:flex;flex-direction:column;gap:14px;align-self:start;min-height:0;height:auto;overflow:visible;background:transparent!important;border:0!important;box-shadow:none!important}
+.rhythm-host>.shift-summary{order:0;display:flex;gap:14px;padding:20px 22px 18px;border:1px solid rgba(245,177,76,.38);border-radius:20px;background:linear-gradient(145deg,rgba(28,38,55,.98),rgba(19,29,44,.98));box-shadow:0 14px 32px rgba(0,0,0,.22)}
+.rhythm-host>.shift-summary .shift-top{align-items:flex-start}.rhythm-host>.shift-summary .shift-top b{font-size:17px}.rhythm-host>.shift-summary .shift-done{padding:5px 9px}.rhythm-host>.shift-summary .shift-time{font-size:36px;line-height:.95;color:#FFB342;text-shadow:0 0 16px rgba(245,177,76,.24)}
+.rhythm-host>.shift-summary .shift-caption{font-size:12px;margin-top:6px}.rhythm-host>.shift-summary .shift-route{height:24px;margin:3px 0}.rhythm-host>.shift-summary .shift-foot{font-size:11px}
+.rhythm-host>.care-section{order:1;display:block;align-self:stretch;width:100%;margin:0!important;flex:none!important;min-height:0;height:auto!important;padding:20px!important;border:1px solid rgba(120,166,220,.26);border-radius:22px;background:linear-gradient(155deg,#172842 0%,#13233A 100%);box-shadow:0 16px 34px rgba(0,0,0,.2)}
+.rhythm-host>.care-section>.care-grid{display:block;flex:none!important}.rhythm-host>.care-section .care-card:first-child{display:block;flex:none!important;height:auto!important;min-height:0!important;padding:0!important;background:transparent;border:0;box-shadow:none}.rhythm-host>.care-section .care-card:first-child .cc-inner{display:block;height:auto!important;min-height:0!important}.rhythm-host>.care-section .cc-head{display:none!important}.rhythm-host>.care-section .countdown-panel{display:block;flex:none!important;height:auto!important;padding:0!important}
+.rhythm-host>.care-section .cd-ring-wrap{display:flex;flex-direction:column;align-items:center;gap:0!important;width:100%}.rhythm-host>.care-section .cd-ring{width:226px!important;height:226px!important;margin:0}.rhythm-host>.care-section .cd-ring-text .time{font-size:25px}.rhythm-host>.care-section .cd-ring-text .label{max-width:138px;line-height:1.35}
+.rhythm-host>.care-section .cd-info{display:flex;flex-direction:column;align-items:center;width:100%;min-width:0;margin-top:7px;text-align:center}.rhythm-host>.care-section .cd-info .title{font-size:18px;margin:0}.rhythm-host>.care-section .cd-info .sub{margin:4px 0 12px}.rhythm-host>.care-section .cd-ticks{order:3;margin:13px 0 0}.rhythm-host>.care-section .cd-ticks i{width:15px}
+.rhythm-host>.care-section .cd-ring-legend{order:2;display:flex;justify-content:center;align-items:stretch;gap:7px;width:100%;margin:0}.rhythm-host>.care-section .cd-ring-legend-item{flex:1;min-width:0;display:flex;align-items:flex-start;gap:5px;padding:8px 6px;border-radius:12px;background:rgba(255,255,255,.045);font-size:10px;text-align:left;line-height:1.2}.rhythm-host>.care-section .cd-ring-legend-item i{width:7px;height:7px;margin-top:2px}.rhythm-host>.care-section .cd-ring-legend-item span{min-width:0}.rhythm-host>.care-section .cd-ring-legend-item strong{display:block;min-width:0;color:var(--ink);font-size:11px}.rhythm-host>.care-section .cd-ring-legend-item b{display:block;margin:3px 0 0;color:var(--muted);font-family:var(--mono);font-size:10px;white-space:nowrap}.rhythm-host>.care-section .sympathy{display:none!important}
 @media(max-width:640px){
   .modal-card{max-width:calc(100vw - 32px);max-height:calc(100dvh - 28px);border-radius:18px}
   .modal-body{padding:24px 20px 20px}
@@ -913,9 +923,9 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
                    <div class="title" id="cdInfoTitle">还差一点</div>
                    <div class="sub" id="cdInfoSub">一天进度 62%</div>
                    <div class="cd-ring-legend">
-                     <div class="cd-ring-legend-item work"><i></i><span><strong>外圈</strong> 下班倒计时 <b id="cdWorkLegend">17:30</b></span></div>
-                     <div class="cd-ring-legend-item water"><i></i><span><strong>中圈</strong> 喝水提醒 <b id="cdWaterLegend">按设置提醒</b></span></div>
-                     <div class="cd-ring-legend-item sit"><i></i><span><strong>内圈</strong> 久坐提醒 <b id="cdSitLegend">按设置提醒</b></span></div>
+                     <div class="cd-ring-legend-item work"><i></i><span><strong>下班倒计时</strong><b>外圈 · <span id="cdWorkLegend">17:30</span></b></span></div>
+                     <div class="cd-ring-legend-item water"><i></i><span><strong>喝水提醒</strong><b>中圈 · <span id="cdWaterLegend">按设置提醒</span></b></span></div>
+                     <div class="cd-ring-legend-item sit"><i></i><span><strong>久坐提醒</strong><b>内圈 · <span id="cdSitLegend">按设置提醒</span></b></span></div>
                    </div>
                    <div class="cd-ticks" id="cdTicks">
                     <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -1870,8 +1880,8 @@ function updateCountdown(){
     ringTime.textContent=str;
     progEl.style.strokeDashoffset=100-pct;
     $('#cdWorkLegend').textContent=`${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}`;
-    cdTitle.textContent=pct<50?'还差一点':pct<80?'快了快了':'冲鸭！就快到了';
-    cdSub.textContent=`一天进度 ${pct}%`;
+    cdTitle.textContent='今天的工作节奏';
+    cdSub.textContent='下班、喝水与久坐 · 实时同步';
     const onTicks=Math.round(pct/100*7);
     [...cdTicks.children].forEach((t,i)=>{t.className=i<onTicks?'on':''});
     symEl.style.display='none';
@@ -1883,8 +1893,8 @@ function updateCountdown(){
     ringTime.textContent='00:00:00';
     progEl.style.strokeDashoffset=0;
     $('#cdWorkLegend').textContent='今天收工';
-    cdTitle.textContent='下班啦！';
-    cdSub.textContent='一天进度 100%';
+    cdTitle.textContent='今天的工作节奏';
+    cdSub.textContent='今天收工，提醒也一起休息';
     [...cdTicks.children].forEach(t=>t.className='on');
     const lines=['今天的班下完了，还在卷？抱抱自己','已经过下班时间了，对自己好一点','这么晚还在？摸会儿鱼吧'];
     symEl.style.display='block';
