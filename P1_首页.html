@@ -177,7 +177,20 @@ body::before{
 @keyframes humanSlap{0%,100%{transform:translateX(-50%) scale(1,1) rotate(0)}18%{transform:translateX(-50%) scale(1.2,.62) rotate(-3deg)}34%{transform:translateX(-50%) scale(.84,1.18) rotate(3deg)}50%{transform:translateX(-50%) scale(1.12,.84) rotate(-2deg)}68%{transform:translateX(-50%) scale(.94,1.06) rotate(1deg)}84%{transform:translateX(-50%) scale(1.04,.96)}}
 @keyframes humanFeed{0%,100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1)}15%{transform:translateX(calc(-50% - 13px)) translateY(-5px) rotate(-7deg) scale(1.05)}30%{transform:translateX(calc(-50% + 14px)) translateY(4px) rotate(8deg) scale(.96)}45%{transform:translateX(calc(-50% - 11px)) translateY(-7px) rotate(-6deg) scale(1.06)}62%{transform:translateX(calc(-50% + 9px)) translateY(3px) rotate(5deg) scale(.98)}80%{transform:translateX(calc(-50% - 4px)) rotate(-2deg)}}
 @keyframes humanThrow{0%,100%{transform:translateX(-50%) rotate(0) translateY(0)}16%{transform:translateX(calc(-50% - 18px)) rotate(-13deg) translateY(-5px)}34%{transform:translateX(calc(-50% + 17px)) rotate(14deg) translateY(3px)}52%{transform:translateX(calc(-50% - 14px)) rotate(-11deg) translateY(-3px)}70%{transform:translateX(calc(-50% + 10px)) rotate(8deg) translateY(2px)}86%{transform:translateX(calc(-50% - 4px)) rotate(-3deg)}}
+.holo-card.downing .human-figure{animation:leaderFinalFall 2.25s cubic-bezier(.22,1,.36,1) forwards;transform-origin:50% 90%;pointer-events:none;filter:drop-shadow(0 12px 8px rgba(0,0,0,.35))}
+@keyframes leaderFinalFall{
+  0%{transform:translateX(-50%) rotate(0) translateY(0);filter:drop-shadow(0 9px 7px rgba(0,0,0,.26))}
+  12%{transform:translateX(calc(-50% - 5px)) rotate(-5deg) translateY(0)}
+  25%{transform:translateX(calc(-50% + 6px)) rotate(7deg) translateY(1px)}
+  41%{transform:translateX(calc(-50% - 7px)) rotate(-10deg) translateY(3px)}
+  58%{transform:translateX(calc(-50% + 2px)) rotate(28deg) translateY(9px)}
+  80%{transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.24) drop-shadow(0 12px 8px rgba(0,0,0,.43))}
+  91%{transform:translateX(-50%) rotate(84deg) translateY(25px)}
+  100%{transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.35) drop-shadow(0 12px 8px rgba(0,0,0,.45))}
+}
 .holo-card.down .human-figure{animation:none;transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.35) drop-shadow(0 12px 8px rgba(0,0,0,.45));transition:transform .55s ease,filter .3s ease}
+.holo-card.downing .figure-glow{background:radial-gradient(circle,rgba(232,163,61,.28),rgba(217,122,108,.12) 44%,transparent 72%);animation:finalGlow 2.25s ease-out forwards}
+@keyframes finalGlow{0%,38%{opacity:.36;transform:translateX(-50%) scale(.86)}64%{opacity:.88;transform:translateX(-50%) scale(1.2)}100%{opacity:.52;transform:translateX(-50%) scale(1.04)}}
 .down-panel{position:absolute;left:18px;right:18px;bottom:18px;z-index:8;display:none;padding:13px 14px;border:1px solid rgba(217,122,108,.65);border-radius:16px;background:rgba(14,26,43,.94);box-shadow:0 12px 32px rgba(0,0,0,.35);text-align:center}
 .holo-card.down .down-panel{display:block}
 .down-panel strong{display:block;color:#F0A398;font-size:14px;margin-bottom:4px}
@@ -742,6 +755,7 @@ footer{max-width:1100px;margin:0 auto;padding:48px 32px 40px;border-top:1px soli
 button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offset:2px}
 @media(prefers-reduced-motion:reduce){
   .holo-card::before,.holo-inner::after,.figure,.marquee,.stat-bar i::after{animation:none!important}
+  .holo-card.downing .human-figure{animation:leaderFinalFall .22s ease-out forwards}
   *{transition-duration:.01ms!important}
 }
 </style>
@@ -1750,8 +1764,14 @@ function spawnFx(emojis,count){
   }
 }
 window.pet3D={
-  knockDown(){isDown=true;petControls.autoRotate=false;const s=Date.now(),d=800,sz=charGroup.rotation.z;
-    function fall(){const t=Math.min(1,(Date.now()-s)/d),e=t<.5?2*t*t:1-Math.pow(-2*t+2,2)/2;charGroup.rotation.z=sz+e*(-Math.PI/2);charGroup.position.y=-e*0.5;if(t<1)requestAnimationFrame(fall);}fall();},
+  knockDown({duration=2250}={}){isDown=true;petControls.autoRotate=false;const s=Date.now(),d=prm?220:duration,sz=charGroup.rotation.z,sy=charGroup.position.y;
+    function fall(){const t=Math.min(1,(Date.now()-s)/d);let e;
+      if(t<.22){const p=t/.22;e=-.045*Math.sin(p*Math.PI)}
+      else if(t<.82){const p=(t-.22)/.6;e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2}
+      else{const p=(t-.82)/.18;e=1+Math.sin(p*Math.PI)*.035}
+      charGroup.rotation.z=sz+e*(-Math.PI/2);charGroup.position.y=sy+e*(-.5);
+      if(t<1)requestAnimationFrame(fall);else{charGroup.rotation.z=sz-Math.PI/2;charGroup.position.y=sy-.5;}
+    }fall();},
   revive(){isDown=false;const s=Date.now(),d=600,sz=charGroup.rotation.z,sy=charGroup.position.y;
     function rise(){const t=Math.min(1,(Date.now()-s)/d),e=1-Math.pow(1-t,3);charGroup.rotation.z=sz*(1-e);charGroup.position.y=sy*(1-e);if(t<1)requestAnimationFrame(rise);else if(!prm)petControls.autoRotate=true;}rise();},
   shake(i=0.15){shakeT=20;shakeI=i;},
@@ -2078,7 +2098,7 @@ function physicsFeedback(zone){
 }
 function physicsCombo(show){const el=$('#physicsCombo');if(!el)return;el.textContent=`局部连击 x${physicsState.combo}`;el.classList.toggle('show',show)}
 function physicsDragStart(event){
-  const figure=event.currentTarget;if($('#petCard')?.classList.contains('down'))return;
+  const figure=event.currentTarget;if($('#petCard')?.classList.contains('down')||$('#petCard')?.classList.contains('downing'))return;
   const zone=physicsZone(event,figure),target=physicsMarkedPart(event,figure)||physicsTarget(zone);physicsState.drag={zone,figure,target,lastX:event.clientX,lastY:event.clientY};figure.classList.add('physics-drag');figure.setPointerCapture?.(event.pointerId);event.preventDefault();
 }
 function physicsDragMove(event){
@@ -2089,12 +2109,12 @@ function physicsDragMove(event){
   target.style.transform=`translate(${Math.max(-34,Math.min(34,dx*2.1))}px,${Math.max(-24,Math.min(24,dy*1.7))}px) rotate(${rot}deg)`;
 }
 function physicsDragEnd(){
-  const drag=physicsState.drag;if(!drag)return;const target=drag.target||physicsTarget(drag.zone);if(target){target.animate([{transform:target.style.transform},{transform:''}],{duration:360,easing:'cubic-bezier(.2,1.5,.4,1)'});setTimeout(()=>{target.style.transform=''},380)}drag.figure.classList.remove('physics-drag');drag.figure._ignorePhysicsClick=true;physicsState.drag=null;if(!$('#petCard')?.classList.contains('down'))physicsFeedback(drag.zone);
+  const drag=physicsState.drag;if(!drag)return;const target=drag.target||physicsTarget(drag.zone);if(target){target.animate([{transform:target.style.transform},{transform:''}],{duration:360,easing:'cubic-bezier(.2,1.5,.4,1)'});setTimeout(()=>{target.style.transform=''},380)}drag.figure.classList.remove('physics-drag');drag.figure._ignorePhysicsClick=true;physicsState.drag=null;if(!$('#petCard')?.classList.contains('down')&&!$('#petCard')?.classList.contains('downing'))physicsFeedback(drag.zone);
 }
 function initPhysicsInteraction(){
   const figure=document.querySelector('.human-figure');if(!figure||figure.dataset.physicsReady)return;figure.dataset.physicsReady='1';
   figure.addEventListener('pointerdown',physicsDragStart);figure.addEventListener('pointermove',physicsDragMove);figure.addEventListener('pointerup',physicsDragEnd);figure.addEventListener('pointercancel',physicsDragEnd);
-  figure.addEventListener('click',event=>{if(figure._ignorePhysicsClick){figure._ignorePhysicsClick=false;return}if(physicsState.drag||$('#petCard')?.classList.contains('down'))return;physicsFeedback(physicsZone(event,figure))});
+  figure.addEventListener('click',event=>{if(figure._ignorePhysicsClick){figure._ignorePhysicsClick=false;return}if(physicsState.drag||$('#petCard')?.classList.contains('down')||$('#petCard')?.classList.contains('downing'))return;physicsFeedback(physicsZone(event,figure))});
 }
 initPhysicsInteraction();
 const ACTS={
@@ -2225,13 +2245,22 @@ function surpriseExpr(){
   if(exprTimer)clearTimeout(exprTimer);
   exprTimer=setTimeout(()=>{exprTimer=null;updateExpr()},1500);
 }
+let downSequenceTimer=null;
 function knockDown(){
-  if($('#petCard').classList.contains('down'))return;
-  $('#petCard').classList.add('down');
-  showBubble('我倒下了…');
-  if(window.pet3D)window.pet3D.knockDown();
-  spawnFx(['💫','⭐','🌟','💫','✨'],8); // 倒地卡通星星特效
-  setTimeout(promptReviveOnce, 900);
+  const card=$('#petCard');
+  if(!card||card.classList.contains('down')||card.classList.contains('downing'))return;
+  const fallDuration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?240:2250;
+  card.classList.add('downing');
+  showBubble('等一下……');
+  window.pet3D?.knockDown({duration:fallDuration});
+  setTimeout(()=>{if(card.classList.contains('downing'))showBubble('最后一击，失去平衡……')},Math.min(760,fallDuration*.35));
+  setTimeout(()=>{if(card.classList.contains('downing')){spawnFx(['💫','⭐','🌟','✨'],4);showBubble('我倒下了……')}},Math.min(1720,fallDuration*.76));
+  clearTimeout(downSequenceTimer);
+  downSequenceTimer=setTimeout(()=>{
+    card.classList.remove('downing');
+    card.classList.add('down');
+    setTimeout(promptReviveOnce,window.matchMedia('(prefers-reduced-motion: reduce)').matches?120:850);
+  },fallDuration);
 }
 function playHumanAction(action,eventName){
   const figure=document.querySelector('.human-figure');
@@ -2246,7 +2275,7 @@ function playHumanAction(action,eventName){
 let petActionSequence=0;
 let lastAppliedPetActionSequence=0;
 $$('.act').forEach(b=>b.addEventListener('click',async()=>{
-  if($('#petCard').classList.contains('down'))return;
+  if($('#petCard').classList.contains('down')||$('#petCard').classList.contains('downing'))return;
   const ac=ACTS[b.dataset.act];
   comboCount=Math.min(9,comboCount+1);
   const actionLine=nextActionBubble(ac,b.dataset.act);
@@ -2281,7 +2310,7 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
       // 服务端可能在并发窗口内直接拒绝后续动作；这同样说明领导已经倒地。
       if(error?.message==='pet_down'){knockDown();return;}
       // 倒地后，之前并发动作返回的 pet_down 不再重复打扰用户。
-      if($('#petCard').classList.contains('down'))return;
+      if($('#petCard').classList.contains('down')||$('#petCard').classList.contains('downing'))return;
       toast(XQXAuth.message(error.message),'rose');
     }
     return;
@@ -2633,7 +2662,7 @@ async function reviveLeader(){
     const cloud=result.pet_status||{};
     state.points=Number(result.points_balance??state.points);
     pet.endure=Number(cloud.endure??100);pet.irritate=Number(cloud.irritate??20);pet.fat=Number(cloud.fat??10);pet.dirty=Number(cloud.dirty??5);
-    updateBars();updateUI();$('#petCard').classList.remove('down');
+    updateBars();updateUI();$('#petCard').classList.remove('down','downing');
     sessionStorage.removeItem('xqx_pet_down_prompted');
     if(window.pet3D)window.pet3D.revive();
     toast(`领导复活！${result.points_delta||-500} 积分`,'calm');
@@ -2652,7 +2681,7 @@ function freeReroll(){
   pet.endure = 100; pet.irritate = 20; pet.fat = 10; pet.dirty = 5;
   updateBars();
   if(window.pet3D){window.pet3D.revive();window.pet3D.setExpr(0)}
-  $('#petCard').classList.remove('down');
+  $('#petCard').classList.remove('down','downing');
   toast('新领导已就位！','calm');
 }
 
