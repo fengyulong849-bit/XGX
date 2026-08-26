@@ -190,16 +190,18 @@ body::before{
 .bubble{position:absolute;top:40px;left:50%;transform:translate(-50%,-8px) scale(.6);background:var(--surface-3);border:1px solid var(--rule-2);border-radius:14px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);opacity:0;pointer-events:none;transition:all .25s var(--ease);box-shadow:var(--shadow);z-index:5;white-space:nowrap}
 .bubble.show{opacity:1;transform:translate(-50%,0) scale(1)}
 .bubble::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--surface-3)}
-.action-impact{position:absolute;left:50%;top:72px;z-index:7;pointer-events:none;text-align:center;opacity:0;transform:translate(-50%,16px) scale(.55) rotate(-5deg)}
+.action-impact{position:absolute;left:50%;top:24px;z-index:7;pointer-events:none;text-align:center;opacity:0;transform:translate(-50%,16px) scale(.55) rotate(-5deg)}
 .action-impact.show{animation:impactPop .72s cubic-bezier(.18,1.35,.4,1) forwards}
-.action-impact strong{display:block;color:#FFF9F0;font-size:38px;line-height:1;text-shadow:0 4px 0 rgba(23,24,39,.65),0 0 28px rgba(232,163,61,.72);letter-spacing:1px;animation:impactWordShake .42s ease-in-out infinite alternate}
-.action-impact span{display:block;margin-top:8px;color:var(--amber);font-size:12px;font-weight:800;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.45)}
-.action-impact em{display:block;margin-top:4px;color:rgba(255,249,240,.78);font-size:11px;font-style:normal;white-space:nowrap}
+.action-impact strong{display:block;color:#FFF9F0;font-size:52px;line-height:.88;text-shadow:0 5px 0 rgba(23,24,39,.65),0 0 28px rgba(232,163,61,.72);letter-spacing:2px;animation:impactWordShake .42s ease-in-out infinite alternate}
+.action-impact span{display:block;margin-top:7px;color:var(--amber);font-size:12px;font-weight:800;white-space:nowrap;text-shadow:0 2px 8px rgba(0,0,0,.45)}
+.action-impact em{display:block;margin-top:3px;color:rgba(255,249,240,.78);font-size:11px;font-style:normal;white-space:nowrap}
 .action-impact[data-action="slap"] strong{color:#F0A398;text-shadow:0 3px 0 rgba(23,24,39,.55),0 0 24px rgba(217,122,108,.65)}
 .action-impact[data-action="feed"] strong{color:#B98A5A;text-shadow:0 3px 0 rgba(23,24,39,.55),0 0 24px rgba(137,96,55,.78)}
-.action-cue{position:absolute;left:50%;bottom:17px;z-index:7;min-width:156px;max-width:220px;padding:7px 11px;border:1px solid rgba(232,163,61,.38);border-radius:12px;background:rgba(17,29,48,.84);box-shadow:0 9px 24px rgba(0,0,0,.24);text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,12px) scale(.9);transition:opacity .16s ease,transform .2s cubic-bezier(.2,1.4,.4,1)}
-.action-cue b{display:block;color:var(--amber);font-family:var(--mono);font-size:11px;letter-spacing:.7px}.action-cue span{display:block;margin-top:2px;color:rgba(255,249,240,.82);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.action-cue.show{opacity:1;transform:translate(-50%,0) scale(1)}.action-cue[data-action="slap"]{border-color:rgba(217,122,108,.5)}.action-cue[data-action="slap"] b{color:#F0A398}.action-cue[data-action="feed"]{border-color:rgba(185,138,90,.52)}.action-cue[data-action="feed"] b{color:#D9B07B}.action-cue[data-action="throw"]{border-color:rgba(154,168,188,.54)}.action-cue[data-action="throw"] b{color:#C6D3E4}
+.action-cue{position:absolute;left:50%;bottom:13px;z-index:7;max-width:242px;padding:5px 12px;text-align:center;opacity:0;pointer-events:none;transform:translate(-50%,12px) scale(.9);transition:opacity .16s ease,transform .2s cubic-bezier(.2,1.4,.4,1)}
+.action-cue b{display:block;color:var(--amber);font-size:15px;font-weight:900;letter-spacing:1px;text-shadow:0 2px 0 rgba(23,24,39,.8)}.action-cue span{display:block;margin-top:2px;color:rgba(255,249,240,.9);font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 5px rgba(0,0,0,.45)}
+.action-cue.show{opacity:1;transform:translate(-50%,0) scale(1)}.action-cue[data-action="slap"] b{color:#FF9EAB}.action-cue[data-action="feed"] b{color:#F2C17E}.action-cue[data-action="throw"] b{color:#A9D7FF}
+.action-meme{position:absolute;right:12px;bottom:48px;z-index:9;display:flex;align-items:center;gap:5px;padding:4px 8px 4px 5px;border:2px solid #FFF7E7;border-radius:999px;background:#F05E7A;box-shadow:0 5px 0 rgba(72,25,44,.48),0 10px 22px rgba(0,0,0,.3);opacity:0;pointer-events:none;transform:translateY(15px) rotate(12deg) scale(.55)}.action-meme span{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#FFF7E7;font-size:30px;line-height:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.14))}.action-meme b{max-width:72px;color:#fff;font-size:15px;line-height:1.05;text-shadow:0 2px 0 rgba(86,25,42,.35)}.action-meme.show{animation:memePop 1.08s cubic-bezier(.16,1.45,.35,1) forwards}.action-meme[data-action="poke"]{background:#5B8DEF}.action-meme[data-action="slap"]{background:#F05E7A}.action-meme[data-action="feed"]{background:#A8733D}.action-meme[data-action="throw"]{background:#6F66D9}
+@keyframes memePop{0%{opacity:0;transform:translateY(18px) rotate(16deg) scale(.35)}20%{opacity:1;transform:translateY(-6px) rotate(-8deg) scale(1.18)}48%{opacity:1;transform:translateY(1px) rotate(5deg) scale(.98)}100%{opacity:0;transform:translateY(-32px) rotate(-3deg) scale(.88)}}
 .figure-stage.combo-heat .figure-glow{animation:comboGlow .72s ease-out}.figure-stage.combo-heat::after{content:'';position:absolute;inset:24px 30px 12px;border:1px solid rgba(232,163,61,.55);border-radius:50%;pointer-events:none;animation:comboRing .7s ease-out forwards}
 @keyframes comboGlow{0%{transform:translateX(-50%) scale(.72);opacity:.2}45%{transform:translateX(-50%) scale(1.35);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:.7}}@keyframes comboRing{0%{opacity:0;transform:scale(.62)}24%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
 @keyframes impactPop{0%{opacity:0;transform:translate(-50%,20px) scale(.45) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.18) rotate(3deg)}55%{opacity:1;transform:translate(-50%,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-38px) scale(.92) rotate(2deg)}}
@@ -730,6 +732,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="leader-state-fx" id="leaderStateFx" aria-hidden="true"></div>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
           <div class="action-cue" id="actionCue" aria-live="polite"><b id="actionCueTitle">准备释放</b><span id="actionCueCopy">把烦躁留在这里</span></div>
+          <div class="action-meme" id="actionMeme" aria-live="polite"><span id="actionMemeFace">💥</span><b id="actionMemeWord">爽！</b></div>
           <div class="physics-combo" id="physicsCombo" aria-live="polite">连击 x0</div>
           <div class="action-prop" id="actionProp" aria-hidden="true"></div>
           <div class="human-figure" data-face="0" data-hair="0" data-belly="0" data-glasses="0" data-beard="0" data-expr="0" aria-label="卡通领导人物">
@@ -2067,18 +2070,21 @@ function updateImpactResult(action,points,replayed=false){
   if(!impact||!pointsEl||impact.dataset.action!==action)return;
   pointsEl.textContent=replayed?'动作已同步':`+${Math.max(0,Number(points)||0)} 情绪释放`;
 }
-let actionCueTimer=null,comboHeatTimer=null;
-function showActionCue(action,combo){
-  const cue=$('#actionCue'),title=$('#actionCueTitle'),copy=$('#actionCueCopy');if(!cue||!title||!copy)return;
+let actionCueTimer=null,comboHeatTimer=null,memeTimer=null;
+function showActionCue(action,combo,actionLine=''){
+  const cue=$('#actionCue'),title=$('#actionCueTitle'),copy=$('#actionCueCopy'),meme=$('#actionMeme'),memeFace=$('#actionMemeFace'),memeWord=$('#actionMemeWord');if(!cue||!title||!copy)return;
   const lines={
-    poke:['精准命中','戳进今天的烦躁里'],
-    slap:['掌风落下','这一拍，替你拍掉一点闷气'],
+    poke:['戳中了！','戳进今天的烦躁里'],
+    slap:['拍得好！','这一拍，替你拍掉一点闷气'],
     feed:['臭气来袭','今天的委屈，原样奉还'],
-    throw:['杂物飞来','把这句废话扔出工作区']
+    throw:['扔得漂亮！','把这句废话扔出工作区']
   };
-  const level=combo>=7?['RAGE MODE','领导已经开始怀疑人生'] : combo>=5?['COMBO x5','连击成型，别让情绪憋回去'] : combo>=3?['连击加速','这股劲已经起来了'] : lines[action]||['释放一下','把烦躁留在这里'];
-  cue.dataset.action=action;title.textContent=level[0];copy.textContent=level[1];cue.classList.remove('show');void cue.offsetWidth;cue.classList.add('show');
+  const level=combo>=7?['火力全开','领导已经开始怀疑人生'] : combo>=5?['连击 x5','这股劲别憋回去'] : combo>=3?['越戳越起劲','情绪正在顺畅释放'] : lines[action]||['释放一下','把烦躁留在这里'];
+  cue.dataset.action=action;title.textContent=level[0];copy.textContent=actionLine||level[1];cue.classList.remove('show');void cue.offsetWidth;cue.classList.add('show');
   clearTimeout(actionCueTimer);actionCueTimer=setTimeout(()=>cue.classList.remove('show'),1500);
+  const memes={poke:[['👉','戳！'],['😵','懵了'],['💢','正中！']],slap:[['🖐️','啪！'],['🤯','拍懵'],['💥','带劲！']],feed:[['🤢','呕！'],['💩','投喂'],['😷','好臭！']],throw:[['🗑️','走你！'],['📎','飞来'],['😵‍💫','躲不开']]};
+  const memeData=(memes[action]||[['💥','爽！']])[Math.floor(Math.random()*(memes[action]?.length||1))];
+  if(meme&&memeFace&&memeWord){meme.dataset.action=action;memeFace.textContent=memeData[0];memeWord.textContent=memeData[1];meme.classList.remove('show');void meme.offsetWidth;meme.classList.add('show');clearTimeout(memeTimer);memeTimer=setTimeout(()=>meme.classList.remove('show'),1120);}
   if(combo===3||combo===5||combo===7){
     const stage=$('.figure-stage');stage?.classList.remove('combo-heat');void stage?.offsetWidth;stage?.classList.add('combo-heat');clearTimeout(comboHeatTimer);comboHeatTimer=setTimeout(()=>stage?.classList.remove('combo-heat'),780);
     spawnFx(combo>=5?['💥','⚡','💫','✦','✨','💢']:['✦','💫','✨'],combo>=5?8:4);
@@ -2174,12 +2180,12 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
   if($('#petCard').classList.contains('down'))return;
   const ac=ACTS[b.dataset.act];
   comboCount=Math.min(9,comboCount+1);
+  const actionLine=nextActionBubble(ac,b.dataset.act);
   setPetMood(b.dataset.act,comboCount);
   showPhysicalAction(b.dataset.act);
-  showActionCue(b.dataset.act,comboCount);
+  showActionCue(b.dataset.act,comboCount,actionLine);
    if(state.mode==='auth'){
      const actionSequence=++petActionSequence;
-     showBubble(nextActionBubble(ac,b.dataset.act));
      showImpact(b.dataset.act,0,false,true);
      playHumanAction(b.dataset.act);
      b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
@@ -2211,7 +2217,6 @@ $$('.act').forEach(b=>b.addEventListener('click',async()=>{
     }
     return;
   }
-  showBubble(nextActionBubble(ac,b.dataset.act));
   showImpact(b.dataset.act,ac.pts);
   playHumanAction(b.dataset.act);
   b.style.transform='translateY(2px) scale(.96)';setTimeout(()=>b.style.transform='',150);
