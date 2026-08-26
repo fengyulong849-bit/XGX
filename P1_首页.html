@@ -171,6 +171,8 @@ body::before{
 .human-figure.action-slap{animation:humanSlap .82s cubic-bezier(.2,1.4,.4,1)}
 .human-figure.action-feed{animation:humanFeed .96s cubic-bezier(.2,1.2,.4,1);filter:drop-shadow(0 0 20px rgba(124,91,54,.72))}
 .human-figure.action-throw{animation:humanThrow .84s cubic-bezier(.2,1.2,.4,1)}
+.human-figure[data-strain="high"]{animation:humanStrain 1.08s ease-in-out infinite}.human-figure[data-strain="critical"]{animation:humanCritical .76s ease-in-out infinite}
+@keyframes humanStrain{0%,100%{transform:translateX(-50%) rotate(0)}35%{transform:translateX(calc(-50% + 3px)) rotate(1.2deg)}70%{transform:translateX(calc(-50% - 3px)) rotate(-1.2deg)}}@keyframes humanCritical{0%,100%{transform:translateX(-50%) translateY(0) rotate(0)}25%{transform:translateX(calc(-50% + 6px)) translateY(3px) rotate(2.8deg)}55%{transform:translateX(calc(-50% - 6px)) translateY(1px) rotate(-2.8deg)}78%{transform:translateX(calc(-50% + 2px)) translateY(4px) rotate(1deg)}}
 @keyframes humanPoke{0%,100%{transform:translateX(-50%) rotate(0)}12%{transform:translateX(calc(-50% + 18px)) rotate(7deg)}25%{transform:translateX(calc(-50% - 16px)) rotate(-8deg)}40%{transform:translateX(calc(-50% + 13px)) rotate(6deg)}57%{transform:translateX(calc(-50% - 10px)) rotate(-5deg)}74%{transform:translateX(calc(-50% + 6px)) rotate(3deg)}}
 @keyframes humanSlap{0%,100%{transform:translateX(-50%) scale(1,1) rotate(0)}18%{transform:translateX(-50%) scale(1.2,.62) rotate(-3deg)}34%{transform:translateX(-50%) scale(.84,1.18) rotate(3deg)}50%{transform:translateX(-50%) scale(1.12,.84) rotate(-2deg)}68%{transform:translateX(-50%) scale(.94,1.06) rotate(1deg)}84%{transform:translateX(-50%) scale(1.04,.96)}}
 @keyframes humanFeed{0%,100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1)}15%{transform:translateX(calc(-50% - 13px)) translateY(-5px) rotate(-7deg) scale(1.05)}30%{transform:translateX(calc(-50% + 14px)) translateY(4px) rotate(8deg) scale(.96)}45%{transform:translateX(calc(-50% - 11px)) translateY(-7px) rotate(-6deg) scale(1.06)}62%{transform:translateX(calc(-50% + 9px)) translateY(3px) rotate(5deg) scale(.98)}80%{transform:translateX(calc(-50% - 4px)) rotate(-2deg)}}
@@ -219,6 +221,8 @@ body::before{
 @keyframes propSlap{0%{opacity:0;transform:translateY(-50px) rotate(18deg) scale(.8)}18%{opacity:1}58%{opacity:1;transform:translateY(50px) rotate(-10deg) scale(1.08)}100%{opacity:0;transform:translateY(70px) rotate(-20deg) scale(.9)}}
 @keyframes propFeed{0%{opacity:0;transform:translateX(70px) scale(.7) rotate(20deg)}18%{opacity:1}65%{opacity:1;transform:translateX(-22px) scale(1.04) rotate(-10deg)}100%{opacity:0;transform:translateX(-34px) scale(.9) rotate(-18deg)}}
 @keyframes propThrow{0%{opacity:0;transform:translateX(-10px) rotate(0) scale(.7)}15%{opacity:1}68%{opacity:1;transform:translateX(145px) rotate(420deg) scale(1.04)}100%{opacity:0;transform:translateX(172px) rotate(520deg) scale(.85)}}
+.leader-state-fx{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}.leader-state-fx .steam{position:absolute;top:72px;left:calc(50% + var(--steam-x,0px));width:9px;height:18px;border:2px solid rgba(240,163,152,.76);border-bottom:0;border-radius:50% 50% 0 0;opacity:0;animation:steamRise 1.25s ease-out infinite}.leader-state-fx .steam:nth-child(2){--steam-x:18px;animation-delay:.38s}.leader-state-fx .steam:nth-child(3){--steam-x:-18px;animation-delay:.74s}.leader-state-fx .scrap{position:absolute;top:164px;left:calc(50% + var(--scrap-x,0px));width:9px;height:13px;background:#B9C2D0;border:1px solid rgba(35,43,58,.45);transform:rotate(var(--scrap-r,20deg));opacity:.9;animation:scrapFloat 1.8s ease-in-out infinite}.leader-state-fx .scrap:nth-child(2){--scrap-x:62px;--scrap-r:-18deg;animation-delay:.42s}.leader-state-fx .scrap:nth-child(3){--scrap-x:-68px;--scrap-r:42deg;animation-delay:.86s}.leader-state-fx .warn{position:absolute;top:64px;left:calc(50% + 72px);color:#F0A398;font-family:var(--mono);font-size:18px;font-weight:800;filter:drop-shadow(0 3px 3px rgba(0,0,0,.35));animation:warnPulse .9s ease-in-out infinite}
+@keyframes steamRise{0%{opacity:0;transform:translateY(10px) scale(.7) rotate(-8deg)}35%{opacity:.9}100%{opacity:0;transform:translateY(-24px) scale(1.15) rotate(11deg)}}@keyframes scrapFloat{0%,100%{transform:translateY(0) rotate(var(--scrap-r,20deg))}50%{transform:translateY(-6px) rotate(calc(var(--scrap-r,20deg) + 14deg))}}@keyframes warnPulse{0%,100%{transform:scale(.86) rotate(-6deg);opacity:.55}50%{transform:scale(1.15) rotate(5deg);opacity:1}}
 
 .nameplate{text-align:center;padding-top:14px;border-top:1px solid var(--rule);margin-top:6px;position:relative;z-index:4}
 .nameplate .nm{font-family:var(--serif);font-weight:600;font-size:18px;background:var(--grad);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
@@ -723,6 +727,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="figure-shadow"></div>
           <div class="bubble" id="bubble"></div>
           <canvas id="pet-canvas" aria-hidden="true"></canvas>
+          <div class="leader-state-fx" id="leaderStateFx" aria-hidden="true"></div>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
           <div class="action-cue" id="actionCue" aria-live="polite"><b id="actionCueTitle">准备释放</b><span id="actionCueCopy">把烦躁留在这里</span></div>
           <div class="physics-combo" id="physicsCombo" aria-live="polite">连击 x0</div>
@@ -2108,6 +2113,17 @@ function nextActionBubble(ac,actionKey='default'){
   lastActionLine[actionKey]=index;
   return lines[index];
 }
+function updateLeaderStateFx(){
+  const figure=$('.human-figure'),fx=$('#leaderStateFx');if(!figure||!fx)return;
+  if($('#petCard')?.classList.contains('down')){delete figure.dataset.strain;fx.innerHTML='';return;}
+  const strain=pet.endure<=30?'critical':pet.endure<=48?'high':'';
+  if(strain)figure.dataset.strain=strain;else delete figure.dataset.strain;
+  const parts=[];
+  if(pet.irritate>=65)parts.push('<i class="steam"></i><i class="steam"></i><i class="steam"></i>');
+  if(pet.dirty>=55)parts.push('<i class="scrap"></i><i class="scrap"></i><i class="scrap"></i>');
+  if(pet.endure<=30)parts.push('<b class="warn">!</b>');
+  fx.innerHTML=parts.join('');
+}
 function updateBars(){
   $('#bar-endure').style.width=pet.endure+'%';$('#val-endure').textContent=pet.endure;
   $('#bar-irritate').style.width=pet.irritate+'%';$('#val-irritate').textContent=pet.irritate;
@@ -2115,6 +2131,7 @@ function updateBars(){
   $('#bar-dirty').style.width=pet.dirty+'%';$('#val-dirty').textContent=pet.dirty;
   if(pet.endure<=0&&!$('#petCard').classList.contains('down')){knockDown()}
   updateExpr();
+  updateLeaderStateFx();
 }
 
 let exprTimer=null;
