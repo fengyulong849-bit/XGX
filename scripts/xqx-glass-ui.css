@@ -1,0 +1,126 @@
+/* 小确闲 Apple Glass Design System
+   This file is visual-only. Pages retain their existing DOM, IDs, scripts, and API contracts. */
+:root{
+  --xqx-night:#09121f;
+  --xqx-night-soft:#101c2d;
+  --xqx-glass:rgba(24,39,60,.62);
+  --xqx-glass-strong:rgba(26,44,68,.78);
+  --xqx-glass-light:rgba(255,255,255,.055);
+  --xqx-border:rgba(255,255,255,.12);
+  --xqx-border-soft:rgba(255,255,255,.075);
+  --xqx-orange:#f0a663;
+  --xqx-teal:#69b8af;
+  --xqx-coral:#da897c;
+  --xqx-text:rgba(248,246,241,.95);
+  --xqx-muted:rgba(216,225,235,.58);
+  --xqx-faint:rgba(216,225,235,.38);
+  --xqx-radius-lg:26px;
+  --xqx-radius-md:18px;
+  --xqx-shadow:0 20px 54px rgba(0,0,0,.25),inset 0 1px 0 rgba(255,255,255,.095);
+  --xqx-shadow-hover:0 27px 66px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.14);
+  --xqx-spring:cubic-bezier(.22,1,.36,1);
+}
+
+html{background:var(--xqx-night)}
+body{
+  background:
+    radial-gradient(900px 580px at 4% -10%,rgba(91,142,195,.16),transparent 58%),
+    radial-gradient(760px 500px at 106% 5%,rgba(102,183,172,.10),transparent 56%),
+    radial-gradient(720px 480px at 52% 112%,rgba(240,166,99,.075),transparent 62%),
+    var(--xqx-night)!important;
+  color:var(--xqx-text)!important;
+}
+body::before{content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(115deg,rgba(255,255,255,.015),transparent 30%,rgba(255,255,255,.012) 70%,transparent);}
+
+/* Global navigation behaves like a calm macOS toolbar. */
+.nav,.topbar,.topbar-like{
+  background:rgba(12,23,38,.64)!important;
+  border-color:var(--xqx-border-soft)!important;
+  box-shadow:0 10px 36px rgba(0,0,0,.12);
+  backdrop-filter:blur(24px) saturate(135%)!important;
+  -webkit-backdrop-filter:blur(24px) saturate(135%)!important;
+}
+.nav,.topbar{max-width:none!important}
+.nav a,.topbar a,.nav-links a{transition:color .28s ease,background .28s ease,transform .28s var(--xqx-spring)!important}
+.nav a:hover,.topbar a:hover,.nav-links a:hover{background:rgba(255,255,255,.065)!important;color:var(--xqx-text)!important;transform:translateY(-1px)}
+.topbar .pts,.nav .countdown,.topbar .back,.nav .schedule-settings{
+  border-color:var(--xqx-border-soft)!important;
+  background:rgba(255,255,255,.045)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+}
+
+/* Shared widgets: less card wall, more spatial glass. */
+.glass-widget,.overview,.write-card,.choose-wrap .preview,.calendar-card,.account-item,.tl-item,.rant-item,.milestone,.streak-info,.dim,.name-editor,.card,.notice,.metric,.history,.item,.dialog,.reset-card,.rules-card,.section-card{
+  border-color:var(--xqx-border)!important;
+  background:linear-gradient(145deg,rgba(40,59,84,.58),rgba(19,33,52,.72))!important;
+  box-shadow:var(--xqx-shadow)!important;
+  backdrop-filter:blur(22px) saturate(125%)!important;
+  -webkit-backdrop-filter:blur(22px) saturate(125%)!important;
+}
+.overview,.write-card,.calendar-card,.card,.notice,.dialog,.rules-card,.section-card{border-radius:var(--xqx-radius-lg)!important}
+.account-item,.tl-item,.rant-item,.milestone,.streak-info,.dim,.name-editor,.metric,.item{border-radius:var(--xqx-radius-md)!important}
+.overview,.write-card,.calendar-card,.card,.notice,.metric,.history,.item,.dialog,.reset-card,.rules-card,.section-card{transition:transform .42s var(--xqx-spring),box-shadow .42s ease,border-color .32s ease,background .32s ease}
+.overview:hover,.write-card:hover,.calendar-card:hover,.card:hover,.notice:hover,.metric:hover,.history:hover,.item:hover,.dialog:hover,.reset-card:hover,.rules-card:hover,.section-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.18)!important;box-shadow:var(--xqx-shadow-hover)!important}
+
+/* Primary actions use a restrained Orange material, secondary actions stay glass. */
+.btn-primary,.btn-primary2,.nav-cta,.confirm,.grant{
+  background:linear-gradient(135deg,#f4ba7c,#e99274)!important;
+  color:#162033!important;
+  box-shadow:0 8px 22px rgba(238,157,104,.2),inset 0 1px 0 rgba(255,255,255,.38)!important;
+  transition:transform .32s var(--xqx-spring),box-shadow .32s ease,filter .32s ease!important;
+}
+.btn-primary:hover,.btn-primary2:hover,.nav-cta:hover,.confirm:hover,.grant:hover{transform:translateY(-2px)!important;filter:brightness(1.05);box-shadow:0 13px 30px rgba(238,157,104,.27),inset 0 1px 0 rgba(255,255,255,.45)!important}
+.btn-ghost,.btn-ghost2,.btn-secondary,.back,.cancel,.revoke,.action,.nav .schedule-settings{
+  background:rgba(255,255,255,.035)!important;
+  border-color:var(--xqx-border)!important;
+  color:var(--xqx-muted)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.045);
+  transition:transform .28s var(--xqx-spring),background .28s ease,border-color .28s ease,color .28s ease!important;
+}
+.btn-ghost:hover,.btn-ghost2:hover,.btn-secondary:hover,.back:hover,.cancel:hover,.revoke:hover,.action:hover,.nav .schedule-settings:hover{transform:translateY(-1px);background:rgba(255,255,255,.075)!important;border-color:rgba(255,255,255,.22)!important;color:var(--xqx-text)!important}
+
+input,textarea,select,.field input,.modal-pwd-field input,.name-editor input,#review-note{
+  background:rgba(5,15,28,.5)!important;
+  border-color:var(--xqx-border-soft)!important;
+  box-shadow:inset 0 1px 1px rgba(0,0,0,.16),0 1px 0 rgba(255,255,255,.025);
+  transition:border-color .25s ease,box-shadow .25s ease,background .25s ease!important;
+}
+input:focus,textarea:focus,select:focus,.field input:focus,.modal-pwd-field input:focus,.name-editor input:focus,#review-note:focus{
+  border-color:rgba(240,166,99,.64)!important;
+  box-shadow:0 0 0 3px rgba(240,166,99,.12),inset 0 1px 1px rgba(0,0,0,.16)!important;
+}
+
+/* Content pages receive a bento rhythm rather than a dense dashboard rhythm. */
+.main{max-width:1160px;margin-left:auto;margin-right:auto}
+.main:not(.config):not(.studio){padding-top:36px!important;padding-bottom:64px!important}
+.overview{position:relative;overflow:hidden;padding:30px!important;background:linear-gradient(140deg,rgba(48,69,98,.7),rgba(18,35,56,.78) 58%,rgba(24,58,68,.66))!important}
+.overview::after{content:'';position:absolute;width:290px;height:190px;right:-70px;top:-92px;border-radius:50%;background:radial-gradient(circle,rgba(240,166,99,.14),transparent 70%);pointer-events:none}
+.overview .points-block .value{font-variant-numeric:tabular-nums;color:var(--xqx-orange)!important;text-shadow:0 1px 16px rgba(240,166,99,.16)}
+.timeline,.rant-list,.account-section{gap:11px!important}
+.tl-item,.account-item{min-height:68px;border-color:transparent!important;background:rgba(255,255,255,.038)!important;box-shadow:none!important}
+.tl-item:hover,.account-item:hover{background:rgba(255,255,255,.072)!important;border-color:rgba(255,255,255,.11)!important;transform:translateX(3px)}
+.tabs{gap:5px!important;border:0!important;padding:5px!important;border-radius:15px;background:rgba(255,255,255,.035);width:max-content;max-width:100%;overflow:auto;box-shadow:inset 0 1px 0 rgba(255,255,255,.045)}
+.tab{border-radius:11px!important;padding:8px 14px!important;color:var(--xqx-muted)!important}.tab.active{background:rgba(255,255,255,.09)!important;color:var(--xqx-text)!important;box-shadow:0 3px 12px rgba(0,0,0,.12)}.tab.active::after{display:none!important}
+
+/* DIY becomes a spatial studio with a translucent inspector. */
+.studio{background:radial-gradient(ellipse 65% 60% at 50% 39%,rgba(240,166,99,.12),transparent 66%),radial-gradient(ellipse 45% 42% at 82% 15%,rgba(105,184,175,.10),transparent 65%),#081321!important}
+.studio::after{opacity:.32!important}.config{background:rgba(10,20,34,.76)!important;backdrop-filter:blur(24px)!important;-webkit-backdrop-filter:blur(24px)!important}
+.dim{border-left-color:transparent!important;background:rgba(255,255,255,.035)!important;box-shadow:none!important}.dim.active{border-left-color:var(--xqx-orange)!important;background:rgba(255,255,255,.075)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.07)!important}.dim:hover{background:rgba(255,255,255,.06)!important}
+.opt{border-color:transparent!important;background:rgba(255,255,255,.045)!important;border-radius:999px!important}.opt:hover{background:rgba(255,255,255,.09)!important}.opt.sel{border-color:rgba(240,166,99,.42)!important;background:rgba(240,166,99,.13)!important;color:#f6bd80!important;box-shadow:0 0 0 1px rgba(240,166,99,.08)!important}
+.rotate-ring{background:rgba(15,28,45,.57)!important;border-color:var(--xqx-border)!important;box-shadow:var(--xqx-shadow)!important;backdrop-filter:blur(18px) saturate(130%)!important}
+
+/* Release flow: process is calm and glassy, without losing the existing ritual effects. */
+.steps{background:rgba(9,18,31,.56)!important;border-color:var(--xqx-border-soft)!important;backdrop-filter:blur(22px) saturate(130%)!important}.step .dot{background:rgba(255,255,255,.045)!important;border-color:var(--xqx-border)!important}.step.active .dot{background:var(--xqx-orange)!important;border-color:var(--xqx-orange)!important;box-shadow:0 0 18px rgba(240,166,99,.28)!important}.line{height:1px!important;background:rgba(255,255,255,.13)!important}.line.done{background:var(--xqx-teal)!important}
+.stage{background:radial-gradient(ellipse 65% 55% at 50% 37%,rgba(74,110,148,.12),transparent 65%),var(--xqx-night)!important}.method{border-color:var(--xqx-border)!important;background:rgba(30,48,72,.56)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.06)!important}.method:hover{background:rgba(48,67,94,.7)!important;box-shadow:var(--xqx-shadow)!important}.method.sel{border-color:rgba(240,166,99,.62)!important;background:rgba(240,166,99,.09)!important;box-shadow:0 18px 40px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.09)!important}
+
+/* Rule and back-office content remain efficient, but gain the same materials. */
+.side-nav{background:rgba(14,27,44,.56)!important;border-color:var(--xqx-border-soft)!important;backdrop-filter:blur(20px)!important}.side-nav a{border-radius:12px!important}.side-nav a.active,.side-nav a:hover{background:rgba(255,255,255,.07)!important}
+.content{max-width:850px}.content section,.content article{border-color:var(--xqx-border)!important;background:rgba(30,48,72,.5)!important;box-shadow:var(--xqx-shadow)!important;border-radius:var(--xqx-radius-md)!important}
+.shell{max-width:1160px!important}.headline{padding:26px 0!important}.summary{gap:14px!important}.metric{padding:22px!important}.queue,.history-list{gap:12px!important}.item{padding:20px!important}.history{padding:22px!important}.tag,.reason,.seal{border-color:rgba(255,255,255,.13)!important;background:rgba(255,255,255,.05)!important;border-radius:999px!important}
+
+/* Focus, page entrance and accessibility. */
+.overview,.write-card,.choose-wrap,.calendar-card,.card,.notice,.item,.history,.reset-card,.rules-card{animation:xqxWidgetEnter .55s var(--xqx-spring) both}
+@keyframes xqxWidgetEnter{from{opacity:0;transform:translateY(9px);filter:blur(2px)}to{opacity:1;transform:translateY(0);filter:blur(0)}}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid rgba(240,166,99,.78)!important;outline-offset:3px!important}
+@media(max-width:760px){.main:not(.config):not(.studio){padding-left:16px!important;padding-right:16px!important}.overview{padding:23px!important}.methods{gap:10px!important}.summary{grid-template-columns:1fr!important}.topbar{padding-left:14px!important;padding-right:14px!important}.topbar nav{display:none!important}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
