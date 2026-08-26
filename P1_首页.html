@@ -141,17 +141,26 @@ body::before{
 .human-figure svg{width:100%;height:100%;overflow:visible}
 .human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}.human-figure .face-shape{transform-box:fill-box;transform-origin:50% 50%;transition:transform .25s ease}.human-figure[data-face="1"] .face-shape{transform:scaleX(1.08) scaleY(1.02)}.human-figure[data-face="2"] .face-shape{transform:scaleX(.9) scaleY(1.14)}.human-figure .hair-variant{display:none}.human-figure[data-hair="0"] .hair-0,.human-figure[data-hair="1"] .hair-1,.human-figure[data-hair="2"] .hair-2,.human-figure[data-hair="3"] .hair-3{display:block}
 .human-figure .optional{display:none}.human-figure[data-glasses="1"] .glasses-round,.human-figure[data-glasses="2"] .glasses-square,.human-figure[data-beard="1"] .beard-mustache,.human-figure[data-beard="2"] .beard-full{display:block}
+.human-figure .physics-part{transform-box:fill-box;transform-origin:center;transition:transform .22s ease;will-change:transform}
 .human-figure.physics-hit-head .face-shape{animation:physicsHeadHit .42s cubic-bezier(.2,1.5,.4,1)}
 .human-figure.physics-hit-face .face-shape{animation:physicsFaceHit .38s cubic-bezier(.2,1.6,.4,1)}
 .human-figure.physics-hit-belly .human-body{animation:physicsBellyHit .5s cubic-bezier(.2,1.4,.4,1)}
-.human-figure.physics-hit-ear .human-body{animation:physicsBodyHit .42s cubic-bezier(.2,1.4,.4,1)}
-.human-figure.physics-hit-nose .face-shape{animation:physicsNoseHit .32s cubic-bezier(.2,1.7,.4,1)}
-.human-figure.physics-drag .face-shape,.human-figure.physics-drag .human-body{transition:none!important}
+.human-figure.physics-hit-ear .physics-ear{animation:physicsBodyHit .42s cubic-bezier(.2,1.4,.4,1)}
+.human-figure.physics-hit-nose [data-physics-zone="nose"]{animation:physicsNoseHit .32s cubic-bezier(.2,1.7,.4,1)}
+.human-figure.physics-hit-hair .physics-hair{animation:physicsHairHit .46s cubic-bezier(.2,1.55,.4,1)}
+.human-figure.physics-hit-tie .physics-tie{animation:physicsTieHit .48s cubic-bezier(.2,1.45,.4,1)}
+.human-figure.physics-hit-arm-left .physics-arm-left,.human-figure.physics-hit-arm-right .physics-arm-right{animation:physicsArmHit .44s cubic-bezier(.2,1.45,.4,1)}
+.human-figure.physics-hit-glasses .physics-glasses{animation:physicsGlassesHit .42s cubic-bezier(.2,1.5,.4,1)}
+.human-figure.physics-drag .physics-part,.human-figure.physics-drag .face-shape,.human-figure.physics-drag .human-body{transition:none!important}
 @keyframes physicsHeadHit{0%{transform:translate(0,0) rotate(0)}35%{transform:translate(10px,-4px) rotate(7deg)}100%{transform:translate(0,0) rotate(0)}}
 @keyframes physicsFaceHit{0%{transform:scaleX(1) translateX(0)}35%{transform:scaleX(1.16) translateX(7px)}100%{transform:scaleX(1) translateX(0)}}
 @keyframes physicsBellyHit{0%,100%{transform:scaleX(1)}35%{transform:scaleX(1.16) translateY(3px)}70%{transform:scaleX(.94) translateY(-1px)}}
 @keyframes physicsBodyHit{0%,100%{transform:translateX(0) rotate(0)}35%{transform:translateX(11px) rotate(5deg)}70%{transform:translateX(-5px) rotate(-2deg)}}
 @keyframes physicsNoseHit{0%,100%{transform:scale(1)}35%{transform:scale(1.18,.9)}70%{transform:scale(.96,1.04)}}
+@keyframes physicsHairHit{0%,100%{transform:rotate(0)}30%{transform:translateY(-7px) rotate(-8deg)}65%{transform:translateY(2px) rotate(5deg)}}
+@keyframes physicsTieHit{0%,100%{transform:rotate(0)}30%{transform:translateX(8px) rotate(14deg)}65%{transform:translateX(-5px) rotate(-8deg)}}
+@keyframes physicsArmHit{0%,100%{transform:rotate(0)}30%{transform:translateY(-8px) rotate(var(--arm-swing,10deg))}65%{transform:translateY(2px) rotate(calc(var(--arm-swing,10deg) * -.55))}}
+@keyframes physicsGlassesHit{0%,100%{transform:translateX(0) rotate(0)}30%{transform:translateX(7px) rotate(8deg)}65%{transform:translateX(-4px) rotate(-5deg)}}
 .physics-combo{position:absolute;right:18px;top:18px;z-index:7;font-family:var(--mono);font-size:12px;color:var(--amber);opacity:0;transform:translateY(-4px);transition:all .2s var(--ease);pointer-events:none}.physics-combo.show{opacity:1;transform:translateY(0)}
 .human-figure .outline{stroke:#171827;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}
 @keyframes humanFloat{0%,100%{margin-bottom:0}50%{margin-bottom:6px}}
@@ -712,28 +721,28 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
           <div class="physics-combo" id="physicsCombo" aria-live="polite">连击 x0</div>
           <div class="action-prop" id="actionProp" aria-hidden="true"></div>
-          <div class="human-figure" aria-label="卡通领导人物">
+          <div class="human-figure" data-face="0" data-hair="0" data-belly="0" data-glasses="0" data-beard="0" data-expr="0" aria-label="卡通领导人物">
             <svg viewBox="0 0 220 278" role="img" aria-labelledby="human-title">
               <title id="human-title">卡通领导人物</title>
               <!-- 身体和肩膀 -->
               <g class="human-body"><path class="suit outline" d="M42 270c2-48 12-72 40-83h56c28 11 38 35 40 83z"/>
               <path class="suit-dark outline" d="M82 188l28 27 28-27 13 82H69z"/>
               <path class="shirt outline" d="M88 184l22 25 22-25 9 20-31 30-31-30z"/>
-              <path class="tie outline" d="M104 205h12l5 29-11 12-11-12z"/>
-              <circle class="tie" cx="110" cy="204" r="7"/>
+              <g class="physics-part physics-tie" data-physics-zone="tie"><path class="tie outline" d="M104 205h12l5 29-11 12-11-12z"/>
+              <circle class="tie" cx="110" cy="204" r="7"/></g>
               <path class="suit-dark outline" d="M42 270l9-59 25 7-5 52zM178 270l-9-59-25 7 5 52z"/>
               <!-- 脖子和耳朵 -->
               <path class="skin-light outline" d="M88 170v28c0 12 44 12 44 0v-28z"/>
-              <ellipse class="skin-light outline" cx="67" cy="119" rx="13" ry="20"/>
-              <ellipse class="skin-light outline" cx="153" cy="119" rx="13" ry="20"/>
+              <ellipse class="skin-light outline physics-part physics-ear" data-physics-zone="ear" cx="67" cy="119" rx="13" ry="20"/>
+              <ellipse class="skin-light outline physics-part physics-ear" data-physics-zone="ear" cx="153" cy="119" rx="13" ry="20"/>
               <!-- 头部 -->
-              <path class="skin-light outline face-shape" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
+              <path class="skin-light outline face-shape" data-physics-zone="face" d="M70 57c16-22 64-22 80 0 8 12 8 55-2 78-9 22-25 35-38 35s-29-13-38-35c-10-23-10-66-2-78z"/>
               <!-- 头发和刘海 -->
-              <path class="hair hair-variant hair-0 outline" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/>
-              <path class="hair-hi hair-variant hair-0" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
-              <g class="hair-variant hair-1"><path class="hair outline" d="M68 91c-7-34 10-68 42-72 31-3 52 21 44 70l-13-24-13 15-17-18-15 18-13-13z"/><path class="hair-hi" d="M109 25v58"/></g>
-              <path class="hair hair-variant hair-2 outline" d="M72 79c0-27 16-51 38-54 24-3 39 18 39 53l-14-11-13 10-13-9-14 10-10-10z"/>
-              <g class="hair-variant hair-3"><path class="hair outline" d="M68 92c-6-24-2-47 15-60l9 18-9 44zM152 92c6-24 2-47-15-60l-9 18 9 44z"/><path class="hair-hi" d="M77 51c6-8 11-12 17-15M143 51c-6-8-11-12-17-15"/></g>
+              <path class="hair hair-variant hair-0 outline physics-part physics-hair" data-physics-zone="hair" d="M66 91c-9-29 3-61 28-72 27-12 60 0 67 30 4 16 1 31-5 44l-13-18-10 15-13-19-16 20-12-18-12 19-12-15z"/>
+              <path class="hair-hi hair-variant hair-0 physics-part physics-hair" data-physics-zone="hair" d="M78 43c17-21 48-25 67-7-18-4-35 1-48 13z"/>
+              <g class="hair-variant hair-1 physics-part physics-hair" data-physics-zone="hair"><path class="hair outline" d="M68 91c-7-34 10-68 42-72 31-3 52 21 44 70l-13-24-13 15-17-18-15 18-13-13z"/><path class="hair-hi" d="M109 25v58"/></g>
+              <path class="hair hair-variant hair-2 outline physics-part physics-hair" data-physics-zone="hair" d="M72 79c0-27 16-51 38-54 24-3 39 18 39 53l-14-11-13 10-13-9-14 10-10-10z"/>
+              <g class="hair-variant hair-3 physics-part physics-hair" data-physics-zone="hair"><path class="hair outline" d="M68 92c-6-24-2-47 15-60l9 18-9 44zM152 92c6-24 2-47-15-60l-9 18 9 44z"/><path class="hair-hi" d="M77 51c6-8 11-12 17-15M143 51c-6-8-11-12-17-15"/></g>
               <!-- 眉毛 -->
               <path class="ink" d="M82 106q12-8 24 0l-2 5q-12-5-22 1zM114 106q12-8 24 0l-1 6q-11-6-22-1z"/>
               <!-- 眼睛 -->
@@ -743,15 +752,15 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
               <circle fill="#fff" cx="99" cy="121" r="1.3"/><circle fill="#fff" cx="123" cy="121" r="1.3"/>
               <!-- 腮红、鼻子和嘴 -->
               <ellipse class="blush" cx="79" cy="142" rx="11" ry="5"/><ellipse class="blush" cx="141" cy="142" rx="11" ry="5"/>
-              <path fill="none" class="outline" d="M109 123q-4 13 2 15"/>
+              <path fill="none" class="outline physics-part" data-physics-zone="nose" d="M109 123q-4 13 2 15"/>
               <path fill="none" class="ink outline" d="M98 153q12 8 24 0"/>
-              <g class="glasses-round optional" fill="none" stroke="#1B1720" stroke-width="4"><circle cx="96" cy="122" r="15"/><circle cx="124" cy="122" r="15"/><path d="M111 122h-2"/></g>
-              <g class="glasses-square optional" fill="none" stroke="#1B1720" stroke-width="4"><rect x="80" y="107" width="29" height="29" rx="5"/><rect x="111" y="107" width="29" height="29" rx="5"/><path d="M111 121h-2"/></g>
+              <g class="glasses-round optional physics-part physics-glasses" data-physics-zone="glasses" fill="none" stroke="#1B1720" stroke-width="4"><circle cx="96" cy="122" r="15"/><circle cx="124" cy="122" r="15"/><path d="M111 122h-2"/></g>
+              <g class="glasses-square optional physics-part physics-glasses" data-physics-zone="glasses" fill="none" stroke="#1B1720" stroke-width="4"><rect x="80" y="107" width="29" height="29" rx="5"/><rect x="111" y="107" width="29" height="29" rx="5"/><path d="M111 121h-2"/></g>
               <g class="beard-mustache optional" fill="none" stroke="#30251F" stroke-width="5"><path d="M110 146q-10 10-18 2M110 146q10 10 18 2"/></g>
               <path class="beard-full optional" d="M84 145q26 36 52 0v28H84z"/>
               <!-- 手臂和手 -->
-              <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/>
-              <circle class="skin-light outline" cx="43" cy="257" r="11"/><circle class="skin-light outline" cx="177" cy="257" r="11"/></g>
+              <g class="physics-part physics-arm-left" data-physics-zone="arm-left" style="--arm-swing:-12deg"><path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36z"/><circle class="skin-light outline" cx="43" cy="257" r="11"/></g>
+              <g class="physics-part physics-arm-right" data-physics-zone="arm-right" style="--arm-swing:12deg"><path class="suit outline" d="M172 215q17 18 14 42l-16 2-18-36z"/><circle class="skin-light outline" cx="177" cy="257" r="11"/></g></g>
             </svg>
           </div>
           <div class="down-panel" id="downPanel">
@@ -1945,9 +1954,24 @@ const bubble=$('#bubble');
 const pet={endure:62,irritate:45,fat:30,dirty:18,locked:false};
 const PET_LINES=window.XQX_PET_LINES||{};
 const physicsState={combo:0,timer:null,drag:null};
+function physicsMarkedPart(event,figure){
+  let node=event.target;
+  while(node&&node!==figure){
+    if(node.dataset?.physicsZone)return node;
+    node=node.parentNode;
+  }
+  return null;
+}
+function physicsMarkedZone(event,figure){
+  return physicsMarkedPart(event,figure)?.dataset.physicsZone||'';
+}
 function physicsZone(event,figure){
+  const marked=physicsMarkedZone(event,figure);if(marked)return marked;
   const r=figure.getBoundingClientRect(),x=(event.clientX-r.left)/r.width,y=(event.clientY-r.top)/r.height;
   if(y<.31)return 'head';
+  if(y>.62&&x<.28)return 'arm-left';
+  if(y>.62&&x>.72)return 'arm-right';
+  if(y>.62&&x>.43&&x<.57)return 'tie';
   if(y>=.39&&y<.53&&x>.44&&x<.56)return 'nose';
   if(y<.49)return x<.34||x>.66?'ear':'face';
   if(y<.68)return x>.36&&x<.64?'belly':'face';
@@ -1956,13 +1980,18 @@ function physicsZone(event,figure){
 function physicsTarget(zone){
   const figure=document.querySelector('.human-figure');
   if(!figure)return null;
+  const selector={hair:'.physics-hair',tie:'.physics-tie','arm-left':'.physics-arm-left','arm-right':'.physics-arm-right',glasses:'.physics-glasses',ear:'.physics-ear',nose:'[data-physics-zone="nose"]'}[zone];
+  if(selector){
+    const parts=[...figure.querySelectorAll(selector)];
+    return parts.find(part=>getComputedStyle(part).display!=='none')||parts[0]||null;
+  }
   if(zone==='head'||zone==='face'||zone==='nose')return figure.querySelector('.face-shape');
   return figure.querySelector(zone==='belly'||zone==='body'?'.human-body':'.face-shape');
 }
 function physicsPulse(zone){
   const figure=document.querySelector('.human-figure');if(!figure)return;
-  ['head','face','belly','ear','nose'].forEach(z=>figure.classList.remove(`physics-hit-${z}`));
-  const hit=zone==='ear'?'ear':zone;figure.classList.add(`physics-hit-${hit}`);
+  ['head','face','belly','ear','nose','hair','tie','arm-left','arm-right','glasses'].forEach(z=>figure.classList.remove(`physics-hit-${z}`));
+  const hit=zone;figure.classList.add(`physics-hit-${hit}`);
   clearTimeout(figure._physicsTimer);figure._physicsTimer=setTimeout(()=>figure.classList.remove(`physics-hit-${hit}`),560);
 }
 function physicsFeedback(zone){
@@ -1970,7 +1999,7 @@ function physicsFeedback(zone){
   physicsState.combo=Math.min(25,physicsState.combo+1);clearTimeout(physicsState.timer);physicsState.timer=setTimeout(()=>{physicsState.combo=0;physicsCombo(false)},2600);
   physicsCombo(true);
   const impact=$('#actionImpact'),word=$('#impactWord'),points=$('#impactPoints'),copy=$('#impactCopy');
-  const words={head:['BONK!','头部命中'],face:['POKE!','脸颊弹回来了'],belly:['JIGGLE!','肚子晃起来了'],ear:['YEOW!','耳朵被拉到了'],nose:['TWITCH!','鼻子回弹']};
+  const words={head:['BONK!','头部命中'],face:['POKE!','脸颊弹回来了'],belly:['JIGGLE!','肚子晃起来了'],ear:['YEOW!','耳朵被拉到了'],nose:['TWITCH!','鼻子回弹'],hair:['MESSY!','头发被薅乱了'],tie:['YANK!','领带歪到一边'], 'arm-left':['FLAIL!','左胳膊甩开了'], 'arm-right':['FLAIL!','右胳膊甩开了'],glasses:['SKEW!','眼镜歪了']};
   const hit=words[zone]||['POW!','局部反馈'];
   if(impact&&word&&points&&copy){impact.dataset.action='physics';word.textContent=hit[0];points.textContent='局部反馈';copy.textContent=hit[1];impact.classList.remove('show');void impact.offsetWidth;impact.classList.add('show');clearTimeout(impact._physicsTimer);impact._physicsTimer=setTimeout(()=>impact.classList.remove('show'),760)}
   if(physicsState.combo===5||physicsState.combo===10||physicsState.combo===15){showBubble(`局部连击 x${physicsState.combo}`);spawnFx(['💥','💫','✨'],physicsState.combo>9?8:4)}
@@ -1978,17 +2007,17 @@ function physicsFeedback(zone){
 function physicsCombo(show){const el=$('#physicsCombo');if(!el)return;el.textContent=`局部连击 x${physicsState.combo}`;el.classList.toggle('show',show)}
 function physicsDragStart(event){
   const figure=event.currentTarget;if($('#petCard')?.classList.contains('down'))return;
-  const zone=physicsZone(event,figure);physicsState.drag={zone,figure,lastX:event.clientX,lastY:event.clientY};figure.classList.add('physics-drag');figure.setPointerCapture?.(event.pointerId);event.preventDefault();
+  const zone=physicsZone(event,figure),target=physicsMarkedPart(event,figure)||physicsTarget(zone);physicsState.drag={zone,figure,target,lastX:event.clientX,lastY:event.clientY};figure.classList.add('physics-drag');figure.setPointerCapture?.(event.pointerId);event.preventDefault();
 }
 function physicsDragMove(event){
   const drag=physicsState.drag;if(!drag)return;
-  const target=physicsTarget(drag.zone);if(!target)return;
+  const target=drag.target||physicsTarget(drag.zone);if(!target)return;
   const dx=event.clientX-drag.lastX,dy=event.clientY-drag.lastY;drag.lastX=event.clientX;drag.lastY=event.clientY;
   const rot=Math.max(-18,Math.min(18,dx*.45));
   target.style.transform=`translate(${Math.max(-18,Math.min(18,dx*1.5))}px,${Math.max(-12,Math.min(12,dy*1.1))}px) rotate(${rot}deg)`;
 }
 function physicsDragEnd(){
-  const drag=physicsState.drag;if(!drag)return;const target=physicsTarget(drag.zone);if(target){target.animate([{transform:target.style.transform},{transform:''}],{duration:360,easing:'cubic-bezier(.2,1.5,.4,1)'});setTimeout(()=>{target.style.transform=''},380)}drag.figure.classList.remove('physics-drag');drag.figure._ignorePhysicsClick=true;physicsState.drag=null;if(!$('#petCard')?.classList.contains('down'))physicsFeedback(drag.zone);
+  const drag=physicsState.drag;if(!drag)return;const target=drag.target||physicsTarget(drag.zone);if(target){target.animate([{transform:target.style.transform},{transform:''}],{duration:360,easing:'cubic-bezier(.2,1.5,.4,1)'});setTimeout(()=>{target.style.transform=''},380)}drag.figure.classList.remove('physics-drag');drag.figure._ignorePhysicsClick=true;physicsState.drag=null;if(!$('#petCard')?.classList.contains('down'))physicsFeedback(drag.zone);
 }
 function initPhysicsInteraction(){
   const figure=document.querySelector('.human-figure');if(!figure||figure.dataset.physicsReady)return;figure.dataset.physicsReady='1';
