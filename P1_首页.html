@@ -202,6 +202,8 @@ body::before{
 .action-cue.show{opacity:1;transform:translate(-50%,0) scale(1)}.action-cue[data-action="slap"] b{color:#FF9EAB}.action-cue[data-action="feed"] b{color:#F2C17E}.action-cue[data-action="throw"] b{color:#A9D7FF}
 .action-meme{position:absolute;right:12px;bottom:48px;z-index:9;display:flex;align-items:center;gap:5px;padding:4px 8px 4px 5px;border:2px solid #FFF7E7;border-radius:999px;background:#F05E7A;box-shadow:0 5px 0 rgba(72,25,44,.48),0 10px 22px rgba(0,0,0,.3);opacity:0;pointer-events:none;transform:translateY(15px) rotate(12deg) scale(.55)}.action-meme span{display:grid;place-items:center;width:45px;height:45px;border-radius:50%;background:#FFF7E7;font-size:30px;line-height:1;filter:drop-shadow(0 2px 1px rgba(0,0,0,.14))}.action-meme b{max-width:72px;color:#fff;font-size:15px;line-height:1.05;text-shadow:0 2px 0 rgba(86,25,42,.35)}.action-meme.show{animation:memePop 1.08s cubic-bezier(.16,1.45,.35,1) forwards}.action-meme[data-action="poke"]{background:#5B8DEF}.action-meme[data-action="slap"]{background:#F05E7A}.action-meme[data-action="feed"]{background:#A8733D}.action-meme[data-action="throw"]{background:#6F66D9}
 @keyframes memePop{0%{opacity:0;transform:translateY(18px) rotate(16deg) scale(.35)}20%{opacity:1;transform:translateY(-6px) rotate(-8deg) scale(1.18)}48%{opacity:1;transform:translateY(1px) rotate(5deg) scale(.98)}100%{opacity:0;transform:translateY(-32px) rotate(-3deg) scale(.88)}}
+.action-meme-burst{position:absolute;inset:0;z-index:6;pointer-events:none;overflow:hidden}.burst-meme{position:absolute;left:var(--meme-x);top:var(--meme-y);display:flex;align-items:center;gap:3px;padding:3px 7px 3px 4px;border:2px solid rgba(255,255,255,.92);border-radius:999px;background:var(--meme-color,#5B8DEF);box-shadow:0 4px 0 rgba(16,22,37,.42),0 9px 18px rgba(0,0,0,.28);color:#fff;font-size:11px;font-weight:900;white-space:nowrap;opacity:0;transform:translate(-50%,-50%) rotate(var(--meme-r,0deg)) scale(.35);animation:burstMeme 1.25s cubic-bezier(.16,1.4,.3,1) var(--meme-delay,0ms) forwards}.burst-meme span{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#FFF7E7;font-size:19px;line-height:1}.burst-meme b{text-shadow:0 1px 0 rgba(0,0,0,.2)}
+@keyframes burstMeme{0%{opacity:0;transform:translate(-50%,-50%) rotate(var(--meme-r,0deg)) scale(.2)}20%{opacity:1;transform:translate(-50%,-50%) rotate(calc(var(--meme-r,0deg) * -.3)) scale(1.14)}62%{opacity:1;transform:translate(calc(-50% + var(--meme-dx,0px)),calc(-50% + var(--meme-dy,-12px))) rotate(var(--meme-r,0deg)) scale(.98)}100%{opacity:0;transform:translate(calc(-50% + var(--meme-dx,0px)),calc(-50% + var(--meme-dy,-26px))) rotate(calc(var(--meme-r,0deg) + 9deg)) scale(.82)}}
 .figure-stage.combo-heat .figure-glow{animation:comboGlow .72s ease-out}.figure-stage.combo-heat::after{content:'';position:absolute;inset:24px 30px 12px;border:1px solid rgba(232,163,61,.55);border-radius:50%;pointer-events:none;animation:comboRing .7s ease-out forwards}
 @keyframes comboGlow{0%{transform:translateX(-50%) scale(.72);opacity:.2}45%{transform:translateX(-50%) scale(1.35);opacity:1}100%{transform:translateX(-50%) scale(1.05);opacity:.7}}@keyframes comboRing{0%{opacity:0;transform:scale(.62)}24%{opacity:1}100%{opacity:0;transform:scale(1.25)}}
 @keyframes impactPop{0%{opacity:0;transform:translate(-50%,20px) scale(.45) rotate(-8deg)}22%{opacity:1;transform:translate(-50%,-4px) scale(1.18) rotate(3deg)}55%{opacity:1;transform:translate(-50%,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(-50%,-38px) scale(.92) rotate(2deg)}}
@@ -320,6 +322,21 @@ body::before{
 .rhythm-host>.care-section .cd-ring{width:clamp(190px,18vw,228px);height:clamp(190px,18vw,228px);margin:16px auto 0}
 .rhythm-host>.care-section .cc-head{padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.08)}
 .rhythm-host>.care-section .care-card:first-child{padding:0}
+.rhythm-host{display:flex;flex-direction:column;height:auto;min-height:620px}
+.rhythm-host>.care-section{display:flex;flex:1;min-height:0;padding:24px}
+.rhythm-host>.care-section>.care-grid{display:block;flex:1;min-height:0}
+.rhythm-host>.care-section .care-card:first-child{height:100%;display:flex}
+.rhythm-host>.care-section .care-card:first-child .cc-inner{height:100%;min-height:0}
+.rhythm-host>.care-section .cc-head{display:none}
+.rhythm-host>.care-section .countdown-panel{display:flex;flex:1;align-items:center;padding:14px 0 0}
+.rhythm-host>.care-section .cd-ring-wrap{display:grid;grid-template-columns:minmax(190px,220px) minmax(0,1fr);align-items:center;gap:18px;width:100%}
+.rhythm-host>.care-section .cd-ring{width:clamp(190px,18vw,220px);height:clamp(190px,18vw,220px);margin:0}
+.rhythm-host>.care-section .cd-info{display:block;min-width:0;flex:initial}
+.rhythm-host>.care-section .cd-info .title{font-size:19px}.rhythm-host>.care-section .cd-info .sub{margin-bottom:12px}
+.rhythm-host>.care-section .cd-ring-legend{gap:9px;margin-top:13px}.rhythm-host>.care-section .cd-ring-legend-item{font-size:12px;line-height:1.35}.rhythm-host>.care-section .cd-ring-legend-item strong{display:inline-block;min-width:27px;color:var(--ink);font-size:11px}.rhythm-host>.care-section .cd-ring-legend-item b{display:block;margin:1px 0 0 35px;color:var(--muted);font-family:var(--mono);font-size:11px}
+.rhythm-host>.care-section .cd-ticks{margin:12px 0}.rhythm-host>.care-section .cd-ticks i{width:16px}
+.rhythm-host>.shift-summary{padding:2px 0 16px}.rhythm-host>.shift-summary .shift-time{font-size:34px;letter-spacing:.03em}.rhythm-host>.shift-summary .shift-caption{font-size:12px}.rhythm-host>.shift-summary .shift-route{height:28px}
+@media(max-width:760px){.rhythm-host,.rhythm-host>.care-section{min-height:0}.rhythm-host>.care-section .cd-ring-wrap{grid-template-columns:1fr}.rhythm-host>.care-section .cd-ring{margin:0 auto}.rhythm-host>.care-section .cd-info{text-align:left}.rhythm-host>.care-section .cd-ring-legend-item b{display:inline;margin-left:5px}.rhythm-host>.care-section .shift-time{font-size:30px}}
 .signal{max-width:1100px;margin:0 auto;padding:22px 32px 12px}
 .signal-head{text-align:left;margin-bottom:16px}
 .signal-head h2{font-size:24px}
@@ -733,6 +750,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
           <div class="action-cue" id="actionCue" aria-live="polite"><b id="actionCueTitle">准备释放</b><span id="actionCueCopy">把烦躁留在这里</span></div>
           <div class="action-meme" id="actionMeme" aria-live="polite"><span id="actionMemeFace">💥</span><b id="actionMemeWord">爽！</b></div>
+          <div class="action-meme-burst" id="actionMemeBurst" aria-hidden="true"></div>
           <div class="physics-combo" id="physicsCombo" aria-live="polite">连击 x0</div>
           <div class="action-prop" id="actionProp" aria-hidden="true"></div>
           <div class="human-figure" data-face="0" data-hair="0" data-belly="0" data-glasses="0" data-beard="0" data-expr="0" aria-label="卡通领导人物">
@@ -888,16 +906,16 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
                   </svg>
                   <div class="cd-ring-text">
                     <div class="time" id="cdRingTime">02:14:30</div>
-                    <div class="label">下班倒计时</div>
+                    <div class="label">距离下班 · 实时倒计时</div>
                   </div>
                 </div>
                  <div class="cd-info">
                    <div class="title" id="cdInfoTitle">还差一点</div>
                    <div class="sub" id="cdInfoSub">一天进度 62%</div>
                    <div class="cd-ring-legend">
-                     <div class="cd-ring-legend-item work"><i></i><span>下班 <b id="cdWorkLegend">17:30</b></span></div>
-                     <div class="cd-ring-legend-item water"><i></i><span>喝水 <b id="cdWaterLegend">按设置提醒</b></span></div>
-                     <div class="cd-ring-legend-item sit"><i></i><span>久坐 <b id="cdSitLegend">按设置提醒</b></span></div>
+                     <div class="cd-ring-legend-item work"><i></i><span><strong>外圈</strong> 下班倒计时 <b id="cdWorkLegend">17:30</b></span></div>
+                     <div class="cd-ring-legend-item water"><i></i><span><strong>中圈</strong> 喝水提醒 <b id="cdWaterLegend">按设置提醒</b></span></div>
+                     <div class="cd-ring-legend-item sit"><i></i><span><strong>内圈</strong> 久坐提醒 <b id="cdSitLegend">按设置提醒</b></span></div>
                    </div>
                    <div class="cd-ticks" id="cdTicks">
                     <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
@@ -1934,7 +1952,8 @@ function renderShiftPanel(now,start,off){
     return;
   }
   const diff=off-now,pct=Math.max(0,Math.min(100,Math.round((now-start)/(off-start)*100))),after=diff<=0;
-  const signature=`${dayKey(now)}:${pct}:${after}`;
+  // 摘要与圆心共用同一秒级时间源，避免顶部倒计时停留在上一分钟。
+  const signature=`${dayKey(now)}:${after?0:Math.max(0,Math.floor(diff/1000))}:${pct}`;
   if(summary.dataset.shiftSignature===signature)return;summary.dataset.shiftSignature=signature;
   const dots=Array.from({length:7},(_,i)=>`<i class="${i<=Math.round(pct/100*6)?'on':''}"></i>`).join('');
   summary.innerHTML=`<div class="shift-top"><b>${after?'今日已下班':'今日签到已完成'}</b><span class="shift-done">✓ 已签到</span></div><div><div class="shift-time">${after?'下班啦':formatClock(diff)}</div><div class="shift-caption">${after?'辛苦了，今天可以慢一点。':`距离下班 · 工作进度 ${pct}%`}</div></div><div class="shift-route"><span class="shift-marker" style="left:${pct}%"></span>${dots}</div><div class="shift-foot"><span>上班 ${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}</span><b>${after?'今天收工':'正在驶向下班'}</b><span>下班 ${String(off.getHours()).padStart(2,'0')}:${String(off.getMinutes()).padStart(2,'0')}</span></div></div>`;
@@ -2070,7 +2089,19 @@ function updateImpactResult(action,points,replayed=false){
   if(!impact||!pointsEl||impact.dataset.action!==action)return;
   pointsEl.textContent=replayed?'动作已同步':`+${Math.max(0,Number(points)||0)} 情绪释放`;
 }
-let actionCueTimer=null,comboHeatTimer=null,memeTimer=null;
+let actionCueTimer=null,comboHeatTimer=null,memeTimer=null,memeBurstTimer=null;
+function showActionMemeBurst(action,combo){
+  const layer=$('#actionMemeBurst');if(!layer)return;
+  const packs={poke:[['👉','戳！'],['😵','懵了'],['💢','正中！']],slap:[['🖐️','啪！'],['🤯','拍懵'],['💥','带劲！']],feed:[['🤢','呕！'],['💩','投喂'],['😷','好臭！']],throw:[['🗑️','走你！'],['📎','飞来'],['😵‍💫','躲不开']]};
+  const colors={poke:['#5B8DEF','#43A6B2','#8166D8'],slap:['#F05E7A','#F08A5B','#D65AA5'],feed:['#A8733D','#C76B45','#7E9A55'],throw:['#6F66D9','#4F99C8','#D26D9A']}[action]||['#5B8DEF'];
+  const count=combo>=5?7:5,items=packs[action]||[['💥','爽！']];layer.replaceChildren();
+  for(let i=0;i<count;i++){
+    const data=items[Math.floor(Math.random()*items.length)],node=document.createElement('div');node.className='burst-meme';
+    node.style.setProperty('--meme-x',`${10+Math.random()*80}%`);node.style.setProperty('--meme-y',`${16+Math.random()*60}%`);node.style.setProperty('--meme-r',`${-18+Math.round(Math.random()*36)}deg`);node.style.setProperty('--meme-delay',`${i*55}ms`);node.style.setProperty('--meme-dx',`${-16+Math.round(Math.random()*32)}px`);node.style.setProperty('--meme-dy',`${-18-Math.round(Math.random()*22)}px`);node.style.setProperty('--meme-color',colors[i%colors.length]);
+    const face=document.createElement('span'),word=document.createElement('b');face.textContent=data[0];word.textContent=data[1];node.append(face,word);layer.append(node);
+  }
+  clearTimeout(memeBurstTimer);memeBurstTimer=setTimeout(()=>layer.replaceChildren(),1500);
+}
 function showActionCue(action,combo,actionLine=''){
   const cue=$('#actionCue'),title=$('#actionCueTitle'),copy=$('#actionCueCopy'),meme=$('#actionMeme'),memeFace=$('#actionMemeFace'),memeWord=$('#actionMemeWord');if(!cue||!title||!copy)return;
   const lines={
@@ -2085,6 +2116,7 @@ function showActionCue(action,combo,actionLine=''){
   const memes={poke:[['👉','戳！'],['😵','懵了'],['💢','正中！']],slap:[['🖐️','啪！'],['🤯','拍懵'],['💥','带劲！']],feed:[['🤢','呕！'],['💩','投喂'],['😷','好臭！']],throw:[['🗑️','走你！'],['📎','飞来'],['😵‍💫','躲不开']]};
   const memeData=(memes[action]||[['💥','爽！']])[Math.floor(Math.random()*(memes[action]?.length||1))];
   if(meme&&memeFace&&memeWord){meme.dataset.action=action;memeFace.textContent=memeData[0];memeWord.textContent=memeData[1];meme.classList.remove('show');void meme.offsetWidth;meme.classList.add('show');clearTimeout(memeTimer);memeTimer=setTimeout(()=>meme.classList.remove('show'),1120);}
+  showActionMemeBurst(action,combo);
   if(combo===3||combo===5||combo===7){
     const stage=$('.figure-stage');stage?.classList.remove('combo-heat');void stage?.offsetWidth;stage?.classList.add('combo-heat');clearTimeout(comboHeatTimer);comboHeatTimer=setTimeout(()=>stage?.classList.remove('combo-heat'),780);
     spawnFx(combo>=5?['💥','⚡','💫','✦','✨','💢']:['✦','💫','✨'],combo>=5?8:4);
