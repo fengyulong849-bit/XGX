@@ -195,7 +195,6 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 .xqx-page .topbar .crumb,.xqx-page .topbar .brand{font-size:20px!important}
 .xqx-page .topbar .pts{font-size:12px!important}
-.xqx-page .topbar .nav-links a[hidden]{display:none!important}
 
 /* Focus pages use a stage plus inspector, never a dashboard grid. */
 .xqx-page-diy .xqx-focus-layout{max-width:none!important;margin:0!important}
