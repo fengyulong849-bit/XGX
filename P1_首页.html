@@ -177,20 +177,24 @@ body::before{
 @keyframes humanSlap{0%,100%{transform:translateX(-50%) scale(1,1) rotate(0)}18%{transform:translateX(-50%) scale(1.2,.62) rotate(-3deg)}34%{transform:translateX(-50%) scale(.84,1.18) rotate(3deg)}50%{transform:translateX(-50%) scale(1.12,.84) rotate(-2deg)}68%{transform:translateX(-50%) scale(.94,1.06) rotate(1deg)}84%{transform:translateX(-50%) scale(1.04,.96)}}
 @keyframes humanFeed{0%,100%{transform:translateX(-50%) translateY(0) rotate(0) scale(1)}15%{transform:translateX(calc(-50% - 13px)) translateY(-5px) rotate(-7deg) scale(1.05)}30%{transform:translateX(calc(-50% + 14px)) translateY(4px) rotate(8deg) scale(.96)}45%{transform:translateX(calc(-50% - 11px)) translateY(-7px) rotate(-6deg) scale(1.06)}62%{transform:translateX(calc(-50% + 9px)) translateY(3px) rotate(5deg) scale(.98)}80%{transform:translateX(calc(-50% - 4px)) rotate(-2deg)}}
 @keyframes humanThrow{0%,100%{transform:translateX(-50%) rotate(0) translateY(0)}16%{transform:translateX(calc(-50% - 18px)) rotate(-13deg) translateY(-5px)}34%{transform:translateX(calc(-50% + 17px)) rotate(14deg) translateY(3px)}52%{transform:translateX(calc(-50% - 14px)) rotate(-11deg) translateY(-3px)}70%{transform:translateX(calc(-50% + 10px)) rotate(8deg) translateY(2px)}86%{transform:translateX(calc(-50% - 4px)) rotate(-3deg)}}
-.holo-card.downing .human-figure{animation:leaderFinalFall 2.25s cubic-bezier(.22,1,.36,1) forwards;transform-origin:50% 90%;pointer-events:none;filter:drop-shadow(0 12px 8px rgba(0,0,0,.35))}
+.holo-card.downing .human-figure{animation:leaderFinalFall 3.35s cubic-bezier(.22,1,.36,1) forwards;transform-origin:50% 90%;pointer-events:none;filter:drop-shadow(0 12px 8px rgba(0,0,0,.35))}
 @keyframes leaderFinalFall{
   0%{transform:translateX(-50%) rotate(0) translateY(0);filter:drop-shadow(0 9px 7px rgba(0,0,0,.26))}
-  12%{transform:translateX(calc(-50% - 5px)) rotate(-5deg) translateY(0)}
-  25%{transform:translateX(calc(-50% + 6px)) rotate(7deg) translateY(1px)}
-  41%{transform:translateX(calc(-50% - 7px)) rotate(-10deg) translateY(3px)}
-  58%{transform:translateX(calc(-50% + 2px)) rotate(28deg) translateY(9px)}
-  80%{transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.24) drop-shadow(0 12px 8px rgba(0,0,0,.43))}
-  91%{transform:translateX(-50%) rotate(84deg) translateY(25px)}
+  10%{transform:translateX(calc(-50% - 5px)) rotate(-5deg) translateY(0)}
+  20%{transform:translateX(calc(-50% + 7px)) rotate(8deg) translateY(1px)}
+  31%{transform:translateX(calc(-50% - 9px)) rotate(-12deg) translateY(3px)}
+  44%{transform:translateX(calc(-50% + 4px)) rotate(10deg) translateY(4px)}
+  57%{transform:translateX(calc(-50% - 3px)) rotate(28deg) translateY(9px)}
+  78%{transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.24) drop-shadow(0 12px 8px rgba(0,0,0,.43))}
+  89%{transform:translateX(-50%) rotate(85deg) translateY(25px)}
   100%{transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.35) drop-shadow(0 12px 8px rgba(0,0,0,.45))}
 }
 .holo-card.down .human-figure{animation:none;transform:translateX(-50%) rotate(78deg) translateY(24px);filter:grayscale(.35) drop-shadow(0 12px 8px rgba(0,0,0,.45));transition:transform .55s ease,filter .3s ease}
-.holo-card.downing .figure-glow{background:radial-gradient(circle,rgba(232,163,61,.28),rgba(217,122,108,.12) 44%,transparent 72%);animation:finalGlow 2.25s ease-out forwards}
-@keyframes finalGlow{0%,38%{opacity:.36;transform:translateX(-50%) scale(.86)}64%{opacity:.88;transform:translateX(-50%) scale(1.2)}100%{opacity:.52;transform:translateX(-50%) scale(1.04)}}
+.holo-card.downing .figure-glow{background:radial-gradient(circle,rgba(232,163,61,.28),rgba(217,122,108,.12) 44%,transparent 72%);animation:finalGlow 3.35s ease-out forwards}
+@keyframes finalGlow{0%,38%{opacity:.36;transform:translateX(-50%) scale(.86)}64%{opacity:.94;transform:translateX(-50%) scale(1.28)}100%{opacity:.52;transform:translateX(-50%) scale(1.04)}}
+.finale-fx{position:absolute;inset:0;z-index:10;overflow:hidden;pointer-events:none;opacity:0}.finale-fx::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 50% 47%,rgba(255,246,217,.22),rgba(232,163,61,.08) 22%,rgba(11,17,30,.04) 55%,rgba(4,8,17,.38));opacity:0}.finale-fx::after{content:'';position:absolute;left:50%;top:49%;width:32px;height:32px;border:2px solid rgba(255,248,224,.96);border-radius:50%;box-shadow:0 0 0 8px rgba(232,163,61,.28),0 0 38px 13px rgba(232,163,61,.55);transform:translate(-50%,-50%) scale(.2);opacity:0}.finale-kicker,.finale-subtitle,.finale-slam{position:absolute;left:50%;text-align:center;white-space:nowrap;opacity:0}.finale-kicker{top:24px;transform:translateX(-50%) scale(.76);font-size:clamp(27px,5vw,48px);font-weight:950;letter-spacing:7px;color:#FFF7DF;text-shadow:0 4px 0 #782B3B,0 0 22px rgba(240,94,122,.92),0 0 48px rgba(232,163,61,.52)}.finale-subtitle{top:78px;transform:translateX(-50%) translateY(-4px);font-size:12px;font-weight:800;letter-spacing:1px;color:rgba(255,249,234,.92);text-shadow:0 2px 9px rgba(0,0,0,.7)}.finale-slam{bottom:46px;transform:translateX(-50%) scale(.3) rotate(-11deg);font-size:clamp(52px,9vw,78px);font-weight:950;letter-spacing:3px;color:#FFCB58;text-shadow:0 5px 0 #8F3741,0 0 22px rgba(255,197,81,.85)}.finale-rings{position:absolute;left:50%;top:56%;width:34px;height:20px;border:2px solid rgba(255,242,205,.95);border-radius:50%;opacity:0;transform:translate(-50%,-50%) scale(.25);box-shadow:0 0 0 9px rgba(240,94,122,.26),0 0 0 18px rgba(232,163,61,.15)}
+.holo-card.downing .finale-fx{opacity:1}.holo-card.downing .finale-fx::before{animation:finaleVignette 3.35s ease-out forwards}.holo-card.downing .finale-fx::after{animation:finaleFlash 3.35s cubic-bezier(.16,1,.3,1) forwards}.holo-card.downing .finale-kicker{animation:finaleKicker 3.35s cubic-bezier(.16,1.3,.3,1) forwards}.holo-card.downing .finale-subtitle{animation:finaleSubtitle 3.35s ease-out forwards}.holo-card.downing .finale-slam{animation:finaleSlam 3.35s cubic-bezier(.12,1.55,.25,1) forwards}.holo-card.downing .finale-rings{animation:finaleRings 3.35s cubic-bezier(.16,1,.3,1) forwards}.holo-card.downing{animation:finaleCardShake 3.35s ease-out forwards}
+@keyframes finaleVignette{0%,12%{opacity:0}25%{opacity:.42}78%{opacity:.6}100%{opacity:.28}}@keyframes finaleFlash{0%,29%{opacity:0;transform:translate(-50%,-50%) scale(.2)}32%{opacity:1;transform:translate(-50%,-50%) scale(1.5)}47%{opacity:.2;transform:translate(-50%,-50%) scale(8)}100%{opacity:0;transform:translate(-50%,-50%) scale(11)}}@keyframes finaleKicker{0%,12%{opacity:0;transform:translateX(-50%) scale(.72)}19%,43%{opacity:1;transform:translateX(-50%) scale(1)}58%{opacity:.9;transform:translateX(-50%) scale(.96)}100%{opacity:0;transform:translateX(-50%) translateY(-12px) scale(.9)}}@keyframes finaleSubtitle{0%,17%{opacity:0;transform:translateX(-50%) translateY(-4px)}25%,54%{opacity:1;transform:translateX(-50%) translateY(0)}83%{opacity:.72}100%{opacity:0;transform:translateX(-50%) translateY(5px)}}@keyframes finaleSlam{0%,59%{opacity:0;transform:translateX(-50%) scale(.3) rotate(-11deg)}68%{opacity:1;transform:translateX(-50%) scale(1.34) rotate(5deg)}78%{opacity:1;transform:translateX(-50%) scale(.94) rotate(-2deg)}92%{opacity:.76;transform:translateX(-50%) scale(1.03) rotate(0)}100%{opacity:0;transform:translateX(-50%) translateY(16px) scale(.9)}}@keyframes finaleRings{0%,64%{opacity:0;transform:translate(-50%,-50%) scale(.25)}70%{opacity:1;transform:translate(-50%,-50%) scale(1)}100%{opacity:0;transform:translate(-50%,-50%) scale(11)}}@keyframes finaleCardShake{0%,27%,100%{transform:translate(0,0)}31%{transform:translate(-5px,1px)}35%{transform:translate(5px,-1px)}39%{transform:translate(-4px,2px)}67%{transform:translate(5px,3px) rotate(.5deg)}71%{transform:translate(-7px,1px) rotate(-.65deg)}76%{transform:translate(4px,2px) rotate(.3deg)}82%{transform:translate(-2px,0)}}
 .down-panel{position:absolute;left:18px;right:18px;bottom:18px;z-index:8;display:none;padding:13px 14px;border:1px solid rgba(217,122,108,.65);border-radius:16px;background:rgba(14,26,43,.94);box-shadow:0 12px 32px rgba(0,0,0,.35);text-align:center}
 .holo-card.down .down-panel{display:block}
 .down-panel strong{display:block;color:#F0A398;font-size:14px;margin-bottom:4px}
@@ -756,6 +760,8 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 @media(prefers-reduced-motion:reduce){
   .holo-card::before,.holo-inner::after,.figure,.marquee,.stat-bar i::after{animation:none!important}
   .holo-card.downing .human-figure{animation:leaderFinalFall .22s ease-out forwards}
+  .holo-card.downing,.holo-card.downing .figure-glow,.holo-card.downing .finale-fx::before,.holo-card.downing .finale-fx::after,.holo-card.downing .finale-kicker,.holo-card.downing .finale-subtitle,.holo-card.downing .finale-slam,.holo-card.downing .finale-rings{animation:none!important}
+  .holo-card.downing .finale-fx{display:none}
   *{transition-duration:.01ms!important}
 }
 </style>
@@ -798,6 +804,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="bubble" id="bubble"></div>
           <canvas id="pet-canvas" aria-hidden="true"></canvas>
           <div class="leader-state-fx" id="leaderStateFx" aria-hidden="true"></div>
+          <div class="finale-fx" aria-hidden="true"><div class="finale-kicker">终结一击</div><div class="finale-subtitle">这一次，轮到他把话咽回去</div><div class="finale-rings"></div><div class="finale-slam">砰！</div></div>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
           <div class="action-cue" id="actionCue" aria-live="polite"><b id="actionCueTitle">准备释放</b><span id="actionCueCopy">把烦躁留在这里</span></div>
           <div class="action-meme" id="actionMeme" aria-live="polite"><span id="actionMemeFace">💥</span><b id="actionMemeWord">爽！</b></div>
@@ -1764,11 +1771,11 @@ function spawnFx(emojis,count){
   }
 }
 window.pet3D={
-  knockDown({duration=2250}={}){isDown=true;petControls.autoRotate=false;const s=Date.now(),d=prm?220:duration,sz=charGroup.rotation.z,sy=charGroup.position.y;
+  knockDown({duration=3350}={}){isDown=true;petControls.autoRotate=false;const s=Date.now(),d=prm?220:duration,sz=charGroup.rotation.z,sy=charGroup.position.y;
     function fall(){const t=Math.min(1,(Date.now()-s)/d);let e;
-      if(t<.22){const p=t/.22;e=-.045*Math.sin(p*Math.PI)}
-      else if(t<.82){const p=(t-.22)/.6;e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2}
-      else{const p=(t-.82)/.18;e=1+Math.sin(p*Math.PI)*.035}
+      if(t<.32){const p=t/.32;e=-.06*Math.sin(p*Math.PI*2)}
+      else if(t<.8){const p=(t-.32)/.48;e=p<.5?2*p*p:1-Math.pow(-2*p+2,2)/2}
+      else{const p=(t-.8)/.2;e=1+Math.sin(p*Math.PI)*.045}
       charGroup.rotation.z=sz+e*(-Math.PI/2);charGroup.position.y=sy+e*(-.5);
       if(t<1)requestAnimationFrame(fall);else{charGroup.rotation.z=sz-Math.PI/2;charGroup.position.y=sy-.5;}
     }fall();},
@@ -2249,12 +2256,13 @@ let downSequenceTimer=null;
 function knockDown(){
   const card=$('#petCard');
   if(!card||card.classList.contains('down')||card.classList.contains('downing'))return;
-  const fallDuration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?240:2250;
+  const fallDuration=window.matchMedia('(prefers-reduced-motion: reduce)').matches?240:3350;
   card.classList.add('downing');
-  showBubble('等一下……');
+  showBubble('等等……我还能解释。');
   window.pet3D?.knockDown({duration:fallDuration});
-  setTimeout(()=>{if(card.classList.contains('downing'))showBubble('最后一击，失去平衡……')},Math.min(760,fallDuration*.35));
-  setTimeout(()=>{if(card.classList.contains('downing')){spawnFx(['💫','⭐','🌟','✨'],4);showBubble('我倒下了……')}},Math.min(1720,fallDuration*.76));
+  setTimeout(()=>{if(card.classList.contains('downing'))showBubble('最后一击，失去平衡……')},Math.min(980,fallDuration*.29));
+  setTimeout(()=>{if(card.classList.contains('downing'))spawnFx(['✦','⚡','💥','🌟','✨'],7)},Math.min(2320,fallDuration*.69));
+  setTimeout(()=>{if(card.classList.contains('downing'))showBubble('……这次是真的站不住了。')},Math.min(2580,fallDuration*.77));
   clearTimeout(downSequenceTimer);
   downSequenceTimer=setTimeout(()=>{
     card.classList.remove('downing');
