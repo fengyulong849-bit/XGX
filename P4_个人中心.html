@@ -187,7 +187,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
   <div class="spacer"></div>
   <nav class="nav-links">
     <a href="P1_首页.html">首页</a>
-    <a href="P2_捏脸DIY.html">捏脸</a>
+    <a href="P2_捏脸DIY.html" id="profile-diy-link" hidden>捏脸</a>
     <a href="P6_规则与隐私.html">规则</a>
   </nav>
   <div class="pts">积分 <b id="nav-points">--</b></div>
@@ -389,6 +389,9 @@ async function loadCloudProfile(){
   document.getElementById('nav-points').textContent=points;
   document.getElementById('profile-points').textContent=points;
   document.getElementById('profile-entitlement').textContent=profile.free_diy_available?'免费 DIY 权益可用':'免费 DIY 权益已使用';
+  // 只有首次免费 DIY 尚可用，或领导已倒地需要重捏时，才提供入口。
+  const diyLink=document.getElementById('profile-diy-link');
+  if(diyLink)diyLink.hidden=!(profile.free_diy_available||profile.pet_status?.down);
   document.getElementById('profile-meta').textContent=`已登录 · 数据来自云端 · ${profile.account_display||'账号信息已隐藏'}`;
   signedDates=Array.isArray(profile.signed_dates)?profile.signed_dates:[];
   renderCalendar();

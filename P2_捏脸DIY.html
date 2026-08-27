@@ -172,7 +172,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 </style>
 <link rel="stylesheet" href="scripts/xqx-glass-ui.css">
 </head>
-<body class="xqx-page xqx-page-diy">
+<body class="xqx-page xqx-page-diy diy-guarding" aria-busy="true">
 
 <div class="topbar">
   <button class="back" onclick="window.location.href='P1_首页.html'">← 返回</button>
@@ -894,17 +894,21 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
   }catch(e){}
 })();
 (async function loadCloudAppearance(){
-  const [profile,petState]=await Promise.all([window.XQXAuth?.profile(),window.XQXAuth?.pet()]);
-  if(!profile||!petState){window.location.replace('P1_首页.html');return}
-  cloudPetState=petState;
-  const hasAppearance=Boolean(petState.appearance||profile.appearance);
-  const isDown=Boolean(petState.down??profile.pet_status?.down);
-  if(hasAppearance&&!isDown){
-    window.location.replace('P1_首页.html#pet');
-    return;
-  }
-  document.getElementById('p2-points').textContent=Number(profile.points_balance||0).toLocaleString('zh-CN');
-  if(petState.appearance) applyCfg(petState.appearance);
+  try{
+    const [profile,petState]=await Promise.all([window.XQXAuth?.profile(),window.XQXAuth?.pet()]);
+    if(!profile||!petState){window.location.replace('P1_首页.html');return}
+    cloudPetState=petState;
+    const isDown=Boolean(petState.down??profile.pet_status?.down);
+    // 入口和云端保存规则保持一致：只有首次免费权益或倒地重捏可以进入。
+    if(!(profile.free_diy_available||isDown)){
+      window.location.replace('P1_首页.html#pet');
+      return;
+    }
+    document.getElementById('p2-points').textContent=Number(profile.points_balance||0).toLocaleString('zh-CN');
+    if(petState.appearance) applyCfg(petState.appearance);
+    document.body.classList.remove('diy-guarding');
+    document.body.setAttribute('aria-busy','false');
+  }catch(error){window.location.replace('P1_首页.html');}
 })();
 document.getElementById('shareBtn').addEventListener('click',function(){
   const code=encodeCfg(cfg);

@@ -198,6 +198,7 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 
 /* Focus pages use a stage plus inspector, never a dashboard grid. */
 .xqx-page-diy .xqx-focus-layout{max-width:none!important;margin:0!important}
+.xqx-page-diy.diy-guarding .main,.xqx-page-diy.diy-guarding .actionbar{visibility:hidden!important}
 .xqx-page-diy .config{border-left:1px solid var(--xqx-border-soft)!important;padding:var(--xqx-space-6)!important}
 .xqx-page-diy .cfg-head{padding:4px 4px var(--xqx-space-3)!important;margin-bottom:var(--xqx-space-3)!important}
 .xqx-page-diy .cfg-head h3{font-size:var(--xqx-h2)!important}
