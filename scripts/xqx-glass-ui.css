@@ -331,3 +331,45 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .xqx-page-home .xqx-home-stage > .checkin-bar,.xqx-page-home .xqx-home-stage > .rhythm-host{min-height:0!important}
   .xqx-page-home .xqx-home-stage > .checkin-bar{padding:var(--xqx-space-6)!important}
 }
+
+/* Page-level refinement: each page keeps its job, but now uses a distinct
+   Apple-widget composition instead of inheriting the same generic card wall. */
+.xqx-page-diy .topbar{background:rgba(8,18,31,.78)!important}
+.xqx-page-diy .studio{position:relative!important;isolation:isolate}
+.xqx-page-diy .studio::before{content:'';position:absolute;inset:8% 12%;z-index:0;pointer-events:none;border-radius:50%;background:radial-gradient(circle,rgba(240,166,99,.13),rgba(105,184,175,.055) 38%,transparent 69%);filter:blur(8px)}
+.xqx-page-diy .studio-hint{top:24px!important;padding:8px 12px;border:1px solid var(--xqx-border-soft);border-radius:999px;background:rgba(8,18,31,.38);backdrop-filter:blur(12px)}
+.xqx-page-diy #three-canvas,.xqx-page-diy #humanFigure{position:relative;z-index:1}
+.xqx-page-diy .config{width:min(420px,38vw)!important;flex:0 0 min(420px,38vw)!important;padding:28px 24px!important;box-shadow:-20px 0 54px rgba(0,0,0,.12)}
+.xqx-page-diy .cfg-head{position:sticky;top:-20px;z-index:3;padding:8px 4px 18px!important;background:linear-gradient(180deg,rgba(10,20,34,.98) 70%,transparent)!important}
+.xqx-page-diy .name-editor{margin-top:20px!important;padding:14px!important;border-radius:var(--xqx-radius-row)!important;background:rgba(255,255,255,.045)!important;border:1px solid var(--xqx-border-soft)!important}
+.xqx-page-diy .dim{border-radius:var(--xqx-radius-row)!important}.xqx-page-diy .dim-head{padding:14px 15px!important}
+.xqx-page-diy .actionbar{background:rgba(8,18,31,.82)!important;box-shadow:0 -12px 34px rgba(0,0,0,.12)}
+.xqx-page-diy .actionbar .ab-info{font-size:13px!important}.xqx-page-diy .actionbar .ab-info b{font-size:16px!important}
+
+.xqx-page-release .topbar{background:rgba(8,18,31,.78)!important}
+.xqx-page-release .xqx-flow-nav{display:flex!important;justify-content:center!important;box-shadow:0 16px 46px rgba(0,0,0,.14)!important}
+.xqx-page-release .step{min-width:74px!important}.xqx-page-release .step .label{margin-top:7px!important;color:var(--xqx-faint)!important;font-size:11px!important}.xqx-page-release .step.active .label{color:var(--xqx-text)!important}
+.xqx-page-release .xqx-focus-stage{position:relative;overflow:hidden;background:radial-gradient(ellipse 48% 48% at 50% 42%,rgba(240,166,99,.09),transparent 70%),radial-gradient(ellipse 34% 38% at 76% 78%,rgba(105,184,175,.055),transparent 76%),var(--xqx-night)!important}
+.xqx-page-release .xqx-focus-stage::before{content:'';position:absolute;inset:24px;pointer-events:none;border-radius:32px;border:1px solid rgba(255,255,255,.035)}
+.xqx-page-release .panel{position:relative;z-index:1}.xqx-page-release .write-card{width:min(620px,100%)!important;padding:clamp(28px,4vw,44px)!important}
+.xqx-page-release .write-card .title,.xqx-page-release .choose-wrap>.title{font-size:clamp(30px,4vw,42px)!important;line-height:1.15!important}
+.xqx-page-release .choose-wrap{width:min(920px,100%)!important;padding:clamp(24px,3vw,40px)!important}.xqx-page-release .methods{gap:var(--xqx-space-5)!important}
+.xqx-page-release .method{min-height:220px!important;border-radius:var(--xqx-radius-panel)!important;display:flex!important;flex-direction:column!important;justify-content:center!important}.xqx-page-release .method .icon{font-size:31px!important;margin-bottom:10px!important}
+
+.xqx-page-profile .topbar{background:rgba(8,18,31,.78)!important}
+.xqx-page-profile .overview{padding:clamp(24px,3.2vw,38px)!important;min-height:206px!important;background:linear-gradient(140deg,rgba(53,76,106,.82),rgba(18,35,56,.86) 57%,rgba(23,67,74,.62))!important}
+.xqx-page-profile .overview .avatar-big{width:76px!important;height:76px!important;border-radius:24px!important;font-size:29px!important;box-shadow:0 12px 28px rgba(0,0,0,.2),inset 0 1px 0 rgba(255,255,255,.2)}
+.xqx-page-profile .overview .name{font-size:clamp(24px,3vw,34px)!important}.xqx-page-profile .streak-badge{justify-self:start!important;border-radius:999px!important;background:rgba(255,255,255,.07)!important;border:1px solid var(--xqx-border-soft)!important}
+.xqx-page-profile .points-block{padding:16px 0 16px 24px!important;border-left:1px solid var(--xqx-border-soft)!important}.xqx-page-profile .points-block .value{font-size:clamp(38px,4vw,54px)!important;line-height:1!important}
+.xqx-page-profile .tabs{position:sticky;top:76px;z-index:5;margin-top:28px!important;background:rgba(14,27,44,.76)!important;backdrop-filter:blur(18px)!important}
+.xqx-page-profile .tab-panel{padding-top:var(--xqx-space-3)!important}.xqx-page-profile .timeline,.xqx-page-profile .rant-list{gap:var(--xqx-space-3)!important}
+.xqx-page-profile .tl-item,.xqx-page-profile .rant-item,.xqx-page-profile .account-item{padding:18px 20px!important;border-radius:var(--xqx-radius-row)!important}.xqx-page-profile .calendar-card{max-width:900px!important}
+
+@media(max-width:880px){
+  .xqx-page-diy .config{width:100%!important;flex:1 1 auto!important}.xqx-page-diy .cfg-head{position:relative;top:auto}.xqx-page-diy .studio-hint{top:14px!important}
+  .xqx-page-release .method{min-height:185px!important}.xqx-page-profile .points-block{padding-left:0!important;border-left:0!important}
+}
+@media(max-width:640px){
+  .xqx-page-release .xqx-flow-nav{justify-content:space-between!important}.xqx-page-release .step{min-width:0!important}.xqx-page-release .line{flex:1!important}.xqx-page-release .methods{grid-template-columns:1fr!important}.xqx-page-release .method{min-height:0!important;padding:22px!important}
+  .xqx-page-profile .tabs{top:68px!important;margin-left:-2px!important}.xqx-page-profile .overview .avatar-big{width:62px!important;height:62px!important;border-radius:20px!important}.xqx-page-profile .points-block{border-top:1px solid var(--xqx-border-soft)!important}
+}
