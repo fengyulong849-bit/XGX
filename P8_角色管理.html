@@ -8,8 +8,8 @@
 :root{--bg:#0e1a2b;--surface:#142336;--ink:#ede8dd;--muted:#9aa8bc;--rule:rgba(237,232,221,.12);--amber:#e8a33d;--rose:#d97a6c;--calm:#6fb3a8}*{box-sizing:border-box}body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:Inter,"Noto Sans SC",sans-serif}main{width:min(680px,calc(100% - 32px));margin:0 auto;padding:12vh 0}.bar{display:flex;align-items:center;gap:12px;margin-bottom:28px}.brand{font-family:serif;font-size:25px;font-weight:600}.brand i{color:var(--amber)}.tag{color:var(--amber);border:1px solid rgba(232,163,61,.45);padding:5px 8px;font:11px monospace;border-radius:4px}.card{background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:28px;box-shadow:0 20px 60px #0004}.eyebrow{color:var(--amber);font:11px monospace;letter-spacing:.12em}.card h1{font:32px serif;margin:8px 0}.sub{color:var(--muted);font-size:13px;line-height:1.7}.field{margin:24px 0 10px}.field label{display:block;color:var(--muted);font-size:12px;margin-bottom:7px}.field input{width:100%;background:var(--bg);border:1px solid var(--rule);border-radius:5px;padding:12px;color:var(--ink);font:14px monospace;outline:none}.field input:focus{border-color:var(--amber)}.actions{display:flex;gap:8px;margin-top:16px}.actions button{flex:1;border:1px solid var(--rule);border-radius:5px;padding:11px;cursor:pointer;color:var(--ink);background:transparent}.actions .grant:hover{border-color:var(--calm);color:var(--calm)}.actions .revoke:hover{border-color:var(--rose);color:var(--rose)}.status{min-height:22px;margin-top:16px;font-size:13px;color:var(--muted)}.status.ok{color:var(--calm)}.status.err{color:#f0a398}.back{display:inline-block;margin-top:22px;color:var(--muted);font-size:13px;text-decoration:none}.back:hover{color:var(--amber)}</style>
 <link rel="stylesheet" href="scripts/xqx-glass-ui.css">
 </head>
-<body>
-<main>
+<body class="xqx-page xqx-page-roles">
+<main class="xqx-focus-card">
   <div class="bar"><div class="brand">小确<i>闲</i></div><span class="tag">ADMIN ACCESS</span></div>
   <section class="card">
     <div class="eyebrow">RESTRICTED SETTINGS</div>

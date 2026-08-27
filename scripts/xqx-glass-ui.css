@@ -124,3 +124,143 @@ input:focus,textarea:focus,select:focus,.field input:focus,.modal-pwd-field inpu
 button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid rgba(240,166,99,.78)!important;outline-offset:3px!important}
 @media(max-width:760px){.main:not(.config):not(.studio){padding-left:16px!important;padding-right:16px!important}.overview{padding:23px!important}.methods{gap:10px!important}.summary{grid-template-columns:1fr!important}.topbar{padding-left:14px!important;padding-right:14px!important}.topbar nav{display:none!important}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition-duration:.01ms!important}}
+
+/* ========================================================================
+   Global Layout System v2
+   Visual-only layout primitives. Business DOM, IDs and feature contracts
+   remain owned by their page scripts. New work should use these tokens and
+   semantic classes instead of adding page-specific spacing values.
+   ======================================================================== */
+:root{
+  --xqx-space-1:4px;--xqx-space-2:8px;--xqx-space-3:12px;--xqx-space-4:16px;
+  --xqx-space-5:20px;--xqx-space-6:24px;--xqx-space-8:32px;--xqx-space-10:40px;
+  --xqx-space-12:48px;--xqx-space-16:64px;--xqx-space-24:96px;
+  --xqx-page-max:1200px;--xqx-page-pad:32px;--xqx-page-top:40px;
+  --xqx-grid-gap:20px;--xqx-section-gap:64px;
+  --xqx-radius-widget:24px;--xqx-radius-panel:18px;--xqx-radius-row:14px;--xqx-radius-control:12px;
+  --xqx-display:clamp(38px,4.2vw,52px);--xqx-h1:32px;--xqx-h2:22px;--xqx-h3:16px;
+  --xqx-body:14px;--xqx-small:12px;--xqx-caption:11px;
+}
+
+.xqx-page{min-height:100vh;isolation:isolate}
+.xqx-shell,.xqx-page-container,.xqx-reading-layout,.xqx-focus-card{
+  width:min(var(--xqx-page-max),calc(100% - (var(--xqx-page-pad) * 2)));
+  margin-left:auto;margin-right:auto;
+}
+.xqx-page .eyebrow,.xqx-page .kicker{
+  font-size:var(--xqx-caption)!important;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--xqx-orange)!important;opacity:.86;
+}
+.xqx-page :is(.value,.points,.pts b,.countdown b){font-variant-numeric:tabular-nums}
+.xqx-page :is(.meta,.hint,.subtitle,.sub,.desc,.lede){color:var(--xqx-muted)}
+
+/* Page entrance keeps the product calm while allowing its native feature
+   animations (DIY / release / desktop pet) to remain independent. */
+.xqx-page .xqx-page-container,.xqx-page .xqx-hero,.xqx-page .xqx-focus-card{
+  animation:xqxPageEnter .58s var(--xqx-spring) both;
+}
+@keyframes xqxPageEnter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* Layout Master: one hero, one companion/work focus group, then support. */
+.xqx-page-home .nav{
+  width:min(calc(var(--xqx-page-max) + 32px),calc(100% - 24px))!important;
+  margin:12px auto 0!important;border:1px solid var(--xqx-border-soft)!important;
+  border-radius:18px!important;padding:10px 14px!important;
+}
+.xqx-page-home .xqx-hero{
+  max-width:760px!important;padding:72px 0 44px!important;
+}
+.xqx-page-home .hero h1{font-size:var(--xqx-display)!important;letter-spacing:0!important}
+.xqx-page-home .hero .lede{max-width:540px!important;font-size:15px!important;margin-bottom:28px!important}
+.xqx-page-home .hero-cta{gap:10px!important}
+.xqx-page-home .xqx-home-stage{
+  width:min(var(--xqx-page-max),calc(100% - (var(--xqx-page-pad) * 2)))!important;
+  grid-template-columns:minmax(0,1.22fr) minmax(300px,.78fr)!important;
+  gap:var(--xqx-grid-gap)!important;padding:0!important;align-items:stretch!important;
+}
+.xqx-page-home .holo-card{
+  border-radius:var(--xqx-radius-widget)!important;
+  box-shadow:0 28px 76px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.xqx-page-home .holo-inner{border-radius:22px!important;padding:var(--xqx-space-6)!important}
+.xqx-page-home .section{width:min(var(--xqx-page-max),calc(100% - (var(--xqx-page-pad) * 2)))!important;padding:var(--xqx-section-gap) 0!important}
+.xqx-page-home .sec-head{text-align:left!important;margin:0 0 var(--xqx-space-8)!important;max-width:620px}
+.xqx-page-home .sec-head p{margin-left:0!important}
+.xqx-page-home .signal,.xqx-page-home .manifesto{width:min(var(--xqx-page-max),calc(100% - (var(--xqx-page-pad) * 2)))!important}
+
+/* Shared navigation is a utility layer, deliberately quieter than content. */
+.xqx-page:not(.xqx-page-home) .topbar{
+  height:64px!important;padding-left:max(24px,calc((100% - var(--xqx-page-max)) / 2))!important;
+  padding-right:max(24px,calc((100% - var(--xqx-page-max)) / 2))!important;
+}
+.xqx-page .topbar .crumb,.xqx-page .topbar .brand{font-size:20px!important}
+.xqx-page .topbar .pts{font-size:12px!important}
+
+/* Focus pages use a stage plus inspector, never a dashboard grid. */
+.xqx-page-diy .xqx-focus-layout{max-width:none!important;margin:0!important}
+.xqx-page-diy .config{border-left:1px solid var(--xqx-border-soft)!important;padding:var(--xqx-space-6)!important}
+.xqx-page-diy .cfg-head{padding:4px 4px var(--xqx-space-3)!important;margin-bottom:var(--xqx-space-3)!important}
+.xqx-page-diy .cfg-head h3{font-size:var(--xqx-h2)!important}
+.xqx-page-diy .actionbar{height:76px!important;padding-left:max(24px,calc((100% - var(--xqx-page-max)) / 2))!important;padding-right:max(24px,calc((100% - var(--xqx-page-max)) / 2))!important;border-color:var(--xqx-border-soft)!important}
+.xqx-page-diy .dim-list{gap:var(--xqx-space-2)!important}
+
+/* Release is an intentional flow. The rail provides context but never wins
+   against the ritual stage. */
+.xqx-page-release .xqx-flow-nav{width:min(760px,calc(100% - 32px))!important;margin:26px auto 0!important;border-radius:18px!important;padding:14px 18px!important}
+.xqx-page-release .xqx-focus-stage{min-height:calc(100vh - 174px)!important;padding:var(--xqx-space-10) var(--xqx-page-pad)!important}
+.xqx-page-release .write-card,.xqx-page-release .choose-wrap{border-radius:var(--xqx-radius-widget)!important}
+
+/* Profile is a quiet overview followed by an Apple-style segmented context. */
+.xqx-page-profile .xqx-page-container{max-width:var(--xqx-page-max)!important;padding-top:var(--xqx-page-top)!important;padding-bottom:var(--xqx-space-16)!important}
+.xqx-page-profile .overview{min-height:174px!important;display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;gap:var(--xqx-space-6)!important;align-items:center!important}
+.xqx-page-profile .tabs{margin:var(--xqx-space-8) 0 var(--xqx-space-5)!important}
+.xqx-page-profile .tab-panel{max-width:920px}
+.xqx-page-profile .calendar-card{padding:var(--xqx-space-8)!important}
+
+/* Reading and management pages share the container and hierarchy, but retain
+   their appropriate density. */
+.xqx-page-rules .xqx-reading-layout{max-width:var(--xqx-page-max)!important;gap:var(--xqx-space-10)!important;padding-top:var(--xqx-page-top)!important;padding-bottom:var(--xqx-space-16)!important}
+.xqx-page-rules .side-nav{top:88px!important;border-radius:var(--xqx-radius-panel)!important;align-self:start}
+.xqx-page-rules .content{max-width:800px!important}
+.xqx-page-rules .content section,.xqx-page-rules .content article{padding:var(--xqx-space-8)!important;margin-bottom:var(--xqx-space-5)!important}
+.xqx-page-review .shell{width:min(var(--xqx-page-max),calc(100% - (var(--xqx-page-pad) * 2)))!important;padding-top:var(--xqx-page-top)!important}
+.xqx-page-review .headline{margin-bottom:var(--xqx-space-8)!important}
+.xqx-page-review .summary{gap:var(--xqx-grid-gap)!important;margin-bottom:var(--xqx-space-8)!important}
+.xqx-page-review .item{border-radius:var(--xqx-radius-panel)!important}
+.xqx-page-roles .xqx-focus-card{width:min(680px,calc(100% - (var(--xqx-page-pad) * 2)))!important;padding-top:12vh!important}
+.xqx-page-roles .card{border-radius:var(--xqx-radius-widget)!important;padding:var(--xqx-space-8)!important}
+
+/* Recovery is a focused single-purpose screen, not a generic dialog. */
+.xqx-page-recovery .form-card,.xqx-page-recovery .success-card{border-radius:var(--xqx-radius-widget)!important;box-shadow:0 28px 76px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.1)!important}
+
+/* Responsiveness is a reflow, not a shrunken desktop. */
+@media(max-width:980px){
+  :root{--xqx-page-pad:24px;--xqx-page-top:32px;--xqx-section-gap:48px;--xqx-grid-gap:16px}
+  .xqx-page-home .xqx-home-stage{grid-template-columns:1fr!important;max-width:720px!important}
+  .xqx-page-home .xqx-home-stage > :last-child{min-height:0}
+  .xqx-page-profile .overview{grid-template-columns:auto minmax(0,1fr)!important}
+  .xqx-page-profile .points-block{grid-column:1 / -1}
+  .xqx-page-rules .xqx-reading-layout{gap:var(--xqx-space-6)!important}
+}
+@media(max-width:760px){
+  :root{--xqx-page-pad:16px;--xqx-page-top:24px;--xqx-section-gap:40px;--xqx-grid-gap:12px;--xqx-display:38px}
+  .xqx-shell,.xqx-page-container,.xqx-reading-layout,.xqx-focus-card{width:calc(100% - (var(--xqx-page-pad) * 2))}
+  .xqx-page-home .nav{width:calc(100% - 20px)!important;margin-top:8px!important;padding:9px 10px!important;border-radius:15px!important}
+  .xqx-page-home .nav-links{display:none!important}.xqx-page-home .countdown{margin-left:auto!important;padding:6px 9px!important}.xqx-page-home .schedule-settings{padding:7px 9px!important;font-size:11px!important}
+  .xqx-page-home .xqx-hero{padding:48px var(--xqx-page-pad) 34px!important}.xqx-page-home .hero-cta{flex-direction:column!important;align-items:stretch!important}.xqx-page-home .hero-cta button{width:100%}
+  .xqx-page-home .xqx-home-stage,.xqx-page-home .section,.xqx-page-home .signal,.xqx-page-home .manifesto{width:calc(100% - (var(--xqx-page-pad) * 2))!important}
+  .xqx-page-home .figure-stage{height:300px!important}
+  .xqx-page:not(.xqx-page-home) .topbar{padding-left:14px!important;padding-right:14px!important}.xqx-page:not(.xqx-page-home) .topbar nav{display:none!important}
+  .xqx-page-diy .main{top:56px!important;bottom:132px!important}.xqx-page-diy .studio{flex-basis:45%!important}.xqx-page-diy .actionbar{height:auto!important;min-height:132px!important;flex-wrap:wrap!important;padding:10px 14px!important;gap:8px!important}.xqx-page-diy .actionbar .ab-info{width:100%;margin-right:0!important}.xqx-page-diy .actionbar button{padding:9px 12px!important}
+  .xqx-page-release .xqx-flow-nav{width:calc(100% - 24px)!important;margin-top:16px!important;padding:12px!important}.xqx-page-release .step .label{font-size:10px!important}.xqx-page-release .xqx-focus-stage{padding:var(--xqx-space-6) var(--xqx-page-pad)!important}
+  .xqx-page-profile .overview{display:flex!important;flex-wrap:wrap!important;padding:var(--xqx-space-6)!important}.xqx-page-profile .points-block{width:100%;padding-top:var(--xqx-space-4);border-top:1px solid var(--xqx-border-soft)}
+  .xqx-page-rules .xqx-reading-layout{width:100%!important;padding:var(--xqx-page-top) var(--xqx-page-pad)!important}.xqx-page-rules .side-nav{position:relative!important;top:auto!important;overflow:auto;white-space:nowrap}.xqx-page-rules .content section,.xqx-page-rules .content article{padding:var(--xqx-space-6)!important}
+  .xqx-page-review .shell{width:calc(100% - (var(--xqx-page-pad) * 2))!important}.xqx-page-review .summary{gap:var(--xqx-space-3)!important}.xqx-page-review .metric{padding:var(--xqx-space-5)!important}
+}
+
+/* Kept separately for the legacy P1 mobile grid, whose original selector has
+   a stronger nested media rule. The home stage must always read top to bottom
+   on a narrow device. */
+@media screen and (max-width:760px){
+  body.xqx-page-home .pet-row.xqx-home-stage{grid-template-columns:minmax(0,1fr)!important;display:grid!important}
+}
