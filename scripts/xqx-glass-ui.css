@@ -476,3 +476,15 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
      fit fully inside it instead of letting the head escape above the stage. */
   .xqx-page-diy .studio #humanFigure{width:min(48vw,190px)!important;bottom:8px!important}
 }
+
+/* Keep each profile view on the same content rail as its account overview.
+   The old max-width made a narrow ledger appear detached from the page above. */
+.xqx-page-profile .tab-panel{max-width:none!important;width:100%!important}
+.xqx-page-profile .calendar-card{max-width:none!important}
+
+/* The pet and work-rhythm widgets already provide their own surfaces. The
+   previous stage-level background read as an accidental empty third card once
+   the shorter rhythm widget finished. Space, rather than another border,
+   expresses their relationship. */
+.xqx-page-home .xqx-home-stage::before{display:none!important}
+.xqx-page-home .xqx-home-stage{padding:0!important}
