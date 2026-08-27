@@ -488,3 +488,66 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
    expresses their relationship. */
 .xqx-page-home .xqx-home-stage::before{display:none!important}
 .xqx-page-home .xqx-home-stage{padding:0!important}
+
+/* Final visual pass: each supporting page uses the same spatial language as
+   the home page while retaining the information density its task requires. */
+
+/* Release is a single quiet ritual surface: the progress rail stays light and
+   every step occupies the same centered visual stage. */
+.xqx-page-release .steps{background:rgba(8,18,31,.72)!important;box-shadow:0 10px 28px rgba(0,0,0,.1)!important}
+.xqx-page-release .xqx-flow-nav{box-shadow:0 14px 36px rgba(0,0,0,.14)!important}
+.xqx-page-release .panel{padding:clamp(24px,4vw,56px) var(--xqx-page-pad)!important}
+.xqx-page-release .write-card{max-width:620px!important}
+.xqx-page-release .write-card .title,.xqx-page-release .choose-wrap>.title{letter-spacing:0!important}
+.xqx-page-release .choose-wrap .preview{padding:22px 24px!important;border-radius:var(--xqx-radius-panel)!important}
+.xqx-page-release .methods{gap:var(--xqx-space-4)!important}
+.xqx-page-release .method{min-height:208px!important;padding:24px 20px!important}
+.xqx-page-release .destroy-stage,.xqx-page-release .release-center{width:min(720px,100%)!important}
+
+/* Rules are an editorial reading layout. The rail navigates; it is not a
+   second column of equal-weight cards. */
+.xqx-page-rules .xqx-reading-layout{display:grid!important;grid-template-columns:218px minmax(0,1fr)!important;align-items:start!important}
+.xqx-page-rules .side-nav{width:auto!important;max-height:calc(100vh - 92px)!important;padding:16px!important;border:1px solid var(--xqx-border-soft)!important;box-shadow:var(--xqx-shadow)!important}
+.xqx-page-rules .side-nav .side-footer{margin-top:16px!important;padding-top:14px!important}
+.xqx-page-rules .content{max-width:800px!important;padding:0!important}
+.xqx-page-rules .content-header{margin:4px 0 var(--xqx-space-10)!important}
+.xqx-page-rules .content-header p{max-width:590px!important;line-height:1.75!important}
+.xqx-page-rules .rule-card{padding:var(--xqx-space-8)!important;margin-bottom:var(--xqx-space-5)!important;border-radius:var(--xqx-radius-panel)!important;border-color:var(--xqx-border-soft)!important;background:rgba(255,255,255,.026)!important;box-shadow:none!important}
+.xqx-page-rules .rule-card::before{opacity:.34!important}
+.xqx-page-rules .rule-card:hover{background:rgba(255,255,255,.045)!important}
+
+/* Review is deliberately denser, but it still follows the shared bento
+   rhythm: one primary metric, two supporting metrics, then a readable queue. */
+.xqx-page-review .headline{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(280px,420px)!important;align-items:end!important;padding:var(--xqx-space-8) 0 var(--xqx-space-6)!important}
+.xqx-page-review .headline p{text-align:left!important;justify-self:end!important}
+.xqx-page-review .summary{grid-template-columns:1.35fr 1fr 1fr!important}
+.xqx-page-review .metric{min-height:142px!important;padding:24px!important}
+.xqx-page-review .metric:first-child .value{font-size:clamp(42px,4vw,58px)!important}
+.xqx-page-review .queue{gap:var(--xqx-space-4)!important}
+.xqx-page-review .item{padding:24px!important;border-color:var(--xqx-border-soft)!important}
+.xqx-page-review .history{margin-top:var(--xqx-space-12)!important;padding-top:var(--xqx-space-8)!important}
+.xqx-page-review .history-item{border-radius:var(--xqx-radius-row)!important;background:rgba(255,255,255,.027)!important}
+
+/* Single-purpose pages share one focused vertical rhythm. */
+.xqx-page-recovery .form-card,.xqx-page-recovery .success-card{min-height:0!important}
+.xqx-page-recovery .form-card .subtitle{line-height:1.65!important}
+.xqx-page-roles .xqx-focus-card{padding-top:clamp(88px,12vh,150px)!important;padding-bottom:64px!important}
+.xqx-page-roles .bar{margin-bottom:var(--xqx-space-6)!important}
+.xqx-page-roles .card{padding:clamp(28px,4vw,44px)!important}
+.xqx-page-roles .field{margin:var(--xqx-space-8) 0 var(--xqx-space-4)!important}
+.xqx-page-roles .status{margin-top:var(--xqx-space-5)!important}
+
+@media(max-width:760px){
+  .xqx-page-release .panel{padding:20px var(--xqx-page-pad)!important}
+  .xqx-page-release .choose-wrap .preview{padding:18px!important;margin-bottom:20px!important}
+  .xqx-page-release .methods{gap:var(--xqx-space-3)!important}
+  .xqx-page-rules .xqx-reading-layout{grid-template-columns:1fr!important;gap:var(--xqx-space-5)!important}
+  .xqx-page-rules .side-nav{position:relative!important;top:auto!important;max-height:none!important}
+  .xqx-page-rules .content-header{margin-top:var(--xqx-space-3)!important;margin-bottom:var(--xqx-space-8)!important}
+  .xqx-page-rules .rule-card{padding:var(--xqx-space-6)!important}
+  .xqx-page-review .headline{grid-template-columns:1fr!important;gap:var(--xqx-space-4)!important}
+  .xqx-page-review .headline p{justify-self:start!important}
+  .xqx-page-review .summary{grid-template-columns:1fr!important}
+  .xqx-page-review .item{padding:var(--xqx-space-5)!important}
+  .xqx-page-roles .xqx-focus-card{padding-top:88px!important}
+}
