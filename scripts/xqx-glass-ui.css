@@ -373,3 +373,30 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .xqx-page-release .xqx-flow-nav{justify-content:space-between!important}.xqx-page-release .step{min-width:0!important}.xqx-page-release .line{flex:1!important}.xqx-page-release .methods{grid-template-columns:1fr!important}.xqx-page-release .method{min-height:0!important;padding:22px!important}
   .xqx-page-profile .tabs{top:68px!important;margin-left:-2px!important}.xqx-page-profile .overview .avatar-big{width:62px!important;height:62px!important;border-radius:20px!important}.xqx-page-profile .points-block{border-top:1px solid var(--xqx-border-soft)!important}
 }
+
+/* Supporting pages: focused account recovery, calm reading, and dense but
+   legible administration. These rules intentionally do not alter workflows. */
+.xqx-page-recovery{display:grid!important;place-items:center!important;padding:var(--xqx-space-6)!important}
+.xqx-page-recovery .back-btn{position:fixed!important;top:22px!important;left:22px!important;z-index:4}
+.xqx-page-recovery .form-card,.xqx-page-recovery .success-card{width:min(480px,100%)!important;padding:clamp(28px,4vw,44px)!important;background:linear-gradient(145deg,rgba(38,58,84,.78),rgba(14,28,46,.9))!important}
+.xqx-page-recovery .form-card h1,.xqx-page-recovery .success-card h1{font-size:clamp(34px,4vw,46px)!important}.xqx-page-recovery .logo-mark{border-radius:18px!important;box-shadow:0 12px 30px rgba(240,166,99,.18)}
+
+.xqx-page-rules .topbar{background:rgba(8,18,31,.78)!important}.xqx-page-rules .xqx-reading-layout{grid-template-columns:220px minmax(0,1fr)!important;align-items:start!important}
+.xqx-page-rules .side-nav{padding:16px!important;box-shadow:var(--xqx-shadow)!important}.xqx-page-rules .side-nav h3{padding:5px 8px 12px!important;font-size:13px!important;color:var(--xqx-text)!important}
+.xqx-page-rules .side-nav a{padding:9px 10px!important;color:var(--xqx-muted)!important}.xqx-page-rules .content-header{margin-bottom:var(--xqx-space-10)!important}.xqx-page-rules .content-header h1{font-size:clamp(36px,4vw,52px)!important;line-height:1.08!important}
+.xqx-page-rules .content section,.xqx-page-rules .content article{background:rgba(255,255,255,.026)!important;box-shadow:none!important;border-color:var(--xqx-border-soft)!important}.xqx-page-rules .content section:hover,.xqx-page-rules .content article:hover{background:rgba(255,255,255,.045)!important;transform:none!important}
+
+.xqx-page-review .topbar{background:rgba(8,18,31,.78)!important}.xqx-page-review .headline{padding:var(--xqx-space-8) 0 var(--xqx-space-5)!important;border-bottom:1px solid var(--xqx-border-soft)!important}
+.xqx-page-review .headline h1{font-size:clamp(36px,4vw,50px)!important;line-height:1.05!important}.xqx-page-review .summary{grid-template-columns:1.35fr 1fr 1fr!important}
+.xqx-page-review .metric{min-height:136px!important;display:flex!important;flex-direction:column!important;justify-content:flex-end!important;border-radius:var(--xqx-radius-panel)!important;background:linear-gradient(150deg,rgba(38,58,84,.7),rgba(17,32,51,.78))!important}
+.xqx-page-review .metric:first-child{background:linear-gradient(145deg,rgba(94,74,59,.76),rgba(33,43,55,.86))!important}.xqx-page-review .metric .value{font-size:clamp(34px,4vw,48px)!important;line-height:1!important}
+.xqx-page-review .queue{gap:var(--xqx-space-4)!important}.xqx-page-review .item{grid-template-columns:minmax(0,1fr) 210px!important;gap:var(--xqx-space-6)!important;background:rgba(255,255,255,.032)!important}.xqx-page-review .item:hover{background:rgba(255,255,255,.055)!important}.xqx-page-review .actions{width:auto!important;border-left-color:var(--xqx-border-soft)!important}
+.xqx-page-review .history{margin-top:var(--xqx-space-12)!important;padding:var(--xqx-space-8)!important;border:1px solid var(--xqx-border-soft)!important;border-radius:var(--xqx-radius-panel)!important;background:rgba(255,255,255,.022)!important}
+
+.xqx-page-roles{display:grid!important;place-items:center!important;padding:var(--xqx-space-6)!important}.xqx-page-roles .xqx-focus-card{padding-top:0!important}.xqx-page-roles .bar{margin-bottom:var(--xqx-space-5)!important}.xqx-page-roles .brand{font-size:30px!important}.xqx-page-roles .tag{border-radius:999px!important;padding:6px 10px!important}.xqx-page-roles .card{padding:clamp(28px,4vw,42px)!important;background:linear-gradient(145deg,rgba(38,58,84,.78),rgba(14,28,46,.9))!important}.xqx-page-roles .card h1{font-size:clamp(32px,4vw,44px)!important;line-height:1.1!important}.xqx-page-roles .actions{gap:var(--xqx-space-3)!important}.xqx-page-roles .actions button{border-radius:var(--xqx-radius-control)!important}
+
+@media(max-width:760px){
+  .xqx-page-rules .xqx-reading-layout{grid-template-columns:1fr!important}.xqx-page-rules .side-nav{display:flex!important;align-items:center!important;gap:8px!important;padding:8px!important}.xqx-page-rules .side-nav h3{display:none!important}.xqx-page-rules .side-nav ul{display:flex!important;gap:2px!important;margin:0!important}.xqx-page-rules .side-nav a{padding:8px 10px!important}
+  .xqx-page-review .headline{padding-top:var(--xqx-space-5)!important}.xqx-page-review .summary{grid-template-columns:1fr!important}.xqx-page-review .metric{min-height:106px!important}.xqx-page-review .item{grid-template-columns:1fr!important}.xqx-page-review .actions{border-left:0!important;border-top:1px solid var(--xqx-border-soft)!important;padding-top:var(--xqx-space-4)!important}
+  .xqx-page-recovery .back-btn{top:14px!important;left:14px!important}.xqx-page-roles{align-items:start!important;padding-top:96px!important}
+}
