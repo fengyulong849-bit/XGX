@@ -899,8 +899,10 @@ document.getElementById('saveBtn').addEventListener('click',async function(){
     if(!profile||!petState){window.location.replace('P1_首页.html');return}
     cloudPetState=petState;
     const isDown=Boolean(petState.down??profile.pet_status?.down);
-    // 入口和云端保存规则保持一致：只有首次免费权益或倒地重捏可以进入。
-    if(!(profile.free_diy_available||isDown)){
+    // 入口和云端保存规则保持一致：只有首次创建，或倒地重捏可以进入。
+    const hasAppearance=Boolean(petState.appearance||profile.appearance);
+    const canEnterDiy=isDown||(!hasAppearance&&profile.free_diy_available===true);
+    if(!canEnterDiy){
       window.location.replace('P1_首页.html#pet');
       return;
     }
