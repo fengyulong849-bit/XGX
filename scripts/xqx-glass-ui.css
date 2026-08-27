@@ -551,3 +551,58 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .xqx-page-review .item{padding:var(--xqx-space-5)!important}
   .xqx-page-roles .xqx-focus-card{padding-top:88px!important}
 }
+
+/* Home Layout Master, second pass: supporting content has a clear reading
+   rhythm instead of repeating equal-size cards below the primary pet widget. */
+.xqx-page-home #wall.section{padding-top:var(--xqx-space-16)!important}
+.xqx-page-home .wall-head{margin-bottom:var(--xqx-space-6)!important;padding-bottom:0!important;border-bottom:0!important}
+.xqx-page-home .rant-grid{grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:var(--xqx-grid-gap)!important}
+.xqx-page-home .rant-card{grid-column:span 4!important;min-height:168px!important;padding:22px!important;border-color:var(--xqx-border-soft)!important;background:rgba(255,255,255,.027)!important;box-shadow:none!important}
+.xqx-page-home .rant-card:nth-child(1),.xqx-page-home .rant-card:nth-child(6){grid-column:span 5!important;background:linear-gradient(145deg,rgba(43,61,85,.62),rgba(20,35,54,.55))!important}
+.xqx-page-home .rant-card:nth-child(2),.xqx-page-home .rant-card:nth-child(5){grid-column:span 3!important}
+.xqx-page-home .rant-card:hover{background:rgba(255,255,255,.052)!important;box-shadow:0 16px 34px rgba(0,0,0,.13)!important}
+.xqx-page-home .rant-card:nth-child(1) .rant-content,.xqx-page-home .rant-card:nth-child(6) .rant-content{font-size:17px!important;line-height:1.75!important}
+
+/* The work-health section is one widget with a primary time state and two
+   secondary inline actions, not a dashboard of three unrelated cards. */
+.xqx-page-home #care .care-section{padding:clamp(28px,4vw,44px)!important;border:1px solid var(--xqx-border-soft)!important;border-radius:var(--xqx-radius-widget)!important;background:linear-gradient(145deg,rgba(34,55,80,.74),rgba(15,29,47,.84) 62%,rgba(23,63,69,.54))!important;box-shadow:var(--xqx-shadow)!important}
+.xqx-page-home #care .care-section::after{opacity:.12!important}
+.xqx-page-home #care .care-head{text-align:left!important;margin-bottom:var(--xqx-space-6)!important}
+.xqx-page-home #care .care-head p{margin-left:0!important}
+.xqx-page-home #care .care-grid{grid-template-columns:minmax(0,1.2fr) repeat(2,minmax(170px,.7fr))!important;gap:var(--xqx-space-5)!important}
+.xqx-page-home #care .care-grid>.care-card:first-child{grid-column:1 / -1!important;display:grid!important;grid-template-columns:minmax(220px,.85fr) minmax(0,1.15fr)!important;align-items:center!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important}
+.xqx-page-home #care .care-grid>.care-card:first-child::before{display:none!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cc-inner{display:contents!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cc-head{grid-column:2!important;grid-row:1!important;align-self:end!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .countdown-panel{grid-column:1 / -1!important;display:grid!important;grid-template-columns:220px minmax(0,1fr)!important;align-items:center!important;gap:var(--xqx-space-6)!important;padding:0!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cd-ring-wrap{display:contents!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cd-ring{grid-column:1!important;grid-row:1 / span 2!important;width:220px!important;height:220px!important;margin:0 auto!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cd-info{grid-column:2!important;grid-row:1!important;display:block!important;margin:0!important}
+.xqx-page-home #care .care-grid>.care-card:first-child .cd-ring-legend{grid-column:2!important;grid-row:2!important;margin:var(--xqx-space-4) 0 0!important}
+.xqx-page-home #care .care-grid>.care-card:not(:first-child){padding:18px!important;border-radius:var(--xqx-radius-row)!important;border-color:rgba(255,255,255,.07)!important;background:rgba(255,255,255,.04)!important;box-shadow:none!important}
+.xqx-page-home #care .care-grid>.care-card:not(:first-child)::before{display:none!important}
+.xqx-page-home #care .care-grid>.care-card:not(:first-child):hover{background:rgba(255,255,255,.065)!important;transform:translateY(-2px)!important}
+.xqx-page-home #care .care-card .cc-head b{font-family:var(--sans)!important}
+
+/* The product principles are one closing editorial statement with three
+   lightweight columns, deliberately quieter than the actionable modules. */
+.xqx-page-home .manifesto{padding-top:var(--xqx-space-24)!important}
+.xqx-page-home .principles{gap:0!important;border-top:1px solid var(--xqx-border-soft)!important}
+.xqx-page-home .principle{padding:var(--xqx-space-6)!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.xqx-page-home .principle+.principle{border-left:1px solid var(--xqx-border-soft)!important}
+
+@media(max-width:900px){
+  .xqx-page-home #care .care-grid{grid-template-columns:1fr 1fr!important}
+  .xqx-page-home #care .care-grid>.care-card:first-child{grid-column:1 / -1!important}
+}
+@media(max-width:760px){
+  .xqx-page-home .rant-grid{grid-template-columns:1fr!important;gap:var(--xqx-space-3)!important}
+  .xqx-page-home .rant-card,.xqx-page-home .rant-card:nth-child(n){grid-column:auto!important;min-height:0!important}
+  .xqx-page-home #care .care-section{padding:var(--xqx-space-6)!important}
+  .xqx-page-home #care .care-head{text-align:center!important}.xqx-page-home #care .care-head p{margin-left:auto!important;margin-right:auto!important}
+  .xqx-page-home #care .care-grid{grid-template-columns:1fr!important}
+  .xqx-page-home #care .care-grid>.care-card:first-child,.xqx-page-home #care .care-grid>.care-card:first-child .countdown-panel{display:flex!important;flex-direction:column!important;gap:var(--xqx-space-4)!important}
+  .xqx-page-home #care .care-grid>.care-card:first-child .cc-head,.xqx-page-home #care .care-grid>.care-card:first-child .cd-ring,.xqx-page-home #care .care-grid>.care-card:first-child .cd-info,.xqx-page-home #care .care-grid>.care-card:first-child .cd-ring-legend{width:100%!important;margin:0!important}
+  .xqx-page-home #care .care-grid>.care-card:first-child .cd-ring{width:min(68vw,220px)!important;height:min(68vw,220px)!important;margin:0 auto!important}
+  .xqx-page-home .principles{grid-template-columns:1fr!important}.xqx-page-home .principle+.principle{border-left:0!important;border-top:1px solid var(--xqx-border-soft)!important}
+}
