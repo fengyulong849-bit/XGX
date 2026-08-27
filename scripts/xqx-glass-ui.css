@@ -581,15 +581,14 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 }
 
 /* Home Layout Master, second pass: supporting content has a clear reading
-   rhythm instead of repeating equal-size cards below the primary pet widget. */
+   rhythm below the primary pet widget without making community posts compete
+   by size. Every anonymous voice gets the same visual weight. */
 .xqx-page-home #wall.section{padding-top:var(--xqx-space-16)!important}
 .xqx-page-home .wall-head{margin-bottom:var(--xqx-space-6)!important;padding-bottom:0!important;border-bottom:0!important}
-.xqx-page-home .rant-grid{grid-template-columns:repeat(12,minmax(0,1fr))!important;gap:var(--xqx-grid-gap)!important}
-.xqx-page-home .rant-card{grid-column:span 4!important;min-height:168px!important;padding:22px!important;border-color:var(--xqx-border-soft)!important;background:rgba(255,255,255,.027)!important;box-shadow:none!important}
-.xqx-page-home .rant-card:nth-child(1),.xqx-page-home .rant-card:nth-child(6){grid-column:span 5!important;background:linear-gradient(145deg,rgba(43,61,85,.62),rgba(20,35,54,.55))!important}
-.xqx-page-home .rant-card:nth-child(2),.xqx-page-home .rant-card:nth-child(5){grid-column:span 3!important}
+.xqx-page-home .rant-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:var(--xqx-grid-gap)!important}
+.xqx-page-home .rant-card{grid-column:auto!important;min-height:184px!important;padding:22px!important;border-color:var(--xqx-border-soft)!important;background:rgba(255,255,255,.027)!important;box-shadow:none!important}
 .xqx-page-home .rant-card:hover{background:rgba(255,255,255,.052)!important;box-shadow:0 16px 34px rgba(0,0,0,.13)!important}
-.xqx-page-home .rant-card:nth-child(1) .rant-content,.xqx-page-home .rant-card:nth-child(6) .rant-content{font-size:17px!important;line-height:1.75!important}
+.xqx-page-home .rant-card .rant-content{font-size:15px!important;line-height:1.7!important}
 
 /* The work-health section is one widget with a primary time state and two
    secondary inline actions, not a dashboard of three unrelated cards. */

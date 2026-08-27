@@ -215,12 +215,6 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
         <path class="suit outline" d="M48 215q-17 18-14 42l16 2 18-36zM172 215q17 18 14 42l-16 2-18-36z"/><circle class="skin outline" cx="43" cy="257" r="11"/><circle class="skin outline" cx="177" cy="257" r="11"/></g>
       </svg>
     </div>
-    <div class="rotate-ring">
-      <span class="dot"></span>
-      <button class="on" id="autoBtn">自动旋转</button>
-      <span style="color:var(--tertiary)">|</span>
-      <button id="resetBtn">复位</button>
-    </div>
   </div>
 
   <div class="config">
@@ -771,8 +765,10 @@ controls.minPolarAngle=Math.PI*0.15;controls.maxPolarAngle=Math.PI*0.65;
 controls.autoRotate=true;controls.autoRotateSpeed=0.6;
 controls.target.set(0,1.5,0);
 
-document.getElementById('autoBtn').addEventListener('click',function(){controls.autoRotate=!controls.autoRotate;this.classList.toggle('on',controls.autoRotate)});
-document.getElementById('resetBtn').addEventListener('click',()=>{camera.position.set(0,2.2,5.5);controls.target.set(0,1.5,0);controls.update()});
+const autoButton=document.getElementById('autoBtn');
+const resetButton=document.getElementById('resetBtn');
+if(autoButton)autoButton.addEventListener('click',function(){controls.autoRotate=!controls.autoRotate;this.classList.toggle('on',controls.autoRotate)});
+if(resetButton)resetButton.addEventListener('click',()=>{camera.position.set(0,2.2,5.5);controls.target.set(0,1.5,0);controls.update()});
 
 // ===== 动效状态：入场/切换弹跳 =====
 const prm2=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
