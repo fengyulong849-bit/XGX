@@ -264,3 +264,70 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 @media screen and (max-width:760px){
   body.xqx-page-home .pet-row.xqx-home-stage{grid-template-columns:minmax(0,1fr)!important;display:grid!important}
 }
+
+/* Home composition refinement: the companion and the work rhythm become one
+   deliberate, generously sized scene. This is scoped to P1 and leaves every
+   feature node, modal, action and data hook untouched. */
+.xqx-page-home{--xqx-page-max:1320px}
+.xqx-page-home .xqx-hero{
+  max-width:var(--xqx-page-max)!important;padding:clamp(56px,7vw,104px) 0 clamp(36px,4vw,56px)!important;
+  display:grid!important;grid-template-columns:minmax(0,1.08fr) minmax(300px,.66fr)!important;column-gap:var(--xqx-space-16)!important;align-items:end!important;
+}
+.xqx-page-home .xqx-hero .eyebrow,.xqx-page-home .xqx-hero h1,.xqx-page-home .xqx-hero .lede,.xqx-page-home .xqx-hero .hero-cta{grid-column:1;text-align:left!important}
+.xqx-page-home .xqx-hero h1{max-width:680px!important;margin-bottom:var(--xqx-space-4)!important;font-size:clamp(44px,5.1vw,70px)!important;line-height:1.06!important}
+.xqx-page-home .xqx-hero .lede{max-width:540px!important;margin:0 0 var(--xqx-space-6)!important;font-size:15px!important}
+.xqx-page-home .xqx-hero::after{
+  content:'今天的烦躁，先放在这里。';grid-column:2;grid-row:1 / span 4;align-self:center;
+  padding:var(--xqx-space-6);border-left:1px solid var(--xqx-border);font-family:var(--serif);font-size:clamp(18px,2vw,25px);font-style:italic;line-height:1.45;color:rgba(248,246,241,.72);
+}
+.xqx-page-home .xqx-home-stage{
+  position:relative;display:grid!important;grid-template-columns:minmax(0,1.38fr) minmax(360px,.82fr)!important;
+  align-items:stretch!important;gap:var(--xqx-space-6)!important;max-width:var(--xqx-page-max)!important;
+}
+.xqx-page-home .xqx-home-stage::before{
+  content:'';position:absolute;inset:-18px;border-radius:32px;z-index:-1;
+  background:linear-gradient(135deg,rgba(255,255,255,.045),rgba(255,255,255,.012) 42%,rgba(105,184,175,.035));
+  border:1px solid rgba(255,255,255,.045);box-shadow:0 38px 90px rgba(0,0,0,.16);
+}
+.xqx-page-home .xqx-home-stage > .holo-card{min-height:632px!important}
+.xqx-page-home .xqx-home-stage > .checkin-bar,.xqx-page-home .xqx-home-stage > .rhythm-host{
+  min-height:632px!important;align-self:stretch!important;border-radius:var(--xqx-radius-widget)!important;
+  background:linear-gradient(158deg,rgba(36,58,84,.78),rgba(14,29,47,.86))!important;
+  border:1px solid var(--xqx-border)!important;box-shadow:var(--xqx-shadow)!important;
+}
+.xqx-page-home .xqx-home-stage > .checkin-bar{padding:var(--xqx-space-8)!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host{padding:var(--xqx-space-6)!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section{
+  min-height:0!important;height:100%!important;padding:0!important;border:0!important;background:transparent!important;box-shadow:none!important;
+}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .care-card:first-child,
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .care-card:first-child .cc-inner{height:100%!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .cd-ring{width:clamp(236px,20vw,292px)!important;height:clamp(236px,20vw,292px)!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .cd-ring-text .time{font-size:clamp(34px,3vw,46px)!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .cd-info{margin-top:var(--xqx-space-3)!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .cd-ring-legend{margin-top:var(--xqx-space-3)!important}
+.xqx-page-home .signal{margin-top:var(--xqx-section-gap)!important;padding-top:0!important}
+.xqx-page-home .section{padding-top:var(--xqx-section-gap)!important}
+.xqx-page-home #wall.section{padding-top:var(--xqx-space-16)!important}
+
+@media(max-width:1080px){
+  .xqx-page-home .xqx-hero{grid-template-columns:1fr!important;max-width:900px!important;text-align:center!important;padding-left:var(--xqx-page-pad)!important;padding-right:var(--xqx-page-pad)!important}
+  .xqx-page-home .xqx-hero .eyebrow,.xqx-page-home .xqx-hero h1,.xqx-page-home .xqx-hero .lede,.xqx-page-home .xqx-hero .hero-cta{text-align:center!important;margin-left:auto!important;margin-right:auto!important}
+  .xqx-page-home .xqx-hero::after{display:none}
+  .xqx-page-home .xqx-home-stage{grid-template-columns:minmax(0,1.16fr) minmax(310px,.84fr)!important}
+  .xqx-page-home .xqx-home-stage > .holo-card,.xqx-page-home .xqx-home-stage > .checkin-bar,.xqx-page-home .xqx-home-stage > .rhythm-host{min-height:590px!important}
+}
+@media(max-width:780px){
+  .xqx-page-home .xqx-hero{padding-top:48px!important;padding-bottom:32px!important}
+  .xqx-page-home .xqx-home-stage{grid-template-columns:minmax(0,1fr)!important;max-width:620px!important}
+  .xqx-page-home .xqx-home-stage > *{grid-column:auto!important;grid-row:auto!important}
+  .xqx-page-home .xqx-home-stage::before{inset:-10px;border-radius:26px}
+  .xqx-page-home .xqx-home-stage > .holo-card{min-height:0!important}
+  .xqx-page-home .xqx-home-stage > .checkin-bar,.xqx-page-home .xqx-home-stage > .rhythm-host{min-height:500px!important}
+  .xqx-page-home .xqx-home-stage > .rhythm-host>.care-section .cd-ring{width:min(72vw,292px)!important;height:min(72vw,292px)!important}
+}
+@media(max-width:480px){
+  .xqx-page-home .xqx-hero h1{font-size:42px!important}
+  .xqx-page-home .xqx-home-stage > .checkin-bar,.xqx-page-home .xqx-home-stage > .rhythm-host{min-height:0!important}
+  .xqx-page-home .xqx-home-stage > .checkin-bar{padding:var(--xqx-space-6)!important}
+}
