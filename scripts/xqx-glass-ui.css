@@ -400,3 +400,79 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .xqx-page-review .headline{padding-top:var(--xqx-space-5)!important}.xqx-page-review .summary{grid-template-columns:1fr!important}.xqx-page-review .metric{min-height:106px!important}.xqx-page-review .item{grid-template-columns:1fr!important}.xqx-page-review .actions{border-left:0!important;border-top:1px solid var(--xqx-border-soft)!important;padding-top:var(--xqx-space-4)!important}
   .xqx-page-recovery .back-btn{top:14px!important;left:14px!important}.xqx-page-roles{align-items:start!important;padding-top:96px!important}
 }
+
+/* Regression repair: retain the design system without taking legacy elements
+   out of the layouts their interaction code expects. */
+
+/* The SVG is the reliable DIY preview while the transparent Three canvas loads. */
+.xqx-page-diy .studio #three-canvas{position:absolute!important;inset:0!important;z-index:1!important}
+.xqx-page-diy .studio #humanFigure{
+  position:absolute!important;z-index:2!important;left:50%!important;
+  bottom:clamp(28px,6vh,64px)!important;width:clamp(280px,32vw,420px)!important;
+  height:auto!important;display:block!important;visibility:visible!important;opacity:1!important;
+  transform:translateX(-50%)!important;
+}
+.xqx-page-diy .studio #humanFigure svg{width:100%!important;height:auto!important;overflow:visible!important}
+.xqx-page-diy .studio .rotate-ring{z-index:4!important}
+
+/* Keep the account overview as one composed row. The legacy flex spacer must
+   not become an extra grid item between the account and its balance. */
+.xqx-page-profile .overview{
+  display:flex!important;align-items:center!important;gap:24px!important;
+  min-height:190px!important;padding:clamp(28px,3.2vw,38px)!important;
+}
+.xqx-page-profile .overview > .spacer{display:none!important}
+.xqx-page-profile .overview .info{flex:1 1 auto!important;min-width:0!important}
+.xqx-page-profile .overview .points-block{
+  flex:0 0 auto!important;align-self:center!important;padding:0 0 0 28px!important;
+  border-left:1px solid var(--xqx-border-soft)!important;text-align:right!important;
+}
+.xqx-page-profile .overview .streak-badge{
+  position:absolute!important;top:20px!important;right:24px!important;justify-self:auto!important;
+}
+
+/* The work rhythm is a supporting widget, not a forced duplicate of the pet
+   stage height. Let its actual contents set the height so rings cannot clip. */
+.xqx-page-home .xqx-home-stage{align-items:start!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host{
+  min-height:0!important;height:auto!important;align-self:start!important;padding:22px!important;
+  border-radius:26px!important;
+}
+.xqx-page-home .xqx-home-stage > .rhythm-host > .care-section,
+.xqx-page-home .xqx-home-stage > .rhythm-host > .care-section .care-card:first-child,
+.xqx-page-home .xqx-home-stage > .rhythm-host > .care-section .care-card:first-child .cc-inner{
+  min-height:0!important;height:auto!important;
+}
+.xqx-page-home .xqx-home-stage > .rhythm-host > .shift-summary{padding-bottom:16px!important}
+.xqx-page-home .xqx-home-stage > .rhythm-host > .care-section .cd-ring{
+  width:clamp(220px,18vw,270px)!important;height:clamp(220px,18vw,270px)!important;
+}
+
+/* Restore an intentional desktop toolbar scale and reduce dead space above
+   the page's single primary home composition. */
+.xqx-page-home .nav{
+  width:min(1360px,calc(100% - 48px))!important;min-height:72px!important;
+  margin:20px auto 0!important;padding:12px 18px!important;border-radius:22px!important;
+}
+.xqx-page-home .logo{font-size:24px!important}.xqx-page-home .logo-mark{width:36px!important;height:36px!important}
+.xqx-page-home .nav-links a{padding:10px 14px!important;font-size:14px!important}
+.xqx-page-home .xqx-hero{padding-top:clamp(36px,4.5vw,68px)!important}
+
+@media(max-width:780px){
+  .xqx-page-home .xqx-home-stage > .rhythm-host{min-height:0!important;width:100%!important}
+  .xqx-page-home .xqx-home-stage > .rhythm-host > .care-section .cd-ring{width:min(72vw,292px)!important;height:min(72vw,292px)!important}
+}
+@media(max-width:640px){
+  .xqx-page-profile .overview{align-items:flex-start!important;gap:16px!important}
+  .xqx-page-profile .overview .points-block{
+    width:100%!important;padding:16px 0 0!important;border-left:0!important;
+    border-top:1px solid var(--xqx-border-soft)!important;text-align:left!important;
+  }
+  .xqx-page-profile .overview .streak-badge{position:static!important;order:3!important;margin:0!important}
+  .xqx-page-home .nav{width:calc(100% - 20px)!important;min-height:58px!important;margin-top:8px!important;padding:9px 10px!important;border-radius:15px!important}
+}
+@media(max-width:760px){
+  /* The mobile studio is intentionally compact; scale the fallback figure to
+     fit fully inside it instead of letting the head escape above the stage. */
+  .xqx-page-diy .studio #humanFigure{width:min(48vw,190px)!important;bottom:8px!important}
+}
