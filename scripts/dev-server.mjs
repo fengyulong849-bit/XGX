@@ -1,4 +1,4 @@
-import { createReadStream, existsSync, statSync } from "node:fs";
+import { createReadStream, existsSync, readFileSync, statSync } from "node:fs";
 import { createServer } from "node:http";
 import { extname, resolve, sep } from "node:path";
 
@@ -19,6 +19,24 @@ const types = {
 
 createServer((request, response) => {
   const pathname = decodeURIComponent(new URL(request.url, "http://localhost").pathname);
+  // Local visual preview only: no account, cloud requests or business writes.
+  if (pathname === "/__preview-diy.html") {
+    let html = readFileSync(resolve(root, "P2_捏脸DIY.html"), "utf8");
+    const start = html.indexOf("(async function loadCloudAppearance(){");
+    const end = html.indexOf("document.getElementById('shareBtn').addEventListener", start);
+    if (start < 0 || end < 0) {
+      response.writeHead(500); response.end("Preview markers missing"); return;
+    }
+    html = html.slice(0, start) + html.slice(end);
+    html = html.replace(' diy-guarding" aria-busy="true"', '" aria-busy="false"')
+      .replace('<script src="scripts/xqx-auth.js"></script>', '')
+      .replace('id="saveBtn"', 'id="saveBtn" disabled title="本地预览不保存到账号"')
+      .replace('id="shareBtn"', 'id="shareBtn" disabled')
+      .replace('· 已自动保存', '· 本地预览，不写入账号')
+      .replace('id="p2-points">--', 'id="p2-points">预览');
+    response.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" });
+    response.end(html); return;
+  }
   const requested = pathname === "/" ? "P1_首页.html" : pathname.replace(/^[/\\]+/, "");
   const file = resolve(root, requested);
 
