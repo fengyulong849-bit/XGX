@@ -136,7 +136,9 @@ body::before{
 .figure-glow{position:absolute;top:24px;left:50%;transform:translateX(-50%);width:180px;height:180px;border-radius:50%;background:radial-gradient(circle,rgba(232,163,61,.18),transparent 70%);filter:blur(10px);pointer-events:none}
 .figure-shadow{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);width:150px;height:20px;border-radius:50%;background:radial-gradient(ellipse,rgba(0,0,0,.4),transparent 70%);pointer-events:none}
 #pet-canvas{position:absolute;inset:0;width:100%;height:100%;display:block;z-index:0;opacity:0;pointer-events:none}
-#pet-canvas:active{cursor:default}
+#pet-canvas:active{cursor:grabbing}
+.figure-stage.three-ready #pet-canvas{opacity:1;pointer-events:auto;z-index:2;cursor:grab;touch-action:none}
+.figure-stage.three-ready .human-figure{display:none}
 .human-figure{position:absolute;z-index:1;left:50%;bottom:0;width:260px;height:328px;transform:translateX(-50%);filter:drop-shadow(0 14px 12px rgba(0,0,0,.28));animation:humanFloat 3.8s ease-in-out infinite;transform-origin:50% 100%}
 .human-figure svg{width:100%;height:100%;overflow:visible}
 .human-figure .skin{fill:var(--human-skin,#DCA47D)}.human-figure .skin-light{fill:var(--human-skin,#E9B995)}.human-figure .hair{fill:var(--human-hair,#30251F)}.human-figure .hair-hi{fill:#4A3529}.human-figure .suit{fill:var(--human-suit,#263A55)}.human-figure .suit-dark{fill:var(--human-suit-dark,#1B2B42)}.human-figure .shirt{fill:#F0ECE4}.human-figure .tie{fill:var(--human-tie,#E8A33D)}.human-figure .ink{fill:#1B1720}.human-figure .white{fill:#FFF9F0}.human-figure .blush{fill:#D97A6C;opacity:.55}.human-figure .human-body{transform-box:fill-box;transform-origin:50% 100%;transition:transform .25s ease}.human-figure[data-belly="1"] .human-body{transform:scaleX(1.08)}.human-figure[data-belly="2"] .human-body{transform:scaleX(1.18)}.human-figure .face-shape{transform-box:fill-box;transform-origin:50% 50%;transition:transform .25s ease}.human-figure[data-face="1"] .face-shape{transform:scaleX(1.08) scaleY(1.02)}.human-figure[data-face="2"] .face-shape{transform:scaleX(.9) scaleY(1.14)}.human-figure .hair-variant{display:none}.human-figure[data-hair="0"] .hair-0,.human-figure[data-hair="1"] .hair-1,.human-figure[data-hair="2"] .hair-2,.human-figure[data-hair="3"] .hair-3{display:block}
@@ -802,7 +804,7 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
           <div class="figure-glow"></div>
           <div class="figure-shadow"></div>
           <div class="bubble" id="bubble"></div>
-          <canvas id="pet-canvas" aria-hidden="true"></canvas>
+          <canvas id="pet-canvas" aria-label="3D 领导，拖动旋转查看"></canvas>
           <div class="leader-state-fx" id="leaderStateFx" aria-hidden="true"></div>
           <div class="finale-fx" aria-hidden="true"><div class="finale-kicker">终结一击</div><div class="finale-subtitle">这一次，轮到他把话咽回去</div><div class="finale-rings"></div><div class="finale-slam">砰！</div></div>
           <div class="action-impact" id="actionImpact" aria-live="polite"><strong id="impactWord">啪！</strong><span id="impactPoints">+10 情绪释放</span><em id="impactCopy">这一掌，替你拍掉一点烦心事</em></div>
@@ -1325,17 +1327,16 @@ button:focus-visible,a:focus-visible{outline:2px solid var(--amber);outline-offs
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { buildCharacter } from './scripts/xqx-character.js';
 
 // ============ 3D 桌宠模型（复用 P2 捏脸逻辑，嵌入全息卡） ============
-const SKINS=[0xF0C8A0,0xE8B98A,0xD4A574,0x9C7B5A];
-const SUITS=[0x2E3A4A,0x1A1A1A,0x4A4A4A,0x3D2E1F];
 // 默认Q版配置：圆脸·背头·圆框眼镜·微笑·深蓝西装·标准·白肤色
 let petCfg={face:0,hair:0,glasses:1,beard:0,expr:0,suit:0,belly:0,skin:0};
 
 const petCanvas=document.getElementById('pet-canvas');
 const petScene=new THREE.Scene();
 const petCam=new THREE.PerspectiveCamera(38,1,0.1,100);
-petCam.position.set(0,2.0,5.5);
+petCam.position.set(0,2.1,8.5);
 const petRenderer=new THREE.WebGLRenderer({canvas:petCanvas,antialias:true,alpha:true});
 petRenderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 petRenderer.shadowMap.enabled=true;
@@ -1347,13 +1348,15 @@ function petResize(){
   const w=petCanvas.clientWidth,h=petCanvas.clientHeight;
   if(!w||!h)return;
   petRenderer.setSize(w,h,false);
-  petCam.aspect=w/h;petCam.updateProjectionMatrix();
+  petCam.aspect=w/h;petCam.position.set(0,2.1,Math.max(8.5,5/Math.max(petCam.aspect,.45)));petCam.updateProjectionMatrix();
 }
 
 petRenderer.outputColorSpace=THREE.SRGBColorSpace;
 
 // 三点布光 — 深夜蓝+暖琥珀摄影棚
-petScene.add(new THREE.AmbientLight(0x3A4A66,0.55));
+petScene.add(new THREE.HemisphereLight(0xDCEBFF,0x756354,2.2));
+const portraitLight=new THREE.DirectionalLight(0xFFF1DD,3);
+portraitLight.position.set(1,4,6);petScene.add(portraitLight);
 const keyL=new THREE.SpotLight(0xFFE0B0,2.2,30,Math.PI/5,0.4,1.5);
 keyL.position.set(2,9,6);keyL.castShadow=true;
 keyL.shadow.mapSize.set(1024,1024);keyL.shadow.bias=-0.0005;
@@ -1368,14 +1371,14 @@ bottomL.position.set(0,-1,3);petScene.add(bottomL);
 
 // 底座 + 发光环 + 阴影地面
 const petBase=new THREE.Mesh(new THREE.CylinderGeometry(2.0,2.2,0.16,48),new THREE.MeshStandardMaterial({color:0x1A2536,roughness:.7,metalness:.2}));
-petBase.position.y=-1.5;petBase.receiveShadow=true;petScene.add(petBase);
+petBase.position.y=-.75;petBase.receiveShadow=true;petScene.add(petBase);
 const petBaseRing=new THREE.Mesh(new THREE.TorusGeometry(2.0,0.035,12,48),new THREE.MeshStandardMaterial({color:0xE8A33D,emissive:0xE8A33D,emissiveIntensity:0.4}));
-petBaseRing.position.y=-1.4;petBaseRing.rotation.x=-Math.PI/2;petScene.add(petBaseRing);
+petBaseRing.position.y=-.65;petBaseRing.rotation.x=-Math.PI/2;petScene.add(petBaseRing);
 // 第二圈：反向旋转的蓝冷光细环，与琥珀环形成双层呼吸
 const petBaseRing2=new THREE.Mesh(new THREE.TorusGeometry(2.15,0.018,10,64),new THREE.MeshStandardMaterial({color:0x6B9FD4,emissive:0x6B9FD4,emissiveIntensity:0.5,transparent:true,opacity:.7}));
-petBaseRing2.position.y=-1.42;petBaseRing2.rotation.x=-Math.PI/2;petScene.add(petBaseRing2);
+petBaseRing2.position.y=-.67;petBaseRing2.rotation.x=-Math.PI/2;petScene.add(petBaseRing2);
 const petGround=new THREE.Mesh(new THREE.CircleGeometry(5,48),new THREE.ShadowMaterial({opacity:0.4}));
-petGround.rotation.x=-Math.PI/2;petGround.position.y=-1.42;petGround.receiveShadow=true;petScene.add(petGround);
+petGround.rotation.x=-Math.PI/2;petGround.position.y=-.66;petGround.receiveShadow=true;petScene.add(petGround);
 
 // 漂浮光点粒子（琥珀+蓝 双色，缓缓上升漂移）
 const petParticles=new THREE.Group();petScene.add(petParticles);
@@ -1400,277 +1403,7 @@ const petParticles=new THREE.Group();petScene.add(petParticles);
 const charGroup=new THREE.Group();
 petScene.add(charGroup);
 
-function disposeGroup(g){g.traverse(o=>{if(o.geometry)o.geometry.dispose();if(o.material)o.material.dispose()});while(g.children.length)g.remove(g.children[0])}
-
-function buildChar(){
-  disposeGroup(charGroup);
-  const skin=new THREE.MeshStandardMaterial({color:SKINS[petCfg.skin],roughness:.62,emissive:SKINS[petCfg.skin],emissiveIntensity:.04});
-  const suit=new THREE.MeshStandardMaterial({color:SUITS[petCfg.suit],roughness:.72,metalness:.06});
-  const dark=new THREE.MeshStandardMaterial({color:0x2A2530,roughness:.55});
-  const tieM=new THREE.MeshStandardMaterial({color:0xE8A33D,roughness:.4,metalness:.12,emissive:0xE8A33D,emissiveIntensity:.03});
-  const shirtM=new THREE.MeshStandardMaterial({color:0xFAF8F4,roughness:.55});
-  const blushM=new THREE.MeshBasicMaterial({color:0xF5A0A0,transparent:true,opacity:.55});
-  const frameM=new THREE.MeshStandardMaterial({color:0x1A1A1A,roughness:.4,metalness:.15});
-
-  const fs=[[1,1,1],[1.06,1.16,1.04],[.88,1.32,.88]][petCfg.face];
-  const bl=[1,1.14,1.3][petCfg.belly];
-
-  // ===== Q版头（超大，占60%高度）=====
-  const head=new THREE.Mesh(new THREE.SphereGeometry(1.55,32,32),skin);
-  head.scale.set(fs[0]*1.08,fs[1]*1.05,fs[2]);
-  head.position.y=2.25;head.castShadow=true;charGroup.add(head);
-
-  // ===== 耳朵（小而圆）=====
-  const eg=new THREE.SphereGeometry(.28,16,16);
-  const eL=new THREE.Mesh(eg,skin);eL.scale.set(.55,1,.55);eL.position.set(-fs[0]*1.2,2.2,.05);
-  const eR=eL.clone();eR.position.x=fs[0]*1.2;charGroup.add(eL,eR);
-
-  // ===== 脖子（短而粗）=====
-  const neck=new THREE.Mesh(new THREE.CylinderGeometry(.3,.38,.35,16),skin);
-  neck.position.y=1.05;charGroup.add(neck);
-
-  // ===== Q版身体（矮胖圆）=====
-  const body=new THREE.Mesh(new THREE.CylinderGeometry(.7*bl,.9*bl,1.05,24),suit);
-  body.position.y=.6;body.castShadow=true;charGroup.add(body);
-  if(petCfg.belly>0){
-    const belly=new THREE.Mesh(new THREE.SphereGeometry(.55*bl,20,20),suit);
-    belly.position.set(0,.45,.48);belly.scale.set(1,.85,.7);charGroup.add(belly);
-  }
-
-  // ===== 动态衣服：不同西装配不同领带+口袋巾+翻领 =====
-  const TIE_COLORS=[0xE8A33D,0xC44536,0x6B9FD4,0x3D2E1F];
-  const POCKET_COLORS=[0xE8A33D,0xFFFFFF,0x6FB3A8,0xD97A6C];
-  const LAPEL_W=[1,1.15,.9,1.08];
-  const tieColor=TIE_COLORS[petCfg.suit];
-  const pocketColor=POCKET_COLORS[petCfg.suit];
-  const tieM2=new THREE.MeshStandardMaterial({color:tieColor,roughness:.35,metalness:.15});
-  const pocketM=new THREE.MeshStandardMaterial({color:pocketColor,roughness:.5});
-
-  // ===== 衬衫领口 =====
-  const scL=new THREE.Mesh(new THREE.BoxGeometry(.32,.18,.08),shirtM);
-  scL.position.set(-.14,1.05,.48);scL.rotation.z=.2;charGroup.add(scL);
-  const scR=scL.clone();scR.position.x=.14;scR.rotation.z=-.2;charGroup.add(scR);
-
-  // ===== 领带（颜色随西装变）=====
-  const tieKnot=new THREE.Mesh(new THREE.BoxGeometry(.14,.16,.12),tieM2);
-  tieKnot.position.set(0,1.05,.52);charGroup.add(tieKnot);
-  const tieBody=new THREE.Mesh(new THREE.ConeGeometry(.14,.6,4),tieM2);
-  tieBody.position.set(0,.72,.5);tieBody.rotation.y=Math.PI/4;charGroup.add(tieBody);
-
-  // ===== 西装翻领（宽度随西装变）=====
-  const lw=LAPEL_W[petCfg.suit];
-  const lpL=new THREE.Mesh(new THREE.BoxGeometry(.3*lw,.9,.07),suit);
-  lpL.position.set(-.3,1.35,.86);lpL.rotation.set(.05,0,-.28*lw);charGroup.add(lpL);
-  const lpR=new THREE.Mesh(new THREE.BoxGeometry(.3*lw,.9,.07),suit);
-  lpR.position.set(.3,1.35,.86);lpR.rotation.set(.05,0,.28*lw);charGroup.add(lpR);
-
-  // ===== 口袋巾（颜色随西装变）=====
-  const pk=new THREE.Mesh(new THREE.BoxGeometry(.34,.14,.05),pocketM);
-  pk.position.set(.46,1.12,.98);pk.rotation.set(.12,.08,.08);charGroup.add(pk);
-  const pktLine=new THREE.Mesh(new THREE.BoxGeometry(.44,.02,.03),dark);
-  pktLine.position.set(.46,.95,.98);charGroup.add(pktLine);
-
-  // ===== 西装扣 =====
-  for(let i=0;i<2;i++){
-    const btn=new THREE.Mesh(new THREE.SphereGeometry(.055,10,10),new THREE.MeshStandardMaterial({color:0x222222,roughness:.4,metalness:.2}));
-    btn.position.set(0,.7-i*.35,.98);charGroup.add(btn);
-  }
-
-  // ===== 手臂（短小胶囊）=====
-  const armG=new THREE.CapsuleGeometry(.16,.45,6,10);
-  const armX=.72*bl;
-  const aL=new THREE.Mesh(armG,suit);aL.position.set(-armX,.68,.05);aL.rotation.z=.35;aL.rotation.x=.08;aL.castShadow=true;
-  const aR=aL.clone();aR.position.x=armX;aR.rotation.z=-.35;charGroup.add(aL,aR);
-
-  // ===== 手（大圆手）=====
-  const hg=new THREE.SphereGeometry(.22,14,14);
-  const hL=new THREE.Mesh(hg,skin);hL.position.set(-armX-.1,.32,.02);charGroup.add(hL);
-  const hR=hL.clone();hR.position.x=armX+.1;charGroup.add(hL,hR);
-
-  // ===== 动态表情：位置贴合脸部 =====
-  const headCenterY=2.25;
-  const eyeY=headCenterY+.45,eyeZ=fs[2]*.88;
-  const mouthY=headCenterY-.05,mouthZ=eyeZ;
-  const eyeOff=0.45*fs[0];
-  const browY=eyeY+.28;
-
-  if(petCfg.expr===0){
-    // 微笑：弯月眼 + 大弧线嘴 + 温和眉
-    const smileEye=(side)=>{
-      const g=new THREE.Group();
-      const iris=new THREE.Mesh(new THREE.SphereGeometry(.12,14,14),dark);
-      iris.scale.set(1,.6,1);
-      g.add(iris);
-      const lid=new THREE.Mesh(new THREE.SphereGeometry(.14,12,12),new THREE.MeshBasicMaterial({color:0xffffff}));
-      lid.scale.set(1,.4,.5);lid.position.y=.08;lid.scale.y*=-1;
-      g.add(lid);
-      g.position.set(side*eyeOff,eyeY,eyeZ);
-      g.scale.x=side>0?1:-1;
-      return g;
-    };
-    charGroup.add(smileEye(-1));charGroup.add(smileEye(1));
-    const hl=new THREE.Mesh(new THREE.SphereGeometry(.04,8,8),new THREE.MeshBasicMaterial({color:0xffffff}));
-    hl.position.set(-eyeOff*.9,eyeY+.06,eyeZ+.06);charGroup.add(hl);
-    const hl2=hl.clone();hl2.position.x=eyeOff*.9;charGroup.add(hl2);
-    const browG=new THREE.BoxGeometry(.3,.05,.04);
-    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
-    bL.position.set(-eyeOff,browY,eyeZ);bR.position.set(eyeOff,browY,eyeZ);
-    bL.rotation.z=.1;bR.rotation.z=-.1;charGroup.add(bL,bR);
-    const smile=new THREE.Mesh(new THREE.TorusGeometry(.18,.045,8,18,Math.PI),dark);
-    smile.position.set(0,mouthY,mouthZ);smile.rotation.z=Math.PI;charGroup.add(smile);
-    const tongue=new THREE.Mesh(new THREE.SphereGeometry(.06,10,10),new THREE.MeshStandardMaterial({color:0xD97A6C,roughness:.5}));
-    tongue.position.set(0,mouthY-.06,mouthZ+.08);tongue.scale.set(1,.5,.6);charGroup.add(tongue);
-  } else if(petCfg.expr===1){
-    // 皱眉：眯眼下拉 + 咬牙嘴 + 眉毛大幅下压
-    const angryEye=(side)=>{
-      const g=new THREE.Group();
-      const iris=new THREE.Mesh(new THREE.SphereGeometry(.11,12,12),dark);
-      iris.scale.set(1,.7,1);
-      g.add(iris);
-      const lid=new THREE.Mesh(new THREE.BoxGeometry(.22,.035,.04),dark);
-      lid.position.y=.1;
-      g.add(lid);
-      g.position.set(side*eyeOff,eyeY,eyeZ);
-      g.scale.x=side>0?1:-1;
-      return g;
-    };
-    charGroup.add(angryEye(-1));charGroup.add(angryEye(1));
-    const browG=new THREE.BoxGeometry(.32,.06,.04);
-    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
-    bL.position.set(-eyeOff,eyeY+.14,eyeZ);bR.position.set(eyeOff,eyeY+.14,eyeZ);
-    bL.rotation.z=-.35;bR.rotation.z=.35;charGroup.add(bL,bR);
-    const frown=new THREE.Mesh(new THREE.TorusGeometry(.16,.05,8,16,Math.PI*.8),dark);
-    frown.position.set(0,mouthY,mouthZ);charGroup.add(frown);
-    const grind=new THREE.Mesh(new THREE.BoxGeometry(.28,.025,.04),dark);
-    grind.position.set(0,mouthY-.06,mouthZ);charGroup.add(grind);
-  } else if(petCfg.expr===2){
-    // 惊讶：大圆眼 + O型嘴 + 眉毛上抬
-    const bigEye=(side)=>{
-      const g=new THREE.Group();
-      const sclera=new THREE.Mesh(new THREE.SphereGeometry(.14,14,14),new THREE.MeshBasicMaterial({color:0xffffff}));
-      g.add(sclera);
-      const iris=new THREE.Mesh(new THREE.SphereGeometry(.09,12,12),dark);
-      iris.position.z=.02;g.add(iris);
-      const hl=new THREE.Mesh(new THREE.SphereGeometry(.025,6,6),new THREE.MeshBasicMaterial({color:0xffffff}));
-      hl.position.set(.03,.03,.04);g.add(hl);
-      g.position.set(side*eyeOff,eyeY,eyeZ);
-      g.scale.x=side>0?1:-1;
-      return g;
-    };
-    charGroup.add(bigEye(-1));charGroup.add(bigEye(1));
-    const browG=new THREE.BoxGeometry(.3,.055,.04);
-    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
-    bL.position.set(-eyeOff,eyeY+.32,eyeZ);bR.position.set(eyeOff,eyeY+.32,eyeZ);
-    bL.rotation.z=.05;bR.rotation.z=-.05;charGroup.add(bL,bR);
-    const oMouth=new THREE.Mesh(new THREE.SphereGeometry(.12,12,12),dark);
-    oMouth.position.set(0,mouthY,mouthZ);charGroup.add(oMouth);
-    const oInner=new THREE.Mesh(new THREE.SphereGeometry(.07,10,10),new THREE.MeshStandardMaterial({color:0x3D1A1A,roughness:.5}));
-    oInner.position.set(0,mouthY,mouthZ+.02);charGroup.add(oInner);
-  } else {
-    // 生气：眯眼+下眼睑 + 倒三角嘴 + 眉毛倒八字
-    const rageEye=(side)=>{
-      const g=new THREE.Group();
-      const iris=new THREE.Mesh(new THREE.SphereGeometry(.1,12,12),dark);
-      iris.scale.set(1,.65,1);
-      g.add(iris);
-      const upperLid=new THREE.Mesh(new THREE.BoxGeometry(.24,.04,.04),dark);
-      upperLid.position.y=.09;g.add(upperLid);
-      const lowerLid=new THREE.Mesh(new THREE.BoxGeometry(.2,.035,.04),dark);
-      lowerLid.position.y=-.06;lowerLid.rotation.z=side>0?.2:-.2;g.add(lowerLid);
-      g.position.set(side*eyeOff,eyeY,eyeZ);
-      g.scale.x=side>0?1:-1;
-      return g;
-    };
-    charGroup.add(rageEye(-1));charGroup.add(rageEye(1));
-    const browG=new THREE.BoxGeometry(.32,.06,.04);
-    const bL=new THREE.Mesh(browG,dark),bR=new THREE.Mesh(browG,dark);
-    bL.position.set(-eyeOff,eyeY+.12,eyeZ);bR.position.set(eyeOff,eyeY+.12,eyeZ);
-    bL.rotation.z=-.4;bR.rotation.z=.4;charGroup.add(bL,bR);
-    const rageMouth=new THREE.Mesh(new THREE.ConeGeometry(.16,.12,4),dark);
-    rageMouth.position.set(0,mouthY-.06,mouthZ);rageMouth.rotation.set(Math.PI,0,Math.PI);charGroup.add(rageMouth);
-    const wrL=new THREE.Mesh(new THREE.BoxGeometry(.14,.025,.03),dark);
-    wrL.position.set(-eyeOff*.57,eyeY+.18,eyeZ);wrL.rotation.z=-.4;
-    const wrR=wrL.clone();wrR.position.x=eyeOff*.57;wrR.rotation.z=.4;
-    charGroup.add(wrL,wrR);
-  }
-
-  // ===== 腮红（生气时隐藏，惊讶时更红）=====
-  if(petCfg.expr!==3){
-    const blushM2=new THREE.MeshBasicMaterial({color:petCfg.expr===2?0xD97A6C:0xF5A0A0,transparent:true,opacity:petCfg.expr===2?.45:.55});
-    const blG=new THREE.SphereGeometry(.22,14,14);
-    const bl1=new THREE.Mesh(blG,blushM2);bl1.position.set(-eyeOff*1.4,mouthY+.18,eyeZ*.78);bl1.scale.set(1,.5,.3);
-    const bl2=bl1.clone();bl2.position.x=eyeOff*1.4;charGroup.add(bl1,bl2);
-  }
-
-  // ===== 头发（Q版：全头顶发 + 刘海遮眉上）=====
-  if(petCfg.hair===0){
-    const h=new THREE.Mesh(new THREE.SphereGeometry(1.62,28,28,0,Math.PI*2,0,Math.PI*0.56),dark);
-    h.scale.set(fs[0]*1.1,fs[1]*1.12,fs[2]*1.1);h.position.y=2.38;charGroup.add(h);
-    const bang=new THREE.Mesh(new THREE.SphereGeometry(1.46,20,20,Math.PI*.12,Math.PI*.88,0,Math.PI*.38),dark);
-    bang.scale.set(fs[0]*1.08,fs[1]*1.08,fs[2]*1.08);bang.position.set(0,2.58,fs[2]*.38);charGroup.add(bang);
-    // 头顶小呆毛
-    const ahoge=new THREE.Mesh(new THREE.SphereGeometry(.12,8,8),dark);
-    ahoge.position.set(.15,3.05,-.1);ahoge.scale.set(.6,1.4,.6);ahoge.rotation.z=.3;charGroup.add(ahoge);
-  } else if(petCfg.hair===1){
-    const h=new THREE.Mesh(new THREE.SphereGeometry(1.62,28,28,0,Math.PI*2,0,Math.PI*0.53),dark);
-    h.scale.set(fs[0]*1.1,fs[1]*1.1,fs[2]*1.1);h.position.y=2.35;charGroup.add(h);
-    const part=new THREE.Mesh(new THREE.BoxGeometry(.04,1.2,1.1),new THREE.MeshStandardMaterial({color:0x0A0A0A}));
-    part.position.y=2.68;part.position.z=fs[2]*.5;charGroup.add(part);
-  } else if(petCfg.hair===2){
-    const h=new THREE.Mesh(new THREE.SphereGeometry(1.58,24,24,0,Math.PI*2,0,Math.PI*0.42),dark);
-    h.scale.set(fs[0]*1.1,fs[1]*1.08,fs[2]*1.1);h.position.y=2.38;charGroup.add(h);
-  } else {
-    const sideG=new THREE.TorusGeometry(1.54,.15,10,28,Math.PI*1.15);
-    const sideRing=new THREE.Mesh(sideG,dark);
-    sideRing.position.y=2.65;sideRing.rotation.x=Math.PI/2;
-    sideRing.scale.set(fs[0]*1.1,1,fs[2]*1.08);
-    sideRing.rotation.z=Math.PI;charGroup.add(sideRing);
-    const backH=new THREE.Mesh(new THREE.SphereGeometry(1.42,18,18,Math.PI*0.35,Math.PI*0.75,0,Math.PI*0.44),dark);
-    backH.scale.set(fs[0]*1.08,fs[1]*1.12,fs[2]*1.1);backH.position.y=2.52;backH.position.z=-.25;charGroup.add(backH);
-  }
-
-  // ===== 眼镜（大Q圆框 + 镜片反光）=====
-  if(petCfg.glasses>0){
-    if(petCfg.glasses===1){
-      const lg=new THREE.TorusGeometry(.46,.065,10,28);
-      const l1=new THREE.Mesh(lg,frameM);l1.position.set(-eyeOff*1.1,eyeY,eyeZ+.04);
-      const l2=l1.clone();l2.position.x=eyeOff*1.1;charGroup.add(l1,l2);
-      const lensM=new THREE.MeshStandardMaterial({color:0x99BBDD,transparent:true,opacity:.15,metalness:.15,roughness:.1});
-      const lens1=new THREE.Mesh(new THREE.CircleGeometry(.4,24),lensM);lens1.position.set(-eyeOff*1.1,eyeY,eyeZ+.04);charGroup.add(lens1);
-      const lens2=lens1.clone();lens2.position.x=eyeOff*1.1;charGroup.add(lens2);
-      const refM=new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.6});
-      const ref1=new THREE.Mesh(new THREE.SphereGeometry(.08,8,8),refM);ref1.scale.set(1,.5,.3);ref1.position.set(-eyeOff*1.26,eyeY+.14,eyeZ+.06);charGroup.add(ref1);
-      const ref2=ref1.clone();ref2.position.x=eyeOff*.95;charGroup.add(ref2);
-    } else {
-      const mk=(x)=>{const g=new THREE.Group();const s=.48,t=.06;
-        const a=new THREE.Mesh(new THREE.BoxGeometry(s*2,t,t),frameM);a.position.y=s;
-        const b=a.clone();b.position.y=-s;
-        const c=new THREE.Mesh(new THREE.BoxGeometry(t,s*2,t),frameM);c.position.x=-s;
-        const d=c.clone();d.position.x=s;
-        g.add(a,b,c,d);g.position.set(x,eyeY,eyeZ+.04);return g};
-      charGroup.add(mk(-eyeOff*1.1),mk(eyeOff*1.1));
-      const lensM=new THREE.MeshStandardMaterial({color:0xAACCFF,transparent:true,opacity:.12,metalness:.15,roughness:.1});
-      const mkLens=(x)=>{const s=.41;const g=new THREE.Mesh(new THREE.BoxGeometry(s*2,s*2,.01),lensM);g.position.set(x,eyeY,eyeZ+.04);return g;};
-      charGroup.add(mkLens(-eyeOff*1.1),mkLens(eyeOff*1.1));
-    }
-    const bridge=new THREE.Mesh(new THREE.BoxGeometry(eyeOff*.88,.055,.055),frameM);
-    bridge.position.set(0,eyeY,eyeZ+.04);charGroup.add(bridge);
-  }
-
-  // ===== 胡子（Q版可选）=====
-  if(petCfg.beard===1){
-    const m1=new THREE.Mesh(new THREE.TorusGeometry(.12,.04,8,12,Math.PI*.5),dark);
-    m1.position.set(-.08,mouthY-.04,eyeZ);m1.rotation.set(0,0,-.8);
-    const m2=m1.clone();m2.position.x=.08;m2.rotation.set(0,0,.8);
-    charGroup.add(m1,m2);
-  } else if(petCfg.beard===2){
-    const bg=new THREE.SphereGeometry(.62,20,18,0,Math.PI*2,Math.PI*0.55,Math.PI*0.4);
-    const beard=new THREE.Mesh(bg,dark);beard.scale.set(fs[0],fs[1]*.95,fs[2]);beard.position.y=mouthY-.25;charGroup.add(beard);
-  }
-
-  // Q版整体缩放到全息卡适配
-  charGroup.scale.setScalar(0.88);
-}
+function buildChar(){buildCharacter(charGroup,petCfg)}
 
 // 控制器：禁用缩放，慢速自转，限制俯仰
 const petControls=new OrbitControls(petCam,petCanvas);
@@ -1752,6 +1485,7 @@ function petAnimate(){
   petRenderer.render(petScene,petCam);
 }
 petResize();buildChar();petAnimate();
+petCanvas.closest('.figure-stage').classList.add('three-ready');
 new ResizeObserver(petResize).observe(petCanvas);
 
 // 暴露交互接口
